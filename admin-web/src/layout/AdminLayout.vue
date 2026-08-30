@@ -3,36 +3,39 @@
     <!-- 侧边栏 -->
     <aside class="side">
       <div class="brand">
-        <div class="logo">🍊</div>
-        <div>
+        <div class="mark">鲜</div>
+        <div class="bt">
           <div class="t1">鲜果集</div>
           <div class="t2">商家管理后台</div>
         </div>
       </div>
       <el-menu :default-active="$route.path" router class="menu"
-               background-color="transparent" text-color="#a7c4b2" active-text-color="#ffffff">
+               background-color="transparent" text-color="#9aa8b8" active-text-color="#ffffff">
         <el-menu-item index="/dashboard">
           <el-icon><Odometer /></el-icon><span>数据看板</span>
         </el-menu-item>
+        <el-menu-item index="/revenue">
+          <el-icon><TrendCharts /></el-icon><span>营业统计</span>
+        </el-menu-item>
         <el-menu-item index="/products">
-          <el-icon><Apple /></el-icon><span>商品管理</span>
+          <el-icon><Goods /></el-icon><span>商品管理</span>
         </el-menu-item>
         <el-menu-item index="/orders">
           <el-icon><List /></el-icon><span>订单管理</span>
         </el-menu-item>
       </el-menu>
-      <div class="side-foot">M1 基础交易闭环 · v0.1</div>
+      <div class="side-foot">v0.1.0</div>
     </aside>
 
     <el-container class="body">
       <!-- 顶栏（必须用 el-header，el-container 才会按纵向排布） -->
-      <el-header class="head" height="60px">
-        <div class="crumb"><span class="dot"></span>{{ $route.meta.title }}</div>
+      <el-header class="head" height="56px">
+        <div class="crumb">{{ $route.meta.title }}</div>
         <el-dropdown trigger="click" @command="onCommand">
           <div class="user">
             <div class="avatar">{{ (adminStore.name || '管')[0] }}</div>
             <span class="uname">{{ adminStore.name || '管理员' }}</span>
-            <el-icon color="#909399"><ArrowDown /></el-icon>
+            <el-icon color="#8a939f"><ArrowDown /></el-icon>
           </div>
           <template #dropdown>
             <el-dropdown-menu>
@@ -67,49 +70,44 @@ function onCommand(cmd) {
 <style scoped>
 .shell { min-height: 100vh; }
 
-/* ===== 侧边栏 ===== */
+/* ===== 侧边栏：深蓝灰平面风格 ===== */
 .side {
-  width: 224px; flex: none; display: flex; flex-direction: column;
-  background: linear-gradient(185deg, #0e3d1f 0%, #124624 55%, #0c331a 100%);
+  width: 216px; flex: none; display: flex; flex-direction: column;
+  background: #1d2733;
   position: sticky; top: 0; height: 100vh;
 }
-.brand { display: flex; align-items: center; gap: 12px; padding: 22px 20px 18px; }
-.logo {
-  width: 42px; height: 42px; border-radius: 12px; font-size: 24px;
-  background: rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: center;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
-}
-.t1 { color: #fff; font-size: 18px; font-weight: 800; letter-spacing: 2px; }
-.t2 { color: #7fa98c; font-size: 11.5px; letter-spacing: 3px; margin-top: 2px; }
-
-.menu { border: none; flex: 1; padding: 8px 12px; }
-.menu :deep(.el-menu-item) {
-  height: 46px; margin: 5px 0; border-radius: 10px; font-size: 14.5px;
-  transition: all 0.18s;
-}
-.menu :deep(.el-menu-item:hover) { background: rgba(255, 255, 255, 0.08); }
-.menu :deep(.el-menu-item.is-active) {
-  background: linear-gradient(100deg, #2e9e5b, #238548);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); font-weight: 600;
-}
-.side-foot { color: #5c8065; font-size: 11px; text-align: center; padding: 16px; letter-spacing: 1px; }
-
-/* ===== 顶栏 ===== */
-.body { background: #f3f6f2; }
-.head {
-  height: 60px; background: #fff; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 22px; box-shadow: 0 1px 6px rgba(30, 41, 59, 0.06); position: sticky; top: 0; z-index: 10;
-}
-.crumb { font-size: 16.5px; font-weight: 700; display: flex; align-items: center; gap: 9px; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: #2e9e5b; }
-.user { display: flex; align-items: center; gap: 10px; cursor: pointer; outline: none; }
-.avatar {
-  width: 34px; height: 34px; border-radius: 50%; color: #fff; font-size: 15px; font-weight: 700;
-  background: linear-gradient(135deg, #2e9e5b, #14532d);
+.brand { display: flex; align-items: center; gap: 11px; padding: 18px 18px 16px; }
+.mark {
+  width: 36px; height: 36px; border-radius: 8px; flex: none;
+  background: #4080ff; color: #fff; font-size: 17px; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
 }
-.uname { font-size: 14px; color: #374151; }
+.bt .t1 { color: #fff; font-size: 16px; font-weight: 600; letter-spacing: 1px; }
+.bt .t2 { color: #7d8b9c; font-size: 11px; letter-spacing: 1px; margin-top: 1px; }
+
+.menu { border: none; flex: 1; padding: 6px 10px; }
+.menu :deep(.el-menu-item) {
+  height: 42px; margin: 3px 0; border-radius: 6px; font-size: 14px;
+  transition: background 0.15s;
+}
+.menu :deep(.el-menu-item:hover) { background: rgba(255, 255, 255, 0.06); }
+.menu :deep(.el-menu-item.is-active) { background: #4080ff; font-weight: 500; }
+.side-foot { color: #55636f; font-size: 11px; text-align: center; padding: 14px; }
+
+/* ===== 顶栏 ===== */
+.body { background: #f0f2f5; }
+.head {
+  background: #fff; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; border-bottom: 1px solid #e8ebee; position: sticky; top: 0; z-index: 10;
+}
+.crumb { font-size: 15px; font-weight: 600; color: #1f2937; }
+.user { display: flex; align-items: center; gap: 9px; cursor: pointer; outline: none; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%; color: #fff; font-size: 13px; font-weight: 600;
+  background: #4080ff; display: flex; align-items: center; justify-content: center;
+}
+.uname { font-size: 13.5px; color: #374151; }
 
 /* ===== 主区 ===== */
-.main { padding: 18px 20px 30px; }
+.main { padding: 16px 18px 28px; }
 </style>

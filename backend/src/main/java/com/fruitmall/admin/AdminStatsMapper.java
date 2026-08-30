@@ -33,13 +33,33 @@ public interface AdminStatsMapper {
             + "GROUP BY day ORDER BY MIN(paid_at)")
     List<Map<String, Object>> salesTrend();
 
-    /** 在售商品按一级分类的销量占比 */
-    @Select("SELECT c.name AS name, IFNULL(SUM(p.sales), 0) AS value FROM product p "
-            + "JOIN category c ON p.category_id = c.id WHERE p.status = 1 "
-            + "GROUP BY c.id, c.name ORDER BY value DESC")
-    List<Map<String, Object>> categorySales();
-
     /** 各状态订单数量分布 */
     @Select("SELECT status AS status, COUNT(*) AS count FROM `order` GROUP BY status")
     List<Map<String, Object>> statusDistribution();
+
+    /** 已支付订单按一级分类的营业额（分）与订单数 */
+    @Select("SELECT c.name AS name, IFNULL(SUM(oi.subtotal), 0) AS gmv, COUNT(DISTINCT o.id) AS orders "
+            + "FROM order_item oi "
+            + "JOIN product p ON oi.product_id = p.id "
+            + "JOIN category c ON p.category_id = c.id "
+            + "JOIN `order` o ON oi.order_id = o.id "
+            + "WHERE o.status IN (20, 30, 40) "
+            + "GROUP BY c.id, c.name ORDER BY gmv DESC")
+    List<Map<String, Object>> categoryGmv();
+
+    /** 营业额日明细（含起止日期，闭区间） */
+    @Select("SELECT DATE_FORMAT(paid_at, '%Y-%m-%d') AS day, COUNT(*) AS orders, "
+            + "IFNULL(SUM(pay_amount), 0) AS gmv "
+            + "FROM `order` WHERE status IN (20, 30, 40) "
+            + "AND paid_at >= #{from} AND paid_at < DATE_ADD(#{to}, INTERVAL 1 DAY) "
+            + "GROUP BY day ORDER BY day")
+    List<Map<String, Object>> revenueDaily(@org.apache.ibatis.annotations.Param("from") String from,
+                                           @org.apache.ibatis.annotations.Param("to") String to);
+
+    /** 营业额区间汇总 */
+    @Select("SELECT COUNT(*) AS orders, IFNULL(SUM(pay_amount), 0) AS gmv "
+            + "FROM `order` WHERE status IN (20, 30, 40) "
+            + "AND paid_at >= #{from} AND paid_at < DATE_ADD(#{to}, INTERVAL 1 DAY)")
+    Map<String, Object> revenueTotal(@org.apache.ibatis.annotations.Param("from") String from,
+                                     @org.apache.ibatis.annotations.Param("to") String to);
 }

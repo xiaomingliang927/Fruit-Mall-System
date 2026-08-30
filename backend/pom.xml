@@ -52,6 +52,13 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Excel 导出（阿里 EasyExcel，企业级报表常用） -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>easyexcel</artifactId>
+      <version>4.0.3</version>
+    </dependency>
+
     <!-- 数据库版本化迁移：应用启动自动执行 db/migration 下的脚本 -->
     <dependency>
       <groupId>org.flywaydb</groupId>

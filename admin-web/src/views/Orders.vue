@@ -8,6 +8,10 @@
         </el-radio-group>
         <el-input v-model="keyword" placeholder="订单号搜索" style="width:210px" clearable @keyup.enter="load" />
         <el-button type="primary" @click="load">查询</el-button>
+        <div style="flex:1"></div>
+        <el-button :loading="exporting" @click="exportExcel">
+          <el-icon style="margin-right:5px"><Download /></el-icon>导出 Excel
+        </el-button>
       </div>
     </el-card>
 
@@ -89,7 +93,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { api, fmtTime, yuan } from '../api'
+import { api, exportFile, fmtTime, yuan } from '../api'
 
 const statusTabs = [
   { label: '待支付', value: 10 },
@@ -108,6 +112,22 @@ const loading = ref(false)
 
 const drawer = reactive({ visible: false, data: null })
 const ship = reactive({ visible: false, orderId: null, orderNo: '', trackingNo: '', saving: false })
+const exporting = ref(false)
+
+async function exportExcel() {
+  exporting.value = true
+  try {
+    const qs = new URLSearchParams()
+    if (status.value) qs.append('status', status.value)
+    if (keyword.value) qs.append('keyword', keyword.value)
+    await exportFile(`/api/admin/orders/export?${qs}`, `订单列表_${new Date().toISOString().slice(0, 10)}.xlsx`)
+    ElMessage.success('已导出')
+  } catch (e) {
+    ElMessage.error(e.message || '导出失败')
+  } finally {
+    exporting.value = false
+  }
+}
 
 const addrText = computed(() => {
   try {

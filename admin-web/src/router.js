@@ -13,6 +13,7 @@ const routes = [
     redirect: '/dashboard',
     children: [
       { path: 'dashboard', name: 'dashboard', component: () => import('./views/Dashboard.vue'), meta: { title: '数据看板' } },
+      { path: 'revenue', name: 'revenue', component: () => import('./views/Revenue.vue'), meta: { title: '营业统计' } },
       { path: 'products', name: 'products', component: () => import('./views/Products.vue'), meta: { title: '商品管理' } },
       { path: 'orders', name: 'orders', component: () => import('./views/Orders.vue'), meta: { title: '订单管理' } },
     ],

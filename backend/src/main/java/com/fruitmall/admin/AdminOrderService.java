@@ -71,6 +71,22 @@ public class AdminOrderService {
                 o.getCreatedAt(), o.getPaidAt());
     }
 
+    /** 导出用：不分页拉取订单（与列表同筛选条件，上限 5000 条防内存滥用） */
+    public List<OrderVO> listForExport(Integer status, String keyword) {
+        List<Order> orders = orderMapper.selectList(new LambdaQueryWrapper<Order>()
+                .eq(status != null, Order::getStatus, status)
+                .like(StringUtils.hasText(keyword), Order::getOrderNo, keyword)
+                .orderByDesc(Order::getId)
+                .last("LIMIT 5000"));
+        if (orders.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, User> userMap = userMapper.selectBatchIds(
+                        orders.stream().map(Order::getUserId).distinct().toList()).stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+        return orders.stream().map(o -> toVO(o, userMap)).toList();
+    }
+
     public OrderDetailVO detail(Long id) {
         Order order = orderMapper.selectById(id);
         if (order == null) {

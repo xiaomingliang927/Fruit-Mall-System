@@ -30,6 +30,29 @@ export function toFen(y) {
   return Math.round(Number(y) * 100)
 }
 
+/** 下载文件（Excel 导出等）：带 token 请求 → blob 触发浏览器保存 */
+export async function exportFile(url, filename) {
+  const headers = {}
+  if (adminStore.token) headers.Authorization = `Bearer ${adminStore.token}`
+  const res = await fetch(url, { headers })
+  if (!res.ok) {
+    let message = '导出失败'
+    try {
+      const body = await res.json()
+      message = body.message || message
+    } catch { /* 非 JSON 响应 */ }
+    throw new Error(message)
+  }
+  const blob = await res.blob()
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(link.href)
+}
+
 export function fmtTime(iso) {
   return iso ? iso.replace('T', ' ').slice(0, 16) : '-'
 }
