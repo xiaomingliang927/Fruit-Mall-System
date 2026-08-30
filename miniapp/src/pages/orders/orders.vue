@@ -35,7 +35,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onLoad } from '@dcloudio/uni-app'
 import { api, fmtTime, yuan } from '../../api'
 
 const tabs = [
@@ -44,6 +44,12 @@ const tabs = [
 ]
 const status = ref(null)
 const orders = ref([])
+
+onLoad((opt) => {
+  if (opt && opt.status) {
+    status.value = Number(opt.status)
+  }
+})
 
 async function load() {
   const qs = new URLSearchParams({ page: 1, size: 20 })

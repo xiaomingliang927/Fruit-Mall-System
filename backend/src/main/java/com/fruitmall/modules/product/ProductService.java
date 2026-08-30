@@ -21,7 +21,7 @@ public class ProductService {
     private final ProductSkuMapper skuMapper;
 
     /** 最低价 SKU 价格，用于列表展示「xx元起」 */
-    public record ProductListVO(Long id, String name, String subtitle, String mainImage,
+    public record ProductListVO(Long id, Long categoryId, String name, String subtitle, String mainImage,
                                 String origin, String tags, Integer sales, Integer minPrice) {
     }
 
@@ -55,7 +55,7 @@ public class ProductService {
                 .orderByDesc(Product::getSales);
         Page<Product> result = productMapper.selectPage(new Page<>(page, size), wrapper);
         return PageResult.of(result, p -> new ProductListVO(
-                p.getId(), p.getName(), p.getSubtitle(), p.getMainImage(),
+                p.getId(), p.getCategoryId(), p.getName(), p.getSubtitle(), p.getMainImage(),
                 p.getOrigin(), p.getTags(), p.getSales(), minPrice(p.getId())));
     }
 
