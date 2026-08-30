@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+    <stop offset="0%" stop-color="#fff1f2"/><stop offset="100%" stop-color="#ffd9dd"/>
+  </radialGradient>
+  <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="10"/>
+  </filter>
+</defs>
+<rect width="800" height="600" fill="url(#bg)"/>
+<circle cx="672" cy="96" r="82" fill="#ffffff" opacity="0.35"/>
+<circle cx="96" cy="500" r="120" fill="#ffffff" opacity="0.28"/>
+<circle cx="716" cy="452" r="42" fill="#ffffff" opacity="0.3"/>
+<ellipse cx="400" cy="472" rx="152" ry="26" fill="#3d5c47" opacity="0.16" filter="url(#soft)"/>
+
+<defs>
+  <radialGradient id="sbody" cx="38%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#ff7d6e"/><stop offset="55%" stop-color="#e53935"/><stop offset="100%" stop-color="#b71c1c"/>
+  </radialGradient>
+</defs>
+<path d="M400 210 C480 210 528 268 516 344 C505 420 452 474 400 488 C348 474 295 420 284 344 C272 268 320 210 400 210 Z" fill="url(#sbody)"/>
+<g fill="#ffe082" opacity="0.95">
+  <ellipse cx="352" cy="286" rx="7" ry="10"/><ellipse cx="448" cy="286" rx="7" ry="10"/>
+  <ellipse cx="400" cy="322" rx="7" ry="10"/><ellipse cx="316" cy="330" rx="7" ry="10"/><ellipse cx="484" cy="330" rx="7" ry="10"/>
+  <ellipse cx="368" cy="376" rx="7" ry="10"/><ellipse cx="432" cy="376" rx="7" ry="10"/>
+  <ellipse cx="400" cy="430" rx="7" ry="10"/><ellipse cx="344" cy="424" rx="7" ry="10"/><ellipse cx="456" cy="424" rx="7" ry="10"/>
+</g>
+<path d="M400 150 q-10 40 0 62" stroke="#7a4b2a" stroke-width="12" fill="none" stroke-linecap="round"/>
+<g fill="#2e7d32">
+  <path d="M400 232 C360 216 316 222 288 244 C322 254 366 252 400 240 Z"/>
+  <path d="M400 232 C440 216 484 222 512 244 C478 254 434 252 400 240 Z"/>
+  <path d="M400 236 C382 214 352 200 322 200 C342 222 372 236 400 242 Z"/>
+  <path d="M400 236 C418 214 448 200 478 200 C458 222 428 236 400 242 Z"/>
+  <path d="M400 210 C392 232 392 246 400 258 C408 246 408 232 400 210 Z" fill="#43a047"/>
+</g>
+<ellipse cx="348" cy="300" rx="30" ry="16" fill="#ffffff" opacity="0.3" transform="rotate(-34 348 300)"/>
+<text x="400" y="556" font-size="42" fill="#1b4d2e" text-anchor="middle"
+  font-family="PingFang SC, Microsoft YaHei, sans-serif" font-weight="bold">丹东红颜草莓</text>
+</svg>

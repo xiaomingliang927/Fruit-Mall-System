@@ -1,0 +1,31 @@
+# ===== Java / Spring Boot =====
+backend/target/
+*.class
+*.log
+hs_err_pid*
+
+# ===== Node =====
+node_modules/
+web/dist/
+admin-web/dist/
+miniapp/dist/
+
+# ===== 本地环境（密钥不入库） =====
+.env
+application-local.yml
+
+# ===== 本项目自带工具链（体积大，README 有获取方式） =====
+tools/
+
+# ===== IDE / 系统文件 =====
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# ===== 会话产物 =====
+.zcode/
+
+# 架构图 PNG 导出稿不入库（以 HTML 版为准）
+架构图/*.png

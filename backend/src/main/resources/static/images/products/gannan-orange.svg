@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+    <stop offset="0%" stop-color="#fff7e8"/><stop offset="100%" stop-color="#ffe6bd"/>
+  </radialGradient>
+  <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="10"/>
+  </filter>
+</defs>
+<rect width="800" height="600" fill="url(#bg)"/>
+<circle cx="672" cy="96" r="82" fill="#ffffff" opacity="0.35"/>
+<circle cx="96" cy="500" r="120" fill="#ffffff" opacity="0.28"/>
+<circle cx="716" cy="452" r="42" fill="#ffffff" opacity="0.3"/>
+<ellipse cx="400" cy="472" rx="152" ry="26" fill="#3d5c47" opacity="0.16" filter="url(#soft)"/>
+
+<defs>
+  <radialGradient id="obody" cx="36%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#ffb74d"/><stop offset="55%" stop-color="#fb8c00"/><stop offset="100%" stop-color="#e65100"/>
+  </radialGradient>
+  <linearGradient id="oleaf" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#2e7d32"/>
+  </linearGradient>
+</defs>
+<ellipse cx="352" cy="352" rx="126" ry="122" fill="url(#obody)"/>
+<ellipse cx="452" cy="352" rx="126" ry="122" fill="url(#obody)" opacity="0.96"/>
+<g fill="#8d3b00" opacity="0.22">
+  <circle cx="380" cy="330" r="4"/><circle cx="430" cy="300" r="4"/><circle cx="480" cy="330" r="4"/>
+  <circle cx="350" cy="390" r="4"/><circle cx="405" cy="415" r="4"/><circle cx="470" cy="398" r="4"/>
+  <circle cx="520" cy="370" r="4"/><circle cx="508" cy="290" r="4"/><circle cx="410" cy="270" r="4"/>
+</g>
+<circle cx="400" cy="242" r="13" fill="#8d6e63"/>
+<ellipse cx="446" cy="212" rx="54" ry="26" fill="url(#oleaf)" transform="rotate(-18 446 212)"/>
+<ellipse cx="372" cy="218" rx="44" ry="21" fill="#43a047" opacity="0.9" transform="rotate(10 372 218)"/>
+<ellipse cx="330" cy="300" rx="40" ry="22" fill="#ffffff" opacity="0.35" transform="rotate(-30 330 300)"/>
+<text x="400" y="556" font-size="42" fill="#1b4d2e" text-anchor="middle"
+  font-family="PingFang SC, Microsoft YaHei, sans-serif" font-weight="bold">赣南脐橙</text>
+</svg>

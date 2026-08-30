@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: fruit-mall-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/fruit_mall?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: "123456"      # TODO: 改成本机 MySQL 密码，生产环境用环境变量注入
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    default-property-inclusion: non_null
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    banner: false
+
+app:
+  jwt:
+    # HS256 签名密钥，生产环境务必更换并通过环境变量 FRUIT_JWT_SECRET 注入
+    secret: fruit-mall-dev-jwt-secret-change-me-please-0123456789abcdef
+    expire-hours: 168
+  wechat:
+    # 小程序 AppID/Secret；两者都配置后走真实 code2Session，留空则进入开发模式（openid = dev-<code>）
+    appid: ""
+    secret: ""
