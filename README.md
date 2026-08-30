@@ -12,8 +12,10 @@
 - [x] **管理后台**（Vue3 + Element Plus + ECharts）：数据看板（销售趋势/分类占比/状态分布图表）· 商品管理（增改·上下架·SKU 库存）· 订单管理（发货·取消·详情）
 - [x] 数据库脚本 + 7 款水果种子数据 + 矢量插画商品图
 - [x] **微信小程序**（uni-app + Vue3）：首页/详情/购物车/结算/订单/微信登录，已通过 mp-weixin 构建
+- [x] **第一阶段工程地基**：Git 分支模型与规范提交 · 配置外部化（密钥走环境变量）· Flyway 版本化迁移 · 核心链路集成测试（6 个全绿）· Docker 化 · GitHub Actions CI
 - [ ] 真实微信支付 + 订阅消息 + 手机号绑定 + 超时自动关单（Redis 延迟队列）
 - [ ] M2：优惠券、评价、售后退款（坏果包赔）、物流跟踪
+- [ ] 第二阶段（企业级）：微信支付真实接入与对账 · Redis 缓存/延迟队列 · Spring Security + RBAC · 日志监控告警 · 压测
 
 ## 目录结构
 
@@ -21,6 +23,7 @@
 fruit/
 ├── backend/                     # 后端（Spring Boot 3，模块化单体，端口 8080）
 │   ├── pom.xml
+│   ├── Dockerfile               # 后端镜像（多阶段构建）
 │   ├── settings-aliyun.xml      # 国内 Maven 镜像（构建时 -s 指定）
 │   └── src/main/
 │       ├── java/com/fruitmall/
@@ -30,19 +33,26 @@ fruit/
 │       │   ├── config/          # MyBatis-Plus / 双拦截器注册
 │       │   └── modules/
 │       │       ├── auth/ user/ product/ cart/ order/ pay/   # C 端业务模块
-│       └── resources/
-│           ├── application.yml  # 端口/数据库/JWT 配置
-│           └── static/images/products/   # 7 张 SVG 商品占位图（生产换 OSS+CDN）
+│       ├── resources/
+│       │   ├── application.yml  # 配置（密钥走环境变量）
+│       │   ├── application-prod.yml  # 生产 profile（无默认值，fail fast）
+│       │   ├── db/migration/    # Flyway 版本化迁移（V1 建表 / V2 种子）
+│       │   └── static/images/products/   # 7 张矢量插画商品图（生产换 OSS+CDN）
+│       └── src/test/            # 核心链路集成测试（H2 + Flyway）
+├── docker-compose.yml           # MySQL + 后端一键编排
+├── .github/workflows/ci.yml     # CI：后端测试 + 三端构建
+├── docs/
+│   ├── 水果商城系统设计文档.md
+│   ├── 工程规范.md              # 分支模型 / 提交规范 / 质量门禁
+│   └── sql/demo-data.sql        # 近 7 日演示订单（仪表板图表展示用，可选）
 ├── web/                         # 用户端网站（Vue3 + Vite，端口 5173）
 │   └── src/{views,components}   # 首页/登录/详情/购物车/结算/订单 + 导航
 ├── admin-web/                   # 管理后台（Vue3 + Element Plus + ECharts，端口 5174）
 │   └── src/{views,layout}       # 登录/看板(趋势·占比·状态图表)/商品管理/订单管理
 ├── miniapp/                     # 微信小程序（uni-app + Vue3）
 │   └── src/pages/{index,detail,cart,checkout,orders,login}
-├── docs/
-│   ├── 水果商城系统设计文档.md
-│   ├── sql/init.sql             # 建库建表 + 种子数据（含 admin_user）
-│   └── sql/demo-data.sql        # 近 7 日演示订单（仪表板图表展示用，可选）
+├── 架构图/fruit-mall-architecture.html
+└── tools/apache-maven-3.9.9/    # 项目自带 Maven（系统未装 mvn 时使用；不入库）
 ├── 架构图/fruit-mall-architecture.html
 └── tools/apache-maven-3.9.9/    # 项目自带 Maven（系统未装 mvn 时使用）
 ```
@@ -60,15 +70,26 @@ fruit/
 
 ### 1. 初始化数据库
 
+无需手动建库建表——后端启动时 **Flyway 自动执行迁移**（`backend/src/main/resources/db/migration/`）：
+- 全新数据库：自动建库（JDBC `createDatabaseIfNotExist`）+ 建表（V1）+ 种子数据（V2）；
+- 已有表结构的老库：自动打基线（`baseline-version=2`）跳过历史脚本，数据不受影响；
+- 后续表结构变更一律新增迁移脚本 `V3__xxx.sql`，禁止修改已发布的迁移。
+
+可选：导入近 7 日演示订单，让仪表板图表有数据可看：
+
 ```bash
-mysql -u root -p --default-character-set=utf8mb4 < docs/sql/init.sql
-# 可选：导入近 7 日演示订单，让仪表板趋势图/状态分布有数据可看
 mysql -u root -p --default-character-set=utf8mb4 < docs/sql/demo-data.sql
 ```
 
 ### 2. 配置并启动后端（端口 8080）
 
-编辑 `backend/src/main/resources/application.yml` 中的数据库密码，然后：
+敏感配置全部走环境变量（本地开发有默认值，生产用 `--spring.profiles.active=prod`，缺失即启动失败）：
+
+| 环境变量 | 说明 | 默认（仅开发） |
+|---------|------|--------------|
+| `FRUIT_DB_HOST/PORT/NAME/USER/PASSWORD` | 数据库连接 | localhost/3306/fruit_mall/root/123456 |
+| `FRUIT_JWT_SECRET` | JWT 签名密钥（≥32 字符） | dev 占位值 |
+| `FRUIT_WX_APPID/FRUIT_WX_SECRET` | 微信小程序 | 空（开发模式登录） |
 
 ```bash
 cd backend
@@ -76,6 +97,22 @@ cd backend
 ```
 
 首次启动自动创建默认管理员 **admin / admin123**（SHA-256 加盐存储）。
+
+### 2.1 运行测试（核心链路集成测试）
+
+```bash
+cd backend
+../tools/apache-maven-3.9.9/bin/mvn -s settings-aliyun.xml test
+```
+
+H2 内存库 + Flyway 自动建库，无需本地 MySQL，覆盖：下单锁库存、支付回调幂等、取消回补库存、防超卖回滚、短信注册、微信登录幂等。
+
+### 2.2 Docker 一键启动（需安装 Docker）
+
+```bash
+cp .env.example .env   # 按需修改密钥
+docker compose up -d --build
+```
 
 ### 3. 启动用户网站（端口 5173）
 
