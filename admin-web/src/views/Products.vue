@@ -119,7 +119,7 @@ const loading = ref(false)
 const presetImages = [
   'aksu-apple', 'gannan-orange', 'dandong-strawberry', 'yunnan-blueberry',
   'chile-cherry', 'thai-durian', 'gift-box',
-].map((n) => ({ label: n, value: `/images/products/${n}.svg` }))
+].map((n) => ({ label: n, value: `/images/products/${n}.jpg` }))
 
 const dialog = reactive({ visible: false, isEdit: false, saving: false, editId: null })
 const form = reactive({
