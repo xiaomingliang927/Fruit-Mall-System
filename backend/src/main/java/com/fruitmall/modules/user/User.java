@@ -28,6 +28,9 @@ public class User {
     /** 会员等级 */
     private Integer level;
 
+    /** 会员卡有效期，NULL = 未开通限期会员 */
+    private java.time.LocalDateTime memberExpireAt;
+
     /** 1 正常 0 禁用 */
     private Integer status;
 
