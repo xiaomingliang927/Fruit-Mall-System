@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  backend-test:
+    name: 后端测试（Flyway + H2 集成测试）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Run tests
+        run: mvn -s backend/settings-aliyun.xml -B -f backend/pom.xml test
+
+  frontend-build:
+    name: 前端构建（${{ matrix.dir }}）
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: [web, admin-web, miniapp]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: ${{ matrix.dir }}/package-lock.json
+      - name: Install & build
+        working-directory: ${{ matrix.dir }}
+        run: |
+          npm install --no-audit --no-fund
+          npm run build${{ matrix.dir == 'miniapp' && ':mp-weixin' || '' }}
