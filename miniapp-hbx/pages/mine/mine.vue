@@ -2,16 +2,23 @@
 	<view class="page">
 		<!-- 顶部用户区 -->
 		<view class="mine-header">
-			<view class="mine-user">
-				<view class="mine-avatar"><text class="avatar-icon">👤</text></view>
+			<view class="mine-user" @click="me.nickname ? showToast('个人资料') : goLogin()">
+				<view class="mine-avatar">
+					<text v-if="me.nickname" class="avatar-text">{{ me.nickname[0] }}</text>
+					<image v-else src="/static/icon/svg/person.svg" mode="aspectFit" class="avatar-icon"></image>
+				</view>
 				<view class="mine-info">
-					<text class="mine-name">果友_小满</text>
-					<view class="mine-level"><text class="level-tag">普通会员</text></view>
+					<text class="mine-name">{{ me.nickname || '点击登录' }}</text>
+					<view class="mine-level"><text class="level-tag">{{ levelText(me.level) }}</text></view>
 				</view>
 			</view>
 			<view class="mine-actions">
-				<view class="action-btn" @click="showToast('消息')"><text>💬</text></view>
-				<view class="action-btn" @click="showToast('设置')"><text>⚙️</text></view>
+				<view class="action-btn" @click="showToast('消息')">
+					<image src="/static/icon/svg/chat.svg" mode="aspectFit" class="action-img"></image>
+				</view>
+				<view class="action-btn" @click="showToast('设置')">
+					<image src="/static/icon/svg/settings.svg" mode="aspectFit" class="action-img"></image>
+				</view>
 			</view>
 		</view>
 
@@ -19,14 +26,11 @@
 		<view class="mine-card">
 			<view class="card-hd">
 				<text class="card-title">我的订单</text>
-				<text class="card-more" @click="showToast('全部订单')">查看全部 ›</text>
+				<text class="card-more" @click="goOrders(null)">查看全部 ›</text>
 			</view>
 			<view class="order-row">
-				<view class="order-it" v-for="o in orders" :key="o.lb" @click="showToast(o.lb)">
-					<view class="order-ic">
-						<text class="order-icon">{{ o.icon }}</text>
-						<text class="order-dot" v-if="o.dot">{{ o.dot }}</text>
-					</view>
+				<view class="order-it" v-for="o in orders" :key="o.lb" @click="goOrders(o.status)">
+					<view class="order-ic"><image :src="o.img" mode="aspectFit" class="order-img"></image></view>
 					<text class="order-lb">{{ o.lb }}</text>
 				</view>
 			</view>
@@ -38,8 +42,8 @@
 				<text class="card-title">常用工具</text>
 			</view>
 			<view class="tool-grid">
-				<view class="tool-it" v-for="t in tools" :key="t.lb" @click="showToast(t.lb)">
-					<view class="tool-ic"><text>{{ t.icon }}</text></view>
+				<view class="tool-it" v-for="t in tools" :key="t.lb" @click="t.tap ? t.tap() : showToast(t.lb)">
+					<view class="tool-ic"><image :src="t.img" mode="aspectFit" class="tool-img"></image></view>
 					<text class="tool-lb">{{ t.lb }}</text>
 				</view>
 			</view>
@@ -48,7 +52,7 @@
 		<!-- 会员入口 -->
 		<view class="mine-vip-entry" @click="showToast('开通会员')">
 			<view class="vip-entry-l">
-				<text class="vip-entry-icon">👑</text>
+				<image src="/static/icon/svg/crown.svg" mode="aspectFit" class="vip-icon"></image>
 				<text class="vip-entry-t">开通会员享专属优惠</text>
 			</view>
 			<text class="vip-entry-arrow">›</text>
@@ -59,37 +63,63 @@
 </template>
 
 <script>
+	import { api } from '../../api'
 	export default {
 		data() {
 			return {
+				me: {},
 				orders: [
-					{ icon: '💰', lb: '待付款', dot: '1' },
-					{ icon: '📦', lb: '待发货', dot: '2' },
-					{ icon: '🚚', lb: '待收货', dot: '' },
-					{ icon: '⭐', lb: '待评价', dot: '' },
-					{ icon: '🎧', lb: '退款/售后', dot: '' }
+					{ img: '/static/icon/svg/wallet.svg', lb: '待付款', status: 10 },
+					{ img: '/static/icon/svg/box.svg', lb: '待发货', status: 20 },
+					{ img: '/static/icon/svg/truck.svg', lb: '待收货', status: 30 },
+					{ img: '/static/icon/svg/star.svg', lb: '待评价', status: 40 },
+					{ img: '/static/icon/svg/headset.svg', lb: '退款/售后', status: null }
 				],
 				tools: [
-					{ icon: '❤️', lb: '我的收藏' },
-					{ icon: '👣', lb: '浏览足迹' },
-					{ icon: '📍', lb: '收货地址' },
-					{ icon: '🎫', lb: '优惠券' },
-					{ icon: '🎧', lb: '联系客服' },
-					{ icon: '❓', lb: '帮助中心' },
-					{ icon: '⚙️', lb: '设置' },
-					{ icon: 'ℹ️', lb: '关于我们' }
+					{ img: '/static/icon/svg/heart.svg', lb: '我的收藏' },
+					{ img: '/static/icon/svg/map-pin.svg', lb: '收货地址' },
+					{ img: '/static/icon/svg/ticket.svg', lb: '优惠券' },
+					{ img: '/static/icon/svg/gift.svg', lb: '邀请有礼' },
+					{ img: '/static/icon/svg/headset.svg', lb: '联系客服' },
+					{ img: '/static/icon/svg/help.svg', lb: '帮助中心' },
+					{ img: '/static/icon/svg/settings.svg', lb: '设置' },
+					{ img: '/static/icon/svg/person.svg', lb: '关于我们' }
 				]
 			}
 		},
 		onShow() {
-			if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-				this.getTabBar().selected = 4
-				this.getTabBar().refreshCartCount()
-			}
+			this.load()
 		},
 		methods: {
-			showToast(msg) {
+			async load() {
+				if (!uni.getStorageSync('token')) {
+					this.me = {}
+					return
+				}
+				try {
+					this.me = await api.get('/api/v1/users/me')
+				} catch (e) { /* 未登录 */ }
+			},
+			levelText(level) {
+				return { 1: '普通会员', 2: '白银会员', 3: '黄金会员', 4: '钻石会员' }[level] || '普通会员'
+			},
+			goLogin() {
+				uni.navigateTo({ url: '/pages/login/login' })
+			},
+			toast(msg) {
 				uni.showToast({ title: msg + '（原型占位）', icon: 'none' })
+			},
+			showToast(msg) {
+				uni.showToast({ title: msg, icon: 'none' })
+			},
+			goOrders(status) {
+				if (!this.me.nickname) return this.goLogin()
+				uni.navigateTo({ url: '/pages/orders/orders' + (status ? '?status=' + status : '') })
+			},
+			logout() {
+				uni.removeStorageSync('token')
+				this.me = {}
+				uni.showToast({ title: '已退出登录', icon: 'none' })
 			}
 		}
 	}
@@ -117,15 +147,21 @@
 		width: 112rpx;
 		height: 112rpx;
 		border-radius: 50%;
-		background: #fff;
+		background: #17704a;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
 		flex-shrink: 0;
 	}
+	.avatar-text {
+		font-size: 48rpx;
+		color: #fff;
+		font-weight: 700;
+	}
 	.avatar-icon {
-		font-size: 56rpx;
+		width: 56rpx;
+		height: 56rpx;
 	}
 	.mine-info {
 		min-width: 0;
@@ -141,8 +177,8 @@
 	}
 	.level-tag {
 		font-size: 20rpx;
-		background: #f0f0f0;
-		color: #888;
+		background: #e6f4ec;
+		color: #17704a;
 		padding: 4rpx 16rpx;
 		border-radius: 16rpx;
 	}
@@ -153,12 +189,15 @@
 	.action-btn {
 		width: 68rpx;
 		height: 68rpx;
-		background: rgba(255, 255, 255, 0.8);
+		background: #fff;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 32rpx;
+	}
+	.action-img {
+		width: 34rpx;
+		height: 34rpx;
 	}
 	.mine-card {
 		background: #fff;
@@ -194,29 +233,17 @@
 		padding: 8rpx 0;
 	}
 	.order-ic {
-		position: relative;
 		width: 72rpx;
 		height: 72rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 40rpx;
+		background: #f7f9f5;
+		border-radius: 20rpx;
 	}
-	.order-dot {
-		position: absolute;
-		top: 0;
-		right: 4rpx;
-		background: #f24e3e;
-		color: #fff;
-		font-size: 18rpx;
-		min-width: 28rpx;
-		height: 28rpx;
-		border-radius: 14rpx;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0 6rpx;
-		font-weight: 600;
+	.order-img {
+		width: 44rpx;
+		height: 44rpx;
 	}
 	.order-lb {
 		font-size: 22rpx;
@@ -235,12 +262,17 @@
 		padding: 16rpx 0;
 	}
 	.tool-ic {
-		width: 64rpx;
-		height: 64rpx;
+		width: 72rpx;
+		height: 72rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 36rpx;
+		background: #f7f9f5;
+		border-radius: 20rpx;
+	}
+	.tool-img {
+		width: 40rpx;
+		height: 40rpx;
 	}
 	.tool-lb {
 		font-size: 22rpx;
@@ -260,8 +292,9 @@
 		align-items: center;
 		gap: 16rpx;
 	}
-	.vip-entry-icon {
-		font-size: 36rpx;
+	.vip-icon {
+		width: 48rpx;
+		height: 48rpx;
 	}
 	.vip-entry-t {
 		font-size: 26rpx;
