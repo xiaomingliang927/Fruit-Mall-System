@@ -103,6 +103,16 @@ export function isAllSelected() {
 	return ids.length > 0 && ids.every(id => sel[id])
 }
 
+// 同步底部 TabBar 角标（购物车数量）
+export function updateCartBadge() {
+  const count = getCartCount()
+  if (count > 0) {
+    uni.setTabBarBadge({ index: 2, text: count > 99 ? '99+' : String(count) })
+  } else {
+    uni.removeTabBarBadge({ index: 2 })
+  }
+}
+
 // 购物车商品总数
 export function getCartCount() {
 	const cart = getCart()

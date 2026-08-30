@@ -62,7 +62,7 @@
 </template>
 
 <script>
-	import { getCart, getSelected, incQty, decQty, toggleSelect, toggleSelectAll, isAllSelected, getCartTotal, getCartCount } from '@/utils/cart.js'
+	import { getCart, getSelected, incQty, decQty, toggleSelect, toggleSelectAll, isAllSelected, getCartTotal, getCartCount, updateCartBadge } from '@/utils/cart.js'
 	import { PRODUCTS } from '@/utils/data.js'
 
 	export default {
@@ -108,6 +108,7 @@
 			refresh() {
 				this.cart = getCart()
 				this.selected = getSelected()
+				updateCartBadge()
 			},
 			toggleSel(id) {
 				this.selected = toggleSelect(id)

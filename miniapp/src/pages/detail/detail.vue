@@ -80,7 +80,7 @@
 
 <script>
 	import { getProduct } from '@/utils/data.js'
-	import { addToCart, getCartCount } from '@/utils/cart.js'
+	import { addToCart, getCartCount, updateCartBadge } from '@/utils/cart.js'
 
 	export default {
 		data() {
@@ -124,6 +124,7 @@
 			},
 			addCart() {
 				addToCart(this.productId)
+				updateCartBadge()
 				this.refreshCart()
 				uni.showToast({ title: '已加入购物车', icon: 'none' })
 			},

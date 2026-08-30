@@ -108,18 +108,19 @@ function drawHome(cv) {
   strokePoly(cv, [[3, 11], [12, 3], [21, 11]]);
   strokePoly(cv, [[5, 10], [5, 20], [10, 20], [10, 14], [14, 14], [14, 20], [19, 20], [19, 10]]);
 }
+function fillRect(cv, x, y, w, h) {
+  const s = SS * (SIZE / 24);
+  for (let py = Math.floor(y * s); py < Math.ceil((y + h) * s); py++) {
+    for (let px = Math.floor(x * s); px < Math.ceil((x + w) * s); px++) {
+      if (px < cv.w && py < cv.h) cv.px[py * cv.w + px] = 1;
+    }
+  }
+}
+// 分类：列表式（左小方块 + 右横线 ×3）
 function drawCategory(cv) {
-  for (const [x, y] of [[3, 3], [14, 3], [3, 14], [14, 14]]) {
-    strokePoly(cv, [[x + 1.2, y], [x + 6.8, y]], false);
-    strokePoly(cv, [[x + 8, y + 1.2], [x + 8, y + 6.8]], false);
-    strokePoly(cv, [[x + 6.8, y + 8], [x + 1.2, y + 8]], false);
-    strokePoly(cv, [[x, y + 6.8], [x, y + 1.2]], false);
-    circle(cv, x + 1.2, y + 1.2, 1.2, 0.5); circle(cv, x + 6.8, y + 1.2, 1.2, 0.5);
-    circle(cv, x + 1.2, y + 6.8, 1.2, 0.5); circle(cv, x + 6.8, y + 6.8, 1.2, 0.5);
-    circle(cv, x + 1.2, y, 1.2, 1.9); circle(cv, x + 6.8, y, 1.2, 1.9);
-    circle(cv, x + 1.2, y + 8, 1.2, 1.9); circle(cv, x + 6.8, y + 8, 1.2, 1.9);
-    circle(cv, x, y + 1.2, 1.2, 1.9); circle(cv, x + 8, y + 1.2, 1.2, 1.9);
-    circle(cv, x, y + 6.8, 1.2, 1.9); circle(cv, x + 8, y + 6.8, 1.2, 1.9);
+  for (const y of [4.8, 12, 19.2]) {
+    fillRect(cv, 3, y - 1.7, 3.4, 3.4);
+    line(cv, 9.8, y, 21, y);
   }
 }
 function drawCart(cv) {

@@ -85,7 +85,7 @@
 
 <script>
 	import { IMG, PRODUCTS, FLASH_IDS, HOT_IDS, getProduct } from '@/utils/data.js'
-	import { addToCart } from '@/utils/cart.js'
+	import { addToCart, updateCartBadge } from '@/utils/cart.js'
 
 	export default {
 		data() {
@@ -157,6 +157,7 @@
 			},
 			addCart(id) {
 				addToCart(id)
+				updateCartBadge()
 				this.updateTabBar()
 				uni.showToast({ title: '已加入购物车', icon: 'none' })
 			},

@@ -1,6 +1,9 @@
 <script>
-	export default {
+	import { updateCartBadge } from './utils/cart.js'
+
+export default {
 		onLaunch: function() {
+			updateCartBadge()
 			console.log('App Launch')
 		},
 		onShow: function() {

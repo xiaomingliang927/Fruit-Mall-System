@@ -52,7 +52,7 @@
 
 <script>
 	import { IMG, CATS, getProductsByCat } from '@/utils/data.js'
-	import { addToCart } from '@/utils/cart.js'
+	import { addToCart, updateCartBadge } from '@/utils/cart.js'
 
 	export default {
 		data() {
@@ -101,7 +101,7 @@
 				uni.navigateTo({ url: '/pages/detail/detail?id=' + id })
 			},
 			addCart(id) {
-				addToCart(id)
+				updateCartBadge()
 				if (typeof this.getTabBar === 'function' && this.getTabBar()) {
 					this.getTabBar().refreshCartCount()
 				}
