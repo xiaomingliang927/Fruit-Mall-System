@@ -9,7 +9,7 @@
 				</view>
 				<view class="loc"><image src="/static/icon/svg/map-pin-white.svg" mode="aspectFit" class="loc-icon"></image><text>湘西州·滨江公寓</text></view>
 				<view class="head-icons">
-					<view class="icon-btn" @click="showToast('暂无新消息')"><text>🔔</text></view>
+					<view class="icon-btn" @click="showToast('暂无新消息')"><image src="/static/icon/svg/bell-white.svg" mode="aspectFit" class="bell-icon"></image></view>
 				</view>
 			</view>
 			<view class="searchbar" @click="showToast('搜索功能开发中')">
@@ -178,7 +178,8 @@
 	.loc-icon { width: 26rpx; height: 26rpx; flex: none; }
 		.loc { display: flex; align-items: center; gap: 6rpx; font-size: 24rpx; font-weight: 500; opacity: .95; max-width: 280rpx; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 	.head-icons { display: flex; }
-	.icon-btn { width: 64rpx; height: 64rpx; border-radius: 50%; background: rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center; font-size: 28rpx; }
+	.icon-btn { width: 64rpx; height: 64rpx; border-radius: 50%; background: rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center; }
+		.bell-icon { width: 34rpx; height: 34rpx; }
 	.searchbar { display: flex; align-items: center; gap: 12rpx; background: #fff; border-radius: 44rpx; padding: 10rpx 10rpx 10rpx 24rpx; }
 	.cat-icon { color: #333; font-size: 28rpx; }
 	.cat-text { color: #666; font-size: 26rpx; border-right: 1rpx solid #eee; padding-right: 16rpx; }
