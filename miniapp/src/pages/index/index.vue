@@ -7,7 +7,7 @@
 					<view class="logo"><text class="logo-text">果</text></view>
 					<text>果小满</text>
 				</view>
-				<view class="loc"><text>📍</text><text>湘西州·滨江公寓</text></view>
+				<view class="loc"><image src="/static/icon/svg/map-pin-white.svg" mode="aspectFit" class="loc-icon"></image><text>湘西州·滨江公寓</text></view>
 				<view class="head-icons">
 					<view class="icon-btn" @click="showToast('暂无新消息')"><text>🔔</text></view>
 				</view>
@@ -175,7 +175,8 @@
 	.brand { display: flex; align-items: center; gap: 12rpx; font-weight: 800; font-size: 40rpx; }
 	.logo { width: 48rpx; height: 48rpx; border-radius: 14rpx; background: #fff; display: flex; align-items: center; justify-content: center; }
 	.logo-text { color: #d9363e; font-size: 28rpx; font-weight: 700; }
-	.loc { display: flex; align-items: center; gap: 6rpx; font-size: 24rpx; font-weight: 500; opacity: .95; max-width: 280rpx; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+	.loc-icon { width: 26rpx; height: 26rpx; flex: none; }
+		.loc { display: flex; align-items: center; gap: 6rpx; font-size: 24rpx; font-weight: 500; opacity: .95; max-width: 280rpx; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 	.head-icons { display: flex; }
 	.icon-btn { width: 64rpx; height: 64rpx; border-radius: 50%; background: rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center; font-size: 28rpx; }
 	.searchbar { display: flex; align-items: center; gap: 12rpx; background: #fff; border-radius: 44rpx; padding: 10rpx 10rpx 10rpx 24rpx; }
