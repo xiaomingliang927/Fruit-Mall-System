@@ -29,3 +29,6 @@ Thumbs.db
 
 # 架构图 PNG 导出稿不入库（以 HTML 版为准）
 架构图/*.png
+
+# HBuilderX 构建产物
+miniapp-hbx/unpackage/
