@@ -1,0 +1,11 @@
+【鲜果集小程序 · HBuilderX 运行版】
+
+1. 用 HBuilderX 打开本文件夹（miniapp-hbx），注意是打开这一个文件夹
+2. 菜单：运行 → 运行到小程序模拟器 → 微信开发者工具
+   （首次需在 HBuilderX 设置里配置微信开发者工具安装路径，
+     并在微信开发者工具中开启「服务端口」）
+3. 想在浏览器看 H5 版：运行 → 运行到浏览器（端口由 HBuilderX 分配，不是 5173）
+
+⚠️ 数据说明：页面数据来自 src 外的 api.js → 后端（localhost:8080，需先启动后端）
+   后端启动：fruit/backend 目录执行
+   ../tools/apache-maven-3.9.9/bin/mvn -s settings-aliyun.xml spring-boot:run
