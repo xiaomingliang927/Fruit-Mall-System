@@ -65,7 +65,8 @@
 </template>
 
 <script>
-	import { api } from '../../api'
+	import { api, setToken } from '../../api'
+	import { clearLocalMirror, updateCartBadge } from '../../utils/cart.js'
 	export default {
 		data() {
 			return {
@@ -119,7 +120,9 @@
 				uni.navigateTo({ url: '/pages/orders/orders' + (status ? '?status=' + status : '') })
 			},
 			logout() {
-				uni.removeStorageSync('token')
+				setToken('')
+				clearLocalMirror()
+				updateCartBadge()
 				this.me = {}
 				uni.showToast({ title: '已退出登录', icon: 'none' })
 			}

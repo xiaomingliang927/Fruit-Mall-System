@@ -33,5 +33,7 @@ app:
     expire-hours: 168
   wechat:
     # 小程序 AppID/Secret；两者都配置后走真实 code2Session，留空则进入开发模式（openid = dev-<code>）
-    appid: ${FRUIT_WX_APPID:}
+    appid: ${FRUIT_WX_APPID:wxa0baa0a3ac856f2d}
+    # TODO: 填入小程序 AppSecret（mp.weixin.qq.com → 开发管理 → 开发设置），
+    #       填入后同一微信用户在任意设备登录都会得到同一 openid，实现跨设备账号互通
     secret: ${FRUIT_WX_SECRET:}

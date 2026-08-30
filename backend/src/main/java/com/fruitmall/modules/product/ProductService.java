@@ -20,9 +20,10 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final ProductSkuMapper skuMapper;
 
-    /** 最低价 SKU 价格，用于列表展示「xx元起」 */
+    /** 最低价 SKU 价格，用于列表展示「xx元起」；firstSkuId 供购物车直接加购 */
     public record ProductListVO(Long id, Long categoryId, String name, String subtitle, String mainImage,
-                                String origin, String unit, String tags, Integer sales, Integer minPrice) {
+                                String origin, String unit, String tags, Integer sales, Integer minPrice,
+                                Long firstSkuId) {
     }
 
     public record CategoryNode(Long id, String name, String icon, List<CategoryNode> children) {
@@ -54,9 +55,19 @@ public class ProductService {
                 .like(StringUtils.hasText(keyword), Product::getName, keyword)
                 .orderByDesc(Product::getSales);
         Page<Product> result = productMapper.selectPage(new Page<>(page, size), wrapper);
+        List<Long> productIds = result.getRecords().stream().map(Product::getId).toList();
+        // 批量取每个商品的默认 SKU（优先有库存中 ID 最小者）
+        Map<Long, Long> firstSkuByProduct = productIds.isEmpty() ? Map.of()
+                : skuMapper.selectList(new LambdaQueryWrapper<ProductSku>()
+                                .in(ProductSku::getProductId, productIds)
+                                .orderByAsc(ProductSku::getId))
+                        .stream()
+                        .collect(Collectors.toMap(ProductSku::getProductId, ProductSku::getId,
+                                (a, b) -> a));
         return PageResult.of(result, p -> new ProductListVO(
                 p.getId(), p.getCategoryId(), p.getName(), p.getSubtitle(), p.getMainImage(),
-                p.getOrigin(), p.getUnit(), p.getTags(), p.getSales(), minPrice(p.getId())));
+                p.getOrigin(), p.getUnit(), p.getTags(), p.getSales(), minPrice(p.getId()),
+                firstSkuByProduct.get(p.getId())));
     }
 
     private final Map<Long, Integer> minPriceCache = new java.util.concurrent.ConcurrentHashMap<>();

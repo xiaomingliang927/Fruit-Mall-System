@@ -22,6 +22,7 @@
 <script setup>
 import { ref } from 'vue'
 import { api, setToken } from '../../api'
+import { syncFromServer, updateCartBadge } from '../../utils/cart.js'
 
 const phone = ref('')
 const code = ref('123456')
@@ -33,6 +34,7 @@ async function wxLogin() {
       try {
         const data = await api.post('/api/v1/auth/wx-login', { code })
         setToken(data.token)
+			syncFromServer().then(updateCartBadge)
         uni.showToast({ title: `欢迎，${data.nickname}`, icon: 'success' })
         setTimeout(() => uni.switchTab({ url: '/pages/index/index' }), 700)
       } catch (e) {
