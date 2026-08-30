@@ -117,8 +117,9 @@ const categories = ref([])
 const loading = ref(false)
 
 const presetImages = [
-  'aksu-apple', 'gannan-orange', 'dandong-strawberry', 'yunnan-blueberry',
-  'chile-cherry', 'thai-durian', 'gift-box',
+  'fruit-watermelon', 'fruit-apple', 'fruit-banana', 'fruit-orange', 'fruit-grape',
+  'fruit-strawberry', 'fruit-mango', 'fruit-blueberry', 'fruit-dragonfruit',
+  'fruit-pineapple', 'fruit-banner',
 ].map((n) => ({ label: n, value: `/images/products/${n}.jpg` }))
 
 const dialog = reactive({ visible: false, isEdit: false, saving: false, editId: null })

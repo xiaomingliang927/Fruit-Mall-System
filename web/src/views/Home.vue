@@ -10,7 +10,7 @@
           <button class="btn hero-ghost" @click="scrollToAll">浏览全部商品</button>
         </div>
       </div>
-      <img class="hero-img" :src="'/images/products/dandong-strawberry.jpg'" alt="当季草莓" />
+      <img class="hero-img" :src="'/images/products/fruit-strawberry.jpg'" alt="当季草莓" />
     </div>
 
     <!-- 服务保障 -->
