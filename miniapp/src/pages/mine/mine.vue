@@ -22,6 +22,15 @@
 			</view>
 		</view>
 
+		<!-- 会员入口 -->
+		<view class="mine-vip-entry" @click="showToast('开通会员')">
+			<view class="vip-entry-l">
+				<image src="/static/icon/svg/crown.svg" mode="aspectFit" class="vip-icon"></image>
+				<text class="vip-entry-t">开通会员享专属优惠</text>
+			</view>
+			<text class="vip-entry-arrow">›</text>
+		</view>
+
 		<!-- 我的订单 -->
 		<view class="mine-card">
 			<view class="card-hd">
@@ -49,14 +58,7 @@
 			</view>
 		</view>
 
-		<!-- 会员入口 -->
-		<view class="mine-vip-entry" @click="showToast('开通会员')">
-			<view class="vip-entry-l">
-				<image src="/static/icon/svg/crown.svg" mode="aspectFit" class="vip-icon"></image>
-				<text class="vip-entry-t">开通会员享专属优惠</text>
-			</view>
-			<text class="vip-entry-arrow">›</text>
-		</view>
+
 
 		<view style="height: 40rpx;"></view>
 	</view>
