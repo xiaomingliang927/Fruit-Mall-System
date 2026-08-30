@@ -149,6 +149,9 @@
 					this.countdownText = [h, m, s].map(x => String(x).padStart(2, '0')).join(':')
 				}, 1000)
 			},
+			goLive() {
+				uni.navigateTo({ url: '/pages/live/live' })
+			},
 			goDetail(id) {
 				uni.navigateTo({ url: '/pages/detail/detail?id=' + id })
 			},
@@ -228,4 +231,12 @@
 	.p-price { color: #f24e3e; font-size: 32rpx; font-weight: 700; }
 	.p-unit { font-size: 20rpx; color: #bbb; }
 	.p-add { width: 56rpx; height: 56rpx; border-radius: 50%; background: #2e9e6b; color: #fff; display: flex; align-items: center; justify-content: center; }
+	.live-fab {
+		position: fixed; right: 28rpx; bottom: 160rpx; width: 104rpx; height: 104rpx;
+		border-radius: 50%; background: linear-gradient(135deg, #43c98a, #1f8a58);
+		display: flex; flex-direction: column; align-items: center; justify-content: center;
+		box-shadow: 0 8rpx 24rpx rgba(46, 158, 107, 0.4); border: 6rpx solid #fff; z-index: 99;
+	}
+	.live-fab-icon { width: 38rpx; height: 38rpx; }
+	.live-fab-text { font-size: 17rpx; color: #fff; margin-top: 2rpx; font-weight: 600; }
 </style>
