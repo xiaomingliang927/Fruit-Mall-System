@@ -24,7 +24,7 @@
       </view>
     </view>
 
-    <view v-if="!products.length && !loading" class="empty">🔍 没有找到相关商品</view>
+    <view v-if="!products.length && !loading" class="empty">没有找到相关商品，换个关键词试试</view>
     <view v-if="finished && products.length" class="nomore">— 没有更多了 —</view>
   </view>
 </template>
@@ -80,33 +80,35 @@ api.get('/api/v1/categories').then((d) => (categories.value = d))
 </script>
 
 <style scoped>
-.search { display: flex; padding: 20rpx 24rpx; gap: 14rpx; }
+.search { display: flex; padding: 20rpx 24rpx 12rpx; gap: 14rpx; }
 .search-input {
-  flex: 1; background: #fff; border-radius: 40rpx; padding: 16rpx 30rpx; font-size: 27rpx;
-  border: 3rpx solid #2e9e5b;
+  flex: 1; background: #fff; border-radius: 6rpx; padding: 15rpx 26rpx; font-size: 27rpx;
+  border: 2rpx solid #e8ebee;
 }
 .search-btn {
-  background: #2e9e5b; color: #fff; border-radius: 40rpx; padding: 0 34rpx;
+  background: #1f7a3d; color: #fff; border-radius: 6rpx; padding: 0 34rpx;
   display: flex; align-items: center; font-size: 27rpx;
 }
-.cats { white-space: nowrap; padding: 6rpx 24rpx 16rpx; }
+.cats {
+  white-space: nowrap; padding: 0 24rpx; background: #fff; border-bottom: 1rpx solid #f0f2f4;
+}
 .cat {
-  display: inline-block; background: #fff; border-radius: 32rpx; padding: 12rpx 32rpx;
-  margin-right: 14rpx; font-size: 26rpx; color: #374151;
+  display: inline-block; padding: 22rpx 4rpx 18rpx; margin-right: 44rpx;
+  font-size: 28rpx; color: #4b5563; border-bottom: 4rpx solid transparent;
 }
-.cat.on { background: #2e9e5b; color: #fff; font-weight: 600; }
-.grid { display: flex; flex-wrap: wrap; padding: 0 18rpx; gap: 16rpx; }
+.cat.on { color: #1f7a3d; font-weight: 600; border-bottom-color: #1f7a3d; }
+.grid { display: flex; flex-wrap: wrap; padding: 16rpx 18rpx; gap: 14rpx; }
 .pcard {
-  width: calc(50% - 8rpx); background: #fff; border-radius: 18rpx; overflow: hidden;
-  box-shadow: 0 4rpx 14rpx rgba(30, 41, 59, 0.06);
+  width: calc(50% - 7rpx); background: #fff; border-radius: 10rpx; overflow: hidden;
+  border: 1rpx solid #eceef0;
 }
-.pimg { width: 100%; height: 320rpx; background: #f0f2ee; }
-.pbody { padding: 16rpx 20rpx 20rpx; }
-.pname { font-size: 29rpx; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pimg { width: 100%; height: 320rpx; background: #f0f2ee; display: block; }
+.pbody { padding: 14rpx 18rpx 18rpx; }
+.pname { font-size: 28rpx; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .psub { font-size: 23rpx; color: #9ca3af; margin-top: 6rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pfoot { display: flex; justify-content: space-between; align-items: baseline; margin-top: 12rpx; }
-.price { color: #dc2626; font-size: 33rpx; font-weight: 700; }
-.rmb { font-size: 22rpx; }
+.price { color: #e4393c; font-size: 32rpx; font-weight: 700; }
+.rmb { font-size: 21rpx; }
 .qi { font-size: 20rpx; font-weight: 400; }
 .sales { color: #b6bcc6; font-size: 21rpx; }
 .empty, .nomore { text-align: center; color: #9ca3af; padding: 60rpx 0 30rpx; font-size: 26rpx; }

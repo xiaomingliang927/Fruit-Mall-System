@@ -1,14 +1,14 @@
 <template>
   <div>
-    <h3 style="margin-bottom:14px">📦 我的订单</h3>
+    <h3 style="margin-bottom:14px">我的订单</h3>
 
     <div class="order-tabs">
-      <span v-for="t in tabs" :key="t.value ?? 'all'" class="cat-chip"
+      <span v-for="t in tabs" :key="t.value ?? 'all'" class="cat-tab"
             :class="{ active: status === t.value }" @click="pickStatus(t.value)">{{ t.label }}</span>
     </div>
 
     <div v-if="!orders.length" class="cart-empty">
-      <div class="big">📭</div>暂无相关订单，<router-link to="/" style="color:var(--green-700)">去下一单 →</router-link>
+      暂无相关订单，<router-link to="/" style="color:var(--green-700)">去下一单 →</router-link>
     </div>
 
     <div v-for="o in orders" :key="o.orderNo" class="order-card">
@@ -42,9 +42,9 @@
       <div class="modal">
         <h3>订单详情 · {{ detail.orderNo }}</h3>
         <div class="addr-text">
-          📍 {{ addrText }}<br />
-          🚚 配送方式：快递{{ detail.trackingNo ? `（运单号 ${detail.trackingNo}）` : '' }}
-          <template v-if="detail.remark"><br />💬 留言：{{ detail.remark }}</template>
+          收货：{{ addrText }}<br />
+          配送：快递{{ detail.trackingNo ? `（运单号 ${detail.trackingNo}）` : '' }}
+          <template v-if="detail.remark"><br />留言：{{ detail.remark }}</template>
         </div>
         <div v-for="(it, i) in detail.items" :key="i" class="check-line">
           <span><b>{{ it.productName }}</b>（{{ it.skuSpec }}）× {{ it.quantity }}</span>
@@ -117,15 +117,15 @@ function goPage(n) {
   load()
 }
 
-async function pay(o) {
-  try {
-    await api.post(`/api/v1/payments/${o.orderNo}/mock-pay`)
-    toast('支付成功（演示环境模拟微信支付）✅')
-    load()
-  } catch (e) {
-    toast(e.message, 'err')
-  }
-}
+    async function pay(o) {
+      try {
+        await api.post(`/api/v1/payments/${o.orderNo}/mock-pay`)
+        toast('支付成功（演示环境模拟微信支付）')
+        load()
+      } catch (e) {
+        toast(e.message, 'err')
+      }
+    }
 
 async function cancel(o) {
   await api.post(`/api/v1/orders/${o.orderNo}/cancel`)
@@ -135,7 +135,7 @@ async function cancel(o) {
 
 async function confirm(o) {
   await api.post(`/api/v1/orders/${o.orderNo}/confirm`)
-  toast('已确认收货，感谢购买 🍏')
+  toast('已确认收货，感谢购买')
   load()
 }
 

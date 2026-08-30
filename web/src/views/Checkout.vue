@@ -1,9 +1,9 @@
 <template>
   <div>
-    <h3 style="margin-bottom:14px">📝 确认订单</h3>
+    <h3 style="margin-bottom:14px">确认订单</h3>
 
     <div class="panel">
-      <h3>📍 收货地址</h3>
+      <h3>收货地址</h3>
       <div class="addr-grid">
         <div v-for="a in addresses" :key="a.id" class="addr-card" :class="{ active: addressId === a.id }"
              @click="addressId = a.id">
@@ -27,7 +27,7 @@
     </div>
 
     <div class="panel">
-      <h3>🍎 商品清单（{{ lines.length }} 件）</h3>
+      <h3>商品清单（{{ lines.length }} 件）</h3>
       <div v-for="l in lines" :key="l.skuId" class="check-line">
         <span><b>{{ l.name }}</b>（{{ l.spec }}）× {{ l.qty }}</span>
         <span class="price">¥{{ yuan(l.amount) }}</span>
@@ -111,7 +111,7 @@ async function submitOrder() {
     })
     if (fromCart) await api.delete('/api/v1/cart/items/checked')
     await refreshMe()
-    toast('下单成功，去支付 →')
+    toast('下单成功，去支付')
     router.push({ name: 'orders', query: { pay: orderNo } })
   } catch (e) {
     toast(e.message, 'err')

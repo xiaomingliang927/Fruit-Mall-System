@@ -9,11 +9,11 @@
         <span style="font-size:12.5px;color:var(--muted)">/ {{ product.unit }} · {{ currentSku?.spec }}</span>
       </div>
       <div class="d-meta">
-        <div>📦 产地：{{ product.origin || '甄选产区' }} ｜ 已售 {{ product.sales }} 件</div>
-        <div>
+        <div class="row"><span class="lab">产地</span><span>{{ product.origin || '甄选产区' }} ｜ 已售 {{ product.sales }} 件</span></div>
+        <div class="row">
           <span v-for="t in (product.tags || '').split(',').filter(Boolean)" :key="t" class="tag">{{ t }}</span>
         </div>
-        <div>🛡️ 坏果包赔：收货 24 小时内拍照，极速退款</div>
+        <div class="row"><span class="lab">保障</span><span>坏果包赔：收货 24 小时内拍照，极速退款</span></div>
       </div>
 
       <div class="sku-label">选择规格</div>
@@ -36,7 +36,7 @@
       </div>
 
       <div class="d-actions">
-        <button class="btn btn-warn" :disabled="!currentSku || currentSku.stock <= 0" @click="addToCart">🛒 加入购物车</button>
+        <button class="btn btn-warn" :disabled="!currentSku || currentSku.stock <= 0" @click="addToCart">加入购物车</button>
         <button class="btn" :disabled="!currentSku || currentSku.stock <= 0" @click="buyNow">立即购买</button>
       </div>
     </div>
@@ -63,7 +63,7 @@ onMounted(async () => {
 async function addToCart() {
   await api.post('/api/v1/cart/items', { skuId: currentSku.value.id, quantity: qty.value })
   await refreshMe()
-  toast('已加入购物车 🛒')
+  toast('已加入购物车')
 }
 
 function buyNow() {

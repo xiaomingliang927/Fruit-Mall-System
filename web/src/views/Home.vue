@@ -1,16 +1,15 @@
 <template>
   <div>
-    <div class="hero">
+    <div class="promo">
       <div>
         <h1>产地直采 · 新鲜到家</h1>
-        <p>时令鲜果 24 小时直达 🚚 坏果包赔 · 极速退款</p>
+        <p>时令鲜果 24 小时直达，坏果包赔，极速退款</p>
       </div>
-      <div class="emoji">🍎🍊🍇🍓</div>
+      <div class="side">全国多仓发货<br />收货 24 小时内拍照极速退款</div>
     </div>
 
     <div class="cats">
-      <span class="cat-chip" :class="{ active: !categoryId }" @click="pickCategory(null)">全部</span>
-      <span v-for="c in categories" :key="c.id" class="cat-chip"
+      <span v-for="c in allCategories" :key="c.id ?? 'all'" class="cat-tab"
             :class="{ active: categoryId === c.id }" @click="pickCategory(c.id)">{{ c.name }}</span>
     </div>
 
@@ -28,19 +27,19 @@
       </div>
     </div>
     <div v-else-if="!loading" class="cart-empty">
-      <div class="big">🔍</div>没有找到相关商品，换个关键词试试
+      没有找到相关商品，换个关键词试试
     </div>
 
     <div class="pager">
       <button :disabled="page <= 1" @click="goPage(page - 1)">上一页</button>
-      <button v-for="n in totalPages" :key="n" :class="{ cur: n === page }" @click="goPage(n)">{{ n }}</button>
+      <span class="info">第 {{ page }} / {{ totalPages }} 页</span>
       <button :disabled="page >= totalPages" @click="goPage(page + 1)">下一页</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api, yuan } from '../api'
 
@@ -55,6 +54,8 @@ const size = 8
 const total = ref(0)
 const totalPages = ref(1)
 const loading = ref(true)
+
+const allCategories = computed(() => [{ id: null, name: '全部' }, ...categories.value])
 
 async function load() {
   loading.value = true

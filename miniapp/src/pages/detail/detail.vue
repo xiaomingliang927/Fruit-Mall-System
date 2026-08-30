@@ -8,9 +8,12 @@
         <text class="price"><text class="rmb">¥</text>{{ yuan(currentSku?.price || 0) }}</text>
         <text class="unit">/ {{ product.unit }} · {{ currentSku?.spec }}</text>
       </view>
-      <view class="meta">📦 产地：{{ product.origin || '甄选产区' }} ｜ 已售 {{ product.sales }} 件</view>
-      <view class="tags">
-        <text v-for="t in tagList" :key="t" class="tag">{{ t }}</text>
+      <view class="meta">
+        <view class="mrow"><text class="mlab">产地</text><text>{{ product.origin || '甄选产区' }} ｜ 已售 {{ product.sales }} 件</text></view>
+        <view class="mrow tags">
+          <text v-for="t in tagList" :key="t" class="tag">{{ t }}</text>
+        </view>
+        <view class="mrow"><text class="mlab">保障</text><text>坏果包赔：收货 24 小时内拍照，极速退款</text></view>
       </view>
     </view>
 
@@ -33,7 +36,7 @@
     </view>
 
     <view class="bar">
-      <view class="btn warn" @tap="addCart">🛒 加入购物车</view>
+      <view class="btn warn" @tap="addCart">加入购物车</view>
       <view class="btn main" @tap="buyNow">立即购买</view>
     </view>
   </view>
@@ -79,31 +82,32 @@ import { getToken } from '../../api'
 
 <style scoped>
 .main { width: 100%; height: 560rpx; background: #f0f2ee; display: block; }
-.card { background: #fff; border-radius: 20rpx; margin: 20rpx 24rpx 0; padding: 28rpx; }
-.title { font-size: 36rpx; font-weight: 700; }
+.card { background: #fff; border-radius: 10rpx; margin: 16rpx 20rpx 0; padding: 26rpx; border: 1rpx solid #eceef0; }
+.title { font-size: 35rpx; font-weight: 700; }
 .sub { color: #9ca3af; font-size: 25rpx; margin-top: 8rpx; }
-.pricebox { margin-top: 20rpx; padding: 18rpx 24rpx; background: #fff7f0; border-radius: 12rpx; }
-.price { color: #dc2626; font-size: 44rpx; font-weight: 800; }
-.rmb { font-size: 26rpx; }
+.pricebox { margin-top: 20rpx; padding: 16rpx 22rpx; background: #faf7f5; border-radius: 6rpx; border: 1rpx solid #f0e5e0; }
+.price { color: #e4393c; font-size: 42rpx; font-weight: 800; }
+.rmb { font-size: 25rpx; }
 .unit { color: #9ca3af; font-size: 23rpx; margin-left: 12rpx; }
-.meta { margin-top: 18rpx; color: #6b7280; font-size: 24rpx; }
-.tags { margin-top: 12rpx; }
-.tag { display: inline-block; background: #e6f4ea; color: #1f7a3d; font-size: 21rpx; border-radius: 8rpx; padding: 4rpx 14rpx; margin-right: 10rpx; }
+.meta { margin-top: 16rpx; color: #6b7280; font-size: 24rpx; }
+.mrow { display: flex; gap: 12rpx; padding: 4rpx 0; align-items: baseline; }
+.mlab { color: #b6bcc6; flex: none; }
+.tag { display: inline-block; background: #eaf4ee; color: #1f7a3d; font-size: 21rpx; border-radius: 4rpx; padding: 2rpx 12rpx; margin-right: 10rpx; border: 1rpx solid #d3e8db; }
 .lab { font-size: 27rpx; font-weight: 600; }
 .skus { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 16rpx; }
-.sku { border: 3rpx solid #e5e7eb; border-radius: 12rpx; padding: 12rpx 24rpx; font-size: 25rpx; }
-.sku.on { border-color: #ff8c42; color: #ff8c42; background: #fff7f0; font-weight: 600; }
+.sku { border: 2rpx solid #e5e7eb; border-radius: 6rpx; padding: 11rpx 22rpx; font-size: 25rpx; }
+.sku.on { border-color: #e4393c; color: #e4393c; background: #fef4f4; font-weight: 600; }
 .qtyrow { display: flex; align-items: center; gap: 20rpx; margin-top: 16rpx; }
-.stepper { display: flex; align-items: center; border: 3rpx solid #e5e7eb; border-radius: 12rpx; overflow: hidden; }
-.stbtn { width: 64rpx; height: 60rpx; background: #f9fafb; text-align: center; line-height: 58rpx; font-size: 30rpx; }
-.stin { width: 90rpx; height: 60rpx; text-align: center; font-size: 27rpx; }
+.stepper { display: flex; align-items: center; border: 2rpx solid #e5e7eb; border-radius: 6rpx; overflow: hidden; }
+.stbtn { width: 62rpx; height: 58rpx; background: #f9fafb; text-align: center; line-height: 56rpx; font-size: 30rpx; }
+.stin { width: 88rpx; height: 58rpx; text-align: center; font-size: 27rpx; }
 .stock { color: #9ca3af; font-size: 23rpx; }
 .bar {
-  position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 18rpx;
-  padding: 18rpx 24rpx calc(18rpx + env(safe-area-inset-bottom)); background: #fff;
-  box-shadow: 0 -4rpx 16rpx rgba(30, 41, 59, 0.08);
+  position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 16rpx;
+  padding: 16rpx 24rpx calc(16rpx + env(safe-area-inset-bottom)); background: #fff;
+  border-top: 1rpx solid #eceef0;
 }
-.btn { flex: 1; text-align: center; padding: 22rpx 0; border-radius: 44rpx; font-size: 29rpx; font-weight: 600; }
-.btn.warn { background: #ff8c42; color: #fff; }
-.btn.main { background: #2e9e5b; color: #fff; }
+.btn { flex: 1; text-align: center; padding: 21rpx 0; border-radius: 8rpx; font-size: 29rpx; font-weight: 600; }
+.btn.warn { background: #ff6e26; color: #fff; }
+.btn.main { background: #1f7a3d; color: #fff; }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <view class="wrap">
-    <view class="logo">🍊</view>
+    <view class="mark">鲜</view>
     <view class="t1">鲜果集</view>
     <view class="t2">产地直采 · 新鲜到家</view>
 
@@ -60,23 +60,24 @@ async function smsLogin() {
 
 <style scoped>
 .wrap { display: flex; flex-direction: column; align-items: center; padding: 120rpx 70rpx 0; }
-.logo {
-  width: 150rpx; height: 150rpx; border-radius: 44rpx; font-size: 84rpx; text-align: center; line-height: 150rpx;
-  background: linear-gradient(135deg, #1f7a3d, #2e9e5b); box-shadow: 0 14rpx 34rpx rgba(31, 122, 61, 0.3);
+.mark {
+  width: 130rpx; height: 130rpx; border-radius: 24rpx; font-size: 60rpx; font-weight: 700;
+  color: #fff; text-align: center; line-height: 130rpx;
+  background: #1f7a3d;
 }
-.t1 { font-size: 44rpx; font-weight: 800; margin-top: 30rpx; letter-spacing: 4rpx; }
-.t2 { color: #9ca3af; font-size: 25rpx; margin-top: 10rpx; letter-spacing: 2rpx; }
+.t1 { font-size: 42rpx; font-weight: 700; margin-top: 28rpx; letter-spacing: 3rpx; color: #1f2937; }
+.t2 { color: #9ca3af; font-size: 24rpx; margin-top: 10rpx; letter-spacing: 1rpx; }
 .wxbtn {
-  margin-top: 90rpx; width: 100%; background: #07c160; color: #fff; border-radius: 48rpx;
-  font-size: 31rpx; font-weight: 700;
+  margin-top: 90rpx; width: 100%; background: #07c160; color: #fff; border-radius: 8rpx;
+  font-size: 30rpx; font-weight: 600;
 }
 .divider { color: #c8ccd4; font-size: 23rpx; margin: 50rpx 0 34rpx; }
 .in {
-  width: 100%; border: 3rpx solid #e5e7eb; border-radius: 44rpx; padding: 20rpx 36rpx;
+  width: 100%; border: 2rpx solid #e5e7eb; border-radius: 8rpx; padding: 20rpx 30rpx;
   font-size: 28rpx; margin-bottom: 22rpx;
 }
 .smsbtn {
-  width: 100%; background: #2e9e5b; color: #fff; border-radius: 48rpx; font-size: 31rpx; font-weight: 700;
+  width: 100%; background: #1f7a3d; color: #fff; border-radius: 8rpx; font-size: 30rpx; font-weight: 600;
 }
 .hint { color: #b6bcc6; font-size: 21rpx; text-align: center; line-height: 1.9; margin-top: 44rpx; }
 </style>

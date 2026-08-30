@@ -1,7 +1,9 @@
 <template>
   <div class="login-wrap">
     <div class="login-card">
-      <h2>🍏 欢迎来到鲜果集</h2>
+      <div class="login-brand">
+        <span class="mark">鲜</span><span class="name">登录鲜果集</span>
+      </div>
       <div class="tip">登录后可下单购买，新手机号自动注册</div>
       <input v-model.trim="phone" maxlength="11" placeholder="手机号" />
       <input v-model.trim="code" maxlength="6" placeholder="短信验证码" @keyup.enter="doLogin" />

@@ -1,7 +1,6 @@
 <template>
   <view class="page">
     <view v-if="!items.length" class="empty">
-      <view class="big">🛒</view>
       购物车还是空的
       <view class="gohome" @tap="goHome">去逛逛 →</view>
     </view>
@@ -82,35 +81,34 @@ function goHome() { uni.switchTab({ url: '/pages/index/index' }) }
 
 <style scoped>
 .empty { text-align: center; color: #9ca3af; padding-top: 200rpx; font-size: 27rpx; }
-.big { font-size: 90rpx; margin-bottom: 20rpx; }
 .gohome { color: #1f7a3d; margin-top: 16rpx; font-weight: 600; }
 .row {
-  display: flex; align-items: center; background: #fff; border-radius: 18rpx;
-  margin: 16rpx 24rpx 0; padding: 22rpx; gap: 18rpx;
+  display: flex; align-items: center; background: #fff; border-radius: 10rpx;
+  margin: 14rpx 20rpx 0; padding: 20rpx; gap: 16rpx; border: 1rpx solid #eceef0;
 }
 .row.bad { opacity: 0.55; }
 .ck {
-  width: 40rpx; height: 40rpx; border-radius: 50%; border: 3rpx solid #cbd5e1;
-  text-align: center; line-height: 36rpx; color: transparent; font-size: 24rpx; flex: none;
+  width: 38rpx; height: 38rpx; border-radius: 50%; border: 2rpx solid #cbd5e1;
+  text-align: center; line-height: 34rpx; color: transparent; font-size: 23rpx; flex: none;
 }
-.ck.on { background: #2e9e5b; border-color: #2e9e5b; color: #fff; }
-.img { width: 150rpx; height: 118rpx; border-radius: 12rpx; background: #f0f2ee; flex: none; }
+.ck.on { background: #1f7a3d; border-color: #1f7a3d; color: #fff; }
+.img { width: 145rpx; height: 112rpx; border-radius: 6rpx; background: #f0f2ee; flex: none; }
 .mid { flex: 1; min-width: 0; }
 .name { font-size: 27rpx; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .spec { color: #9ca3af; font-size: 22rpx; margin-top: 4rpx; }
-.price { color: #dc2626; font-weight: 700; margin-top: 8rpx; font-size: 27rpx; }
-.right { display: flex; flex-direction: column; align-items: flex-end; gap: 14rpx; }
+.price { color: #e4393c; font-weight: 700; margin-top: 8rpx; font-size: 27rpx; }
+.right { display: flex; flex-direction: column; align-items: flex-end; gap: 12rpx; }
 .del { color: #d1d5db; font-size: 23rpx; }
-.stepper { display: flex; align-items: center; border: 3rpx solid #e5e7eb; border-radius: 10rpx; overflow: hidden; }
-.stbtn { width: 52rpx; height: 50rpx; background: #f9fafb; text-align: center; line-height: 48rpx; font-size: 27rpx; }
-.stnum { width: 70rpx; text-align: center; font-size: 26rpx; }
+.stepper { display: flex; align-items: center; border: 2rpx solid #e5e7eb; border-radius: 6rpx; overflow: hidden; }
+.stbtn { width: 50rpx; height: 48rpx; background: #f9fafb; text-align: center; line-height: 46rpx; font-size: 27rpx; }
+.stnum { width: 68rpx; text-align: center; font-size: 26rpx; }
 .foot {
   position: fixed; left: 0; right: 0; bottom: 0; background: #fff;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 20rpx 30rpx calc(20rpx + env(safe-area-inset-bottom));
-  box-shadow: 0 -4rpx 16rpx rgba(30, 41, 59, 0.08);
+  padding: 18rpx 30rpx calc(18rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid #eceef0;
 }
-.total { color: #dc2626; font-size: 36rpx; font-weight: 800; }
+.total { color: #e4393c; font-size: 35rpx; font-weight: 800; }
 .cnt { color: #9ca3af; font-size: 23rpx; }
-.pay { background: #2e9e5b; color: #fff; border-radius: 40rpx; padding: 18rpx 52rpx; font-size: 29rpx; font-weight: 600; }
+.pay { background: #1f7a3d; color: #fff; border-radius: 8rpx; padding: 17rpx 50rpx; font-size: 29rpx; font-weight: 600; }
 </style>

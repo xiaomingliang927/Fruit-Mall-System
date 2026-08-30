@@ -1,7 +1,7 @@
 <template>
   <view class="page">
     <view class="card">
-      <view class="h">📍 收货地址</view>
+      <view class="h">收货地址</view>
       <view v-for="a in addresses" :key="a.id" class="addr" :class="{ on: addressId === a.id }" @tap="addressId = a.id">
         <view class="r1">{{ a.receiver }} {{ a.phone }}</view>
         <view class="r2">{{ a.province }}{{ a.city }}{{ a.district }} {{ a.detail }}</view>
@@ -21,7 +21,7 @@
     </view>
 
     <view class="card">
-      <view class="h">🍎 商品清单（{{ lines.length }} 种）</view>
+      <view class="h">商品清单（{{ lines.length }} 种）</view>
       <view v-for="l in lines" :key="l.skuId" class="line">
         <text class="lname"><text class="bold">{{ l.name }}</text>（{{ l.spec }}）× {{ l.qty }}</text>
         <text class="lprice">¥{{ yuan(l.amount) }}</text>

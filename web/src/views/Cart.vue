@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h3 style="margin-bottom:14px">🛒 我的购物车</h3>
+    <h3 style="margin-bottom:14px">我的购物车</h3>
     <div v-if="!items.length" class="cart-empty">
-      <div class="big">🛒</div>购物车还是空的，<router-link to="/" style="color:var(--green-700)">去逛逛 →</router-link>
+      购物车还是空的，<router-link to="/" style="color:var(--green-700)">去逛逛 →</router-link>
     </div>
     <template v-else>
       <div class="cart-list">

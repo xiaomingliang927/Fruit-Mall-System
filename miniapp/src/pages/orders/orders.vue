@@ -4,7 +4,7 @@
       <view v-for="t in tabs" :key="t.v ?? 'a'" class="tab" :class="{ on: status === t.v }" @tap="pick(t.v)">{{ t.l }}</view>
     </scroll-view>
 
-    <view v-if="!orders.length" class="empty">📭 暂无相关订单</view>
+    <view v-if="!orders.length" class="empty">暂无相关订单</view>
 
     <view v-for="o in orders" :key="o.orderNo" class="ocard">
       <view class="ohead">
@@ -26,8 +26,8 @@
           <text class="dname">{{ it.productName }}（{{ it.skuSpec }}）× {{ it.quantity }}</text>
           <text class="dprice">¥{{ yuan(it.subtotal) }}</text>
         </view>
-        <view class="daddr">📍 {{ o._addrText }}</view>
-        <view v-if="o._detail?.trackingNo" class="daddr">🚚 运单号：{{ o._detail.trackingNo }}</view>
+        <view class="daddr">收货：{{ o._addrText }}</view>
+        <view v-if="o._detail?.trackingNo" class="daddr">运单号：{{ o._detail.trackingNo }}</view>
       </view>
     </view>
   </view>
@@ -95,31 +95,31 @@ async function confirmOrder(o) {
 </script>
 
 <style scoped>
-.tabs { white-space: nowrap; padding: 20rpx 24rpx 6rpx; }
+.tabs { white-space: nowrap; padding: 0 24rpx; background: #fff; border-bottom: 1rpx solid #f0f2f4; }
 .tab {
-  display: inline-block; background: #fff; border-radius: 32rpx; padding: 12rpx 34rpx;
-  margin-right: 14rpx; font-size: 26rpx; color: #374151;
+  display: inline-block; padding: 22rpx 4rpx 18rpx; margin-right: 40rpx;
+  font-size: 27rpx; color: #4b5563; border-bottom: 4rpx solid transparent;
 }
-.tab.on { background: #2e9e5b; color: #fff; font-weight: 600; }
+.tab.on { color: #1f7a3d; font-weight: 600; border-bottom-color: #1f7a3d; }
 .empty { text-align: center; color: #9ca3af; padding-top: 180rpx; font-size: 27rpx; }
-.ocard { background: #fff; border-radius: 18rpx; margin: 16rpx 24rpx 0; padding: 24rpx; }
+.ocard { background: #fff; border-radius: 10rpx; margin: 14rpx 20rpx 0; padding: 22rpx; border: 1rpx solid #eceef0; }
 .ohead { display: flex; justify-content: space-between; align-items: center; }
 .ono { color: #6b7280; font-size: 23rpx; }
-.st { font-weight: 700; font-size: 26rpx; }
+.st { font-weight: 600; font-size: 26rpx; }
 .s10 { color: #d97706; } .s20 { color: #1f7a3d; } .s30 { color: #0e7490; }
-.s40 { color: #14532d; } .s50 { color: #9ca3af; } .s60 { color: #ff8c42; } .s70 { color: #7c3aed; }
-.obody { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16rpx; }
+.s40 { color: #14532d; } .s50 { color: #9ca3af; } .s60 { color: #ff6e26; } .s70 { color: #7c3aed; }
+.obody { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14rpx; }
 .ocnt { color: #9ca3af; font-size: 24rpx; }
 .oamt { color: #6b7280; font-size: 24rpx; }
-.money { color: #dc2626; font-size: 32rpx; font-weight: 800; }
-.oacts { display: flex; justify-content: flex-end; gap: 14rpx; margin-top: 18rpx; }
-.act { border-radius: 30rpx; padding: 10rpx 30rpx; font-size: 24rpx; }
-.act.main { background: #2e9e5b; color: #fff; font-weight: 600; }
-.act.danger { border: 3rpx solid #fca5a5; color: #dc2626; }
-.act.ghost { border: 3rpx solid #e5e7eb; color: #6b7280; }
-.odetail { margin-top: 18rpx; border-top: 3rpx dashed #f1f5f0; padding-top: 14rpx; }
+.money { color: #e4393c; font-size: 31rpx; font-weight: 800; }
+.oacts { display: flex; justify-content: flex-end; gap: 14rpx; margin-top: 16rpx; }
+.act { border-radius: 6rpx; padding: 9rpx 28rpx; font-size: 24rpx; }
+.act.main { background: #1f7a3d; color: #fff; font-weight: 600; }
+.act.danger { border: 2rpx solid #f5b5b6; color: #e4393c; }
+.act.ghost { border: 2rpx solid #e5e7eb; color: #6b7280; }
+.odetail { margin-top: 16rpx; border-top: 2rpx dashed #f1f5f0; padding-top: 13rpx; }
 .dline { display: flex; justify-content: space-between; font-size: 24rpx; padding: 6rpx 0; }
 .dname { color: #374151; }
-.dprice { color: #dc2626; font-weight: 600; }
-.daddr { background: #f9fafb; border-radius: 10rpx; padding: 12rpx 18rpx; font-size: 22rpx; color: #6b7280; margin-top: 10rpx; }
+.dprice { color: #e4393c; font-weight: 600; }
+.daddr { background: #f9fafb; border-radius: 6rpx; padding: 11rpx 16rpx; font-size: 22rpx; color: #6b7280; margin-top: 10rpx; }
 </style>
