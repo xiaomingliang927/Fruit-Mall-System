@@ -53,6 +53,12 @@
       "style": {
         "navigationBarTitleText": "登录"
       }
+    },
+    {
+      "path": "pages/refund/refund",
+      "style": {
+        "navigationBarTitleText": "申请售后"
+      }
     }
   ],
   "globalStyle": {

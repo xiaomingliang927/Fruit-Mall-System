@@ -12,7 +12,15 @@ public final class AdminContext {
         HOLDER.set(adminId);
     }
 
-    public static Long getAdminId() {
+    public static Long requireAdminId() {
+		Long id = HOLDER.get();
+		if (id == null) {
+			throw new com.fruitmall.common.BizException(com.fruitmall.common.ErrorCode.UNAUTHORIZED);
+		}
+		return id;
+	}
+
+	public static Long getAdminId() {
         return HOLDER.get();
     }
 

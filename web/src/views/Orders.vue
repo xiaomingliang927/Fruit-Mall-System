@@ -27,6 +27,7 @@
         <button v-if="o.status === 10" class="btn btn-sm btn-danger" @click="cancel(o)">取消订单</button>
         <button v-if="o.status === 20" class="btn btn-sm btn-ghost" disabled>等待商家发货</button>
         <button v-if="o.status === 30" class="btn btn-sm" @click="confirm(o)">确认收货</button>
+        <button v-if="[20, 30, 40].includes(o.status)" class="btn btn-sm btn-outline" @click="openRefund(o)">申请售后</button>
         <button class="btn btn-sm btn-outline" @click="openDetail(o)">查看详情</button>
       </div>
     </div>
@@ -35,6 +36,28 @@
       <button :disabled="page <= 1" @click="goPage(page - 1)">上一页</button>
       <span style="align-self:center;color:var(--muted)">{{ page }} / {{ totalPages }}</span>
       <button :disabled="page >= totalPages" @click="goPage(page + 1)">下一页</button>
+    </div>
+
+    <!-- 售后申请弹层 -->
+    <div v-if="refundOrder" class="modal-mask" @click.self="refundOrder = null">
+      <div class="modal">
+        <h3>申请售后 · {{ refundOrder.orderNo }}</h3>
+        <div class="addr-text">售后金额：整单实付 <b class="price">¥{{ yuan(refundOrder.payAmount) }}</b>；≤50 元自动秒审退款，超额进入人工审核</div>
+        <div class="refund-type">
+          <label class="rf-item" :class="{ on: refundForm.type === 1 }">
+            <input type="radio" value="1" v-model="refundForm.type" /> 仅退款（未收到货/坏果包赔）
+          </label>
+          <label class="rf-item" :class="{ on: refundForm.type === 2 }">
+            <input type="radio" value="2" v-model="refundForm.type" /> 退货退款（已收到货）
+          </label>
+        </div>
+        <textarea class="refund-reason" v-model="refundForm.reason" maxlength="200"
+                  placeholder="请填写申请原因（必填），如：坏果/腐烂/少件…"></textarea>
+        <div style="text-align:right;margin-top:14px">
+          <button class="btn btn-sm btn-ghost" @click="refundOrder = null">取消</button>
+          <button class="btn btn-sm" style="margin-left:10px" :disabled="refundSubmitting" @click="submitRefund">提交申请</button>
+        </div>
+      </div>
     </div>
 
     <!-- 订单详情弹层 -->
@@ -63,7 +86,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { api, toast, fmtTime, yuan } from '../api'
 import { refreshMe } from '../store'
@@ -81,6 +104,34 @@ const page = ref(1)
 const totalPages = ref(1)
 const orders = ref([])
 const detail = ref(null)
+const refundOrder = ref(null)
+const refundForm = reactive({ type: 1, reason: '' })
+const refundSubmitting = ref(false)
+
+function openRefund(o) {
+  refundForm.type = 1
+  refundForm.reason = ''
+  refundOrder.value = o
+}
+
+async function submitRefund() {
+  if (!refundForm.reason.trim()) return toast('请填写申请原因', 'err')
+  refundSubmitting.value = true
+  try {
+    const data = await api.post('/api/v1/refunds', {
+      orderNo: refundOrder.value.orderNo,
+      type: refundForm.type,
+      reason: refundForm.reason.trim(),
+    })
+    refundOrder.value = null
+    toast(data.statusText === '已退款' ? '坏果包赔审核通过，退款原路返回' : '已提交，等待审核')
+    load()
+  } catch (e) {
+    toast(e.message, 'err')
+  } finally {
+    refundSubmitting.value = false
+  }
+}
 
 async function load() {
   const data = await api.get(`/api/v1/orders?${new URLSearchParams({

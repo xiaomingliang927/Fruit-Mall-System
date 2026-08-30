@@ -49,7 +49,7 @@ class OrderFlowIntegrationTest {
 
     Long userId;
     Long addressId;
-    Long skuId = 1L; // V2 种子数据：阿克苏苹果 5斤装，库存 500
+    Long skuId = 11L; // V6 种子：麒麟西瓜 2990 分，库存 500
 
     @BeforeEach
     void setUp() {
@@ -93,13 +93,13 @@ class OrderFlowIntegrationTest {
         Order order = orderMapper.selectOne(new LambdaQueryWrapper<Order>()
                 .eq(Order::getOrderNo, orderNo));
         assertThat(order.getStatus()).isEqualTo(OrderStatus.PENDING_PAY);
-        assertThat(order.getTotalAmount()).isEqualTo(3990 * 2);
+        assertThat(order.getTotalAmount()).isEqualTo(2990 * 2);
 
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getOrderId, order.getId()));
         assertThat(items).hasSize(1);
-        assertThat(items.get(0).getProductName()).isEqualTo("阿克苏冰糖心苹果");
-        assertThat(items.get(0).getPrice()).isEqualTo(3990);
+        assertThat(items.get(0).getProductName()).isEqualTo("麒麟西瓜");
+        assertThat(items.get(0).getPrice()).isEqualTo(2990);
     }
 
     @Test

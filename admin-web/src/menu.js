@@ -20,6 +20,7 @@ export const menuGroups = [
     title: '订单中心',
     items: [
       { path: '/orders', title: '订单列表', icon: 'List', perm: 'order:list' },
+      { path: '/refunds', title: '售后管理', icon: 'Headset', perm: 'refund:list' },
       // 售后管理 / 评价管理 —— M2 完成后追加
     ],
   },
