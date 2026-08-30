@@ -1,103 +1,53 @@
 /**
- * 数据层适配器：后端 API → 页面所需的同步数据结构
- *
- * 页面（index/category/cart/detail/mine）保持果小满原始写法不变，
- * 本文件负责从后端拉取数据并填充 PRODUCTS / CATS / FLASH_IDS / HOT_IDS。
- * 数组均为 Vue reactive，加载完成后依赖它们的页面自动刷新。
+ * 水果商城 - 商品数据与分类
+ * 图片使用 CDN 远程 URL，正式项目可下载到 /static 目录后替换为本地路径
  */
-import { reactive } from 'vue'
-import { BASE_URL, imgUrl } from '../api.js'
 
-const photo = (name) => BASE_URL + '/images/products/' + name
-
-/** 页面引用的图片资源（映射到后端静态目录的真实照片） */
+// 图片资源（CDN 远程地址）
 export const IMG = {
-	banner: photo('gift-box.jpg'),
-	apple: photo('aksu-apple.jpg'),
-	banana: photo('gannan-orange.jpg'),
-	orange: photo('gannan-orange.jpg'),
-	grape: photo('chile-cherry.jpg'),
-	watermelon: photo('gannan-orange.jpg'),
-	strawberry: photo('dandong-strawberry.jpg'),
-	mango: photo('thai-durian.jpg'),
-	blueberry: photo('yunnan-blueberry.jpg'),
-	dragonfruit: photo('gift-box.jpg'),
-	pineapple: photo('gannan-orange.jpg')
+	banner: 'https://aka.doubaocdn.com/s/MDyIsn52kp',
+	apple: 'https://aka.doubaocdn.com/s/EbFefw1nFr',
+	banana: 'https://aka.doubaocdn.com/s/1Stqtu279Y',
+	orange: 'https://aka.doubaocdn.com/s/wvAE58fbUY',
+	grape: 'https://aka.doubaocdn.com/s/aEKu5VuWc7',
+	watermelon: 'https://aka.doubaocdn.com/s/oCGvQrDwyS',
+	strawberry: 'https://aka.doubaocdn.com/s/8MEBywSEHw',
+	mango: 'https://aka.doubaocdn.com/s/fiXuV7mHkW',
+	blueberry: 'https://aka.doubaocdn.com/s/AsxcyYuq10',
+	dragonfruit: 'https://aka.doubaocdn.com/s/iemApzkMqY',
+	pineapple: 'https://aka.doubaocdn.com/s/7VvdMsuNsO'
 }
 
-/** 商品列表（后端 /api/v1/products，按销量降序） */
-export const PRODUCTS = reactive([])
+// 商品列表
+export const PRODUCTS = [
+	{ id: 1, name: '麒麟西瓜 · 沙瓤多汁', spec: '约4kg/个', price: 29.9, unit: '/个', img: IMG.watermelon, tag: '热卖', cat: '时令鲜果', sales: 1200 },
+	{ id: 2, name: '红富士苹果', spec: '500g', price: 8.8, unit: '/份', img: IMG.apple, tag: '', cat: '苹果', sales: 2300 },
+	{ id: 3, name: '海南香蕉', spec: '500g', price: 5.9, unit: '/份', img: IMG.banana, tag: '', cat: '香蕉', sales: 3100 },
+	{ id: 4, name: '赣南脐橙', spec: '500g', price: 9.9, unit: '/份', img: IMG.orange, tag: '特价', cat: '柑橘橙柚', sales: 1800 },
+	{ id: 5, name: '巨峰葡萄 · 果粒饱满', spec: '500g', price: 12.8, unit: '/份', img: IMG.grape, tag: '', cat: '时令鲜果', sales: 960 },
+	{ id: 6, name: '丹东草莓 · 奶油甜', spec: '250g', price: 19.9, unit: '/盒', img: IMG.strawberry, tag: '新品', cat: '浆果莓类', sales: 780 },
+	{ id: 7, name: '金煌芒果', spec: '500g', price: 13.9, unit: '/份', img: IMG.mango, tag: '', cat: '热带水果', sales: 1500 },
+	{ id: 8, name: '云南蓝莓 · 当季', spec: '125g', price: 15.9, unit: '/盒', img: IMG.blueberry, tag: '', cat: '浆果莓类', sales: 640 },
+	{ id: 9, name: '红心火龙果', spec: '约450g/个', price: 7.9, unit: '/个', img: IMG.dragonfruit, tag: '', cat: '热带水果', sales: 1100 },
+	{ id: 10, name: '都乐菠萝', spec: '约1kg/个', price: 12.9, unit: '/个', img: IMG.pineapple, tag: '', cat: '热带水果', sales: 880 }
+]
 
-/** 分类名（后端 /api/v1/categories，首项固定「推荐」） */
-export const CATS = reactive(['推荐'])
+// 分类
+export const CATS = ['推荐', '时令鲜果', '苹果', '柑橘橙柚', '香蕉', '热带水果', '浆果莓类', '果切礼盒']
 
-/** 首页秒杀 = 销量前 4；今日热卖 = 第 5~12 */
-export const FLASH_IDS = reactive([])
-export const HOT_IDS = reactive([])
+// 首页秒杀商品 ID
+export const FLASH_IDS = [5, 6, 8, 1]
 
-let loaded = false
-let loading = null
-const catNameById = {}
+// 首页热卖商品 ID
+export const HOT_IDS = [2, 3, 4, 7, 9, 10, 6, 5]
 
-function fetchJson(url) {
-	return new Promise((resolve) => {
-		uni.request({
-			url: BASE_URL + url,
-			method: 'GET',
-			header: { 'Content-Type': 'application/json' },
-			success: (r) => resolve(r.data && r.data.code === 0 ? r.data.data : null),
-			fail: () => resolve(null),
-		})
-	})
-}
-
-/** 拉取分类与商品并填充响应式数组；幂等，可在任意页面重复调用 */
-export function loadProducts() {
-	if (loaded) return Promise.resolve()
-	if (loading) return loading
-	loading = Promise.all([
-		fetchJson('/api/v1/categories'),
-		fetchJson('/api/v1/products?page=1&size=50'),
-	]).then(([cats, page]) => {
-		cats = cats || []
-		const products = (page && page.records) || []
-		cats.forEach((c) => { catNameById[c.id] = c.name })
-		CATS.splice(0, CATS.length, '推荐', ...cats.map((c) => c.name))
-		PRODUCTS.splice(0, PRODUCTS.length, ...products.map((p) => ({
-			id: p.id,
-			name: p.name,
-			spec: p.subtitle || '',
-			price: p.minPrice / 100,
-			unit: p.unit ? '/' + p.unit : '',
-			img: imgUrl(p.mainImage),
-			tag: (p.tags || '').split(',').filter(Boolean)[0] || '',
-			cat: catNameById[p.categoryId] || '',
-			sales: p.sales
-		})))
-		const bySales = [...PRODUCTS].sort((a, b) => b.sales - a.sales)
-		FLASH_IDS.splice(0, FLASH_IDS.length, ...bySales.slice(0, 4).map((p) => p.id))
-		HOT_IDS.splice(0, HOT_IDS.length, ...bySales.slice(4, 12).map((p) => p.id))
-		loaded = true
-	}).catch(() => {
-		loading = null
-		uni.showToast({ title: '数据加载失败，请确认后端已启动', icon: 'none' })
-	})
-	return loading
-}
-
-// 模块加载即预热数据（Tab 首页导入本文件时自动触发）
-loadProducts()
-
-// 根据 ID 获取商品（未加载完成时返回占位对象，避免模板报错）
+// 根据 ID 获取商品
 export function getProduct(id) {
-	return PRODUCTS.find((p) => p.id === Number(id)) || {
-		id: Number(id), name: '加载中…', spec: '', price: 0, unit: '',
-		img: IMG.apple, tag: '', cat: '', sales: 0
-	}
+	return PRODUCTS.find(p => p.id === Number(id))
 }
 
-// 根据分类名获取商品（「推荐」返回全部）
+// 根据分类获取商品
 export function getProductsByCat(cat) {
 	if (cat === '推荐') return PRODUCTS
-	return PRODUCTS.filter((p) => p.cat === cat)
+	return PRODUCTS.filter(p => p.cat === cat)
 }

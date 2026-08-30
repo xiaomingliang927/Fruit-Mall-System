@@ -22,7 +22,7 @@ public class ProductService {
 
     /** 最低价 SKU 价格，用于列表展示「xx元起」 */
     public record ProductListVO(Long id, Long categoryId, String name, String subtitle, String mainImage,
-                                String origin, String tags, Integer sales, Integer minPrice) {
+                                String origin, String unit, String tags, Integer sales, Integer minPrice) {
     }
 
     public record CategoryNode(Long id, String name, String icon, List<CategoryNode> children) {
@@ -56,7 +56,7 @@ public class ProductService {
         Page<Product> result = productMapper.selectPage(new Page<>(page, size), wrapper);
         return PageResult.of(result, p -> new ProductListVO(
                 p.getId(), p.getCategoryId(), p.getName(), p.getSubtitle(), p.getMainImage(),
-                p.getOrigin(), p.getTags(), p.getSales(), minPrice(p.getId())));
+                p.getOrigin(), p.getUnit(), p.getTags(), p.getSales(), minPrice(p.getId())));
     }
 
     private final Map<Long, Integer> minPriceCache = new java.util.concurrent.ConcurrentHashMap<>();
