@@ -18,6 +18,7 @@ const routes = [
       { path: 'products', name: 'products', component: () => import('./views/Products.vue'), meta: { title: '商品列表' } },
       { path: 'orders', name: 'orders', component: () => import('./views/Orders.vue'), meta: { title: '订单列表' } },
       { path: 'refunds', name: 'refunds', component: () => import('./views/Refunds.vue'), meta: { title: '售后管理' } },
+      { path: 'reviews', name: 'reviews', component: () => import('./views/Reviews.vue'), meta: { title: '评价管理' } },
       { path: 'members', name: 'members', component: () => import('./views/Members.vue'), meta: { title: '会员列表' } },
     ],
   },

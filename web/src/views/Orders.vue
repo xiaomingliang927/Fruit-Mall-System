@@ -27,6 +27,7 @@
         <button v-if="o.status === 10" class="btn btn-sm btn-danger" @click="cancel(o)">取消订单</button>
         <button v-if="o.status === 20" class="btn btn-sm btn-ghost" disabled>等待商家发货</button>
         <button v-if="o.status === 30" class="btn btn-sm" @click="confirm(o)">确认收货</button>
+        <button v-if="o.status === 40" class="btn btn-sm" @click="openReview(o)">评价</button>
         <button v-if="[20, 30, 40].includes(o.status)" class="btn btn-sm btn-outline" @click="openRefund(o)">申请售后</button>
         <button class="btn btn-sm btn-outline" @click="openDetail(o)">查看详情</button>
       </div>
@@ -36,6 +37,32 @@
       <button :disabled="page <= 1" @click="goPage(page - 1)">上一页</button>
       <span style="align-self:center;color:var(--muted)">{{ page }} / {{ totalPages }}</span>
       <button :disabled="page >= totalPages" @click="goPage(page + 1)">下一页</button>
+    </div>
+
+    <!-- 评价弹层 -->
+    <div v-if="reviewOrder" class="modal-mask" @click.self="reviewOrder = null">
+      <div class="modal">
+        <h3>评价订单 · {{ reviewOrder.orderNo }}</h3>
+        <div v-if="!reviewItems.length" class="addr-text">该订单商品均已评价过，感谢反馈！</div>
+        <div v-for="(it, i) in reviewItems" :key="it.orderItemId" class="review-item">
+          <div class="ri-head">{{ it.productName }}（{{ it.skuSpec }}）</div>
+          <template v-if="!it.reviewed">
+            <div class="ri-stars">
+              <span v-for="n in 5" :key="n" class="star" :class="{ on: n <= (it.rating || 5) }"
+                    @click="it.rating = n">★</span>
+              <span class="ri-tip">{{ (it.rating || 5) >= 4 ? '好评' : (it.rating || 5) >= 3 ? '中评' : '差评' }}</span>
+            </div>
+            <textarea class="ri-content" v-model="it.content" maxlength="200"
+                      placeholder="宝贝新鲜吗？说说你的体验吧～"></textarea>
+          </template>
+          <div v-else class="ri-done">已评价 ✓</div>
+          <input v-if="!it.reviewed" class="ri-anon" type="checkbox" v-model="it.anonymous" /> <label v-if="!it.reviewed" class="ri-anon-lb">匿名评价</label>
+        </div>
+        <div style="text-align:right;margin-top:14px">
+          <button class="btn btn-sm btn-ghost" @click="reviewOrder = null">取消</button>
+          <button class="btn btn-sm" style="margin-left:10px" :disabled="reviewSubmitting" @click="submitReview">提交评价</button>
+        </div>
+      </div>
     </div>
 
     <!-- 售后申请弹层 -->
@@ -107,6 +134,42 @@ const detail = ref(null)
 const refundOrder = ref(null)
 const refundForm = reactive({ type: 1, reason: '' })
 const refundSubmitting = ref(false)
+const reviewOrder = ref(null)
+const reviewItems = ref([])
+const reviewSubmitting = ref(false)
+
+function openReview(o) {
+  reviewOrder.value = o
+  api.get(`/api/v1/reviews/summary?orderNo=${o.orderNo}`).then((items) => {
+    reviewItems.value = items.map((it) => ({ ...it, rating: 5, content: '', anonymous: false }))
+  })
+}
+
+async function submitReview() {
+  const pending = reviewItems.value.filter((it) => !it.reviewed)
+  for (const it of pending) {
+    if (!it.content.trim()) return toast(`请填写「${it.productName}」的评价内容`, 'err')
+  }
+  reviewSubmitting.value = true
+  try {
+    for (const it of pending) {
+      await api.post('/api/v1/reviews', {
+        orderNo: reviewOrder.value.orderNo,
+        orderItemId: it.orderItemId,
+        rating: it.rating,
+        content: it.content.trim(),
+        isAnonymous: it.anonymous,
+      })
+    }
+    reviewOrder.value = null
+    toast('评价成功，感谢反馈')
+    load()
+  } catch (e) {
+    toast(e.message, 'err')
+  } finally {
+    reviewSubmitting.value = false
+  }
+}
 
 function openRefund(o) {
   refundForm.type = 1

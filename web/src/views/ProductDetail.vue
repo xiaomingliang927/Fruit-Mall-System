@@ -46,6 +46,26 @@
         <button class="btn" :disabled="!currentSku || currentSku.stock <= 0" @click="buyNow">立即购买</button>
       </div>
     </div>
+
+    <!-- 评价区 -->
+    <div class="detail reviews-card" style="display:block;margin-top:16px">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:12px">
+        <span style="font-size:16px;font-weight:700">商品评价（{{ reviews.length }}）</span>
+        <span style="font-size:13px;color:var(--muted)">评分 <b class="price" style="font-size:17px">{{ product.ratingAvg }}</b></span>
+      </div>
+      <div v-if="!reviews.length" style="color:var(--muted);font-size:13.5px;padding:8px 0 12px">暂无评价，买过的同学快来抢沙发～</div>
+      <div v-for="r in reviews" :key="r.id" class="rv-item">
+        <div class="rv-head">
+          <span class="rv-user">{{ r.userNickname }}</span>
+          <span class="rv-stars">
+            <span v-for="n in 5" :key="n" class="rv-star" :class="{ on: n <= r.rating }">★</span>
+          </span>
+          <span class="rv-date">{{ r.createdAt }}</span>
+        </div>
+        <div class="rv-content">{{ r.content }}</div>
+        <div v-if="r.adminReply" class="rv-reply">商家回复：{{ r.adminReply }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -62,6 +82,7 @@ const currentSku = ref(null)
 const qty = ref(1)
 
 const isFav = ref(false)
+const reviews = ref([])
 
 onMounted(async () => {
   product.value = await api.get(`/api/v1/products/${route.params.id}`)
@@ -69,6 +90,9 @@ onMounted(async () => {
   if (useStore.token) {
     isFav.value = await api.get(`/api/v1/favorites/${route.params.id}/exists`)
   }
+  api.get(`/api/v1/products/${route.params.id}/reviews?page=1&size=5`)
+    .then((d) => (reviews.value = d.records))
+    .catch(() => {})
 })
 
 async function toggleFav() {

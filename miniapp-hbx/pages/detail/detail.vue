@@ -79,13 +79,16 @@
 </template>
 
 <script>
+	import { api } from '../../api'
 	import { getProduct } from '@/utils/data.js'
 	import { addToCart, getCartCount, updateCartBadge } from '@/utils/cart.js'
 
 	export default {
 		data() {
 			return {
-				statusBarHeight: 20,
+				reviews: [],
+			avgRating: '5.0',
+			statusBarHeight: 20,
 				productId: 0,
 				product: {},
 				cartCount: 0
@@ -110,6 +113,10 @@
 			this.refreshCart()
 		},
 		methods: {
+		calcAvg(list) {
+			const sum = list.reduce((s, r) => s + r.rating, 0)
+			return (sum / list.length).toFixed(1)
+		},
 			refreshCart() {
 				this.cartCount = getCartCount()
 			},
@@ -181,4 +188,18 @@
 	.d-bar-btn { flex: 1; height: 80rpx; border-radius: 44rpx; font-size: 28rpx; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; }
 	.d-bar-btn.add { background: linear-gradient(90deg, #ffa84d, #ff8a3d); }
 	.d-bar-btn.buy { background: linear-gradient(90deg, #35b47e, #1f8a58); }
+	.rv-avg { color: #f24e3e; font-weight: 700; margin-left: 12rpx; }
+	.rv-empty { color: #a5aca1; font-size: 24rpx; padding: 8rpx 0 12rpx; }
+	.rv-item { border-bottom: 1rpx dashed #f0f2f4; padding: 12rpx 0; }
+	.rv-item:last-child { border-bottom: none; }
+	.rv-head { display: flex; align-items: center; gap: 12rpx; }
+	.rv-user { font-size: 24rpx; font-weight: 600; }
+	.rv-star { font-size: 22rpx; color: #e2e5e9; }
+	.rv-star.on { color: #f7ba2a; }
+	.rv-date { margin-left: auto; font-size: 20rpx; color: #a5aca1; }
+	.rv-content { font-size: 24rpx; color: #4b5563; margin-top: 8rpx; line-height: 1.7; }
+	.rv-reply {
+		background: #f7f9f5; border-left: 4rpx solid #2e9e6b; border-radius: 6rpx;
+		padding: 10rpx 16rpx; font-size: 22rpx; color: #6b7269; margin-top: 10rpx;
+	}
 </style>

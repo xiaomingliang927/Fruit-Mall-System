@@ -19,6 +19,7 @@ public class ProductService {
     private final CategoryMapper categoryMapper;
     private final ProductMapper productMapper;
     private final ProductSkuMapper skuMapper;
+    private final com.fruitmall.modules.review.ReviewMapper reviewMapper;
 
     /** 最低价 SKU 价格，用于列表展示「xx元起」；firstSkuId 供购物车直接加购 */
     public record ProductListVO(Long id, Long categoryId, String name, String subtitle, String mainImage,
@@ -86,8 +87,18 @@ public class ProductService {
     public record SkuVO(Long id, String spec, Integer price, Integer stock) {
     }
 
+    /** 大小写不敏感的聚合取值 */
+    private static long num(Map<String, Object> map, String key) {
+        if (map == null) return 0;
+        for (var e : map.entrySet()) {
+            if (key.equalsIgnoreCase(e.getKey()) && e.getValue() instanceof Number n) return n.longValue();
+        }
+        return 0;
+    }
+
     public record ProductDetailVO(Long id, String name, String subtitle, String mainImage, String origin,
-                                  String unit, String tags, Integer sales, List<SkuVO> skus) {
+                                  String unit, String tags, Integer sales, List<SkuVO> skus,
+                                  String ratingAvg, Long reviewCount) {
     }
 
     public ProductDetailVO detail(Long id) {
@@ -101,8 +112,12 @@ public class ProductService {
                 .stream()
                 .map(s -> new SkuVO(s.getId(), s.getSpec(), s.getPrice(), s.getStock()))
                 .toList();
+        // 评分聚合（仅可见评价）：均分与条数
+        Map<String, Object> agg = reviewMapper.ratingAggByProduct(id);
+        long reviewCount = num(agg, "cnt");
+        String ratingAvg = reviewCount == 0 ? "5.0" : String.valueOf(num(agg, "avgX10") / 10.0);
         return new ProductDetailVO(product.getId(), product.getName(), product.getSubtitle(),
                 product.getMainImage(), product.getOrigin(), product.getUnit(), product.getTags(),
-                product.getSales(), skus);
+                product.getSales(), skus, ratingAvg, reviewCount);
     }
 }

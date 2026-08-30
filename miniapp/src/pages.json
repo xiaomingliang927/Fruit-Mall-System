@@ -37,6 +37,12 @@
       }
     },
     {
+      "path": "pages/review/review",
+      "style": {
+        "navigationBarTitleText": "发表评价"
+      }
+    },
+    {
       "path": "pages/detail/detail",
       "style": {
         "navigationStyle": "custom"

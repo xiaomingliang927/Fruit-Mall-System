@@ -19,6 +19,8 @@
         <view v-if="o.status === 10" class="act main" @tap="pay(o)">立即支付</view>
         <view v-if="o.status === 10" class="act danger" @tap="cancel(o)">取消</view>
         <view v-if="o.status === 30" class="act main" @tap="confirmOrder(o)">确认收货</view>
+        <view v-if="o.status === 40" class="act main" @tap="goReview(o)">评价</view>
+        <view v-if="[20, 30, 40].includes(o.status)" class="act ghost" @tap="goRefund(o)">申请售后</view>
         <view class="act ghost" @tap="toggleDetail(o)">{{ o._open ? '收起' : '详情' }}</view>
       </view>
       <view v-if="o._open" class="odetail">
@@ -73,6 +75,14 @@ async function toggleDetail(o) {
     o._addrText = `${addr.receiver || ''} ${addr.phone || ''} ｜ ${addr.province || ''}${addr.city || ''}${addr.district || ''} ${addr.detail || ''}`
   }
   o._open = !o._open
+}
+
+function goRefund(o) {
+  uni.navigateTo({ url: '/pages/refund/refund?orderNo=' + o.orderNo + '&amount=' + o.payAmount })
+}
+
+function goReview(o) {
+  uni.navigateTo({ url: '/pages/review/review?orderNo=' + o.orderNo })
 }
 
 async function pay(o) {
