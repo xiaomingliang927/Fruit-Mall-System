@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: fruit-mall-backend
+  datasource:
+    # 生产 profile：所有敏感项必须由环境变量提供，缺失即启动失败（fail fast）
+    url: jdbc:mysql://${FRUIT_DB_HOST}:${FRUIT_DB_PORT:3306}/${FRUIT_DB_NAME:fruit_mall}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=true&createDatabaseIfNotExist=false
+    username: ${FRUIT_DB_USER}
+    password: ${FRUIT_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 2
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+
+app:
+  jwt:
+    secret: ${FRUIT_JWT_SECRET}
+    expire-hours: ${FRUIT_JWT_EXPIRE_HOURS:168}
+  wechat:
+    appid: ${FRUIT_WX_APPID}
+    secret: ${FRUIT_WX_SECRET}

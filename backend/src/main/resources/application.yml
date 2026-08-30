@@ -5,10 +5,17 @@ spring:
   application:
     name: fruit-mall-backend
   datasource:
-    url: jdbc:mysql://localhost:3306/fruit_mall?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: "123456"      # TODO: 改成本机 MySQL 密码，生产环境用环境变量注入
+    # 密钥一律走环境变量（默认值仅供本地开发）；createDatabaseIfNotExist 免去手动建库
+    url: jdbc:mysql://${FRUIT_DB_HOST:localhost}:${FRUIT_DB_PORT:3306}/${FRUIT_DB_NAME:fruit_mall}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: ${FRUIT_DB_USER:root}
+    password: ${FRUIT_DB_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # 已有表结构的老库：首次接入 Flyway 时打基线（跳过 V1/V2），此后只应用新增迁移
+    baseline-on-migrate: true
+    baseline-version: 2
   jackson:
     default-property-inclusion: non_null
 
@@ -21,10 +28,10 @@ mybatis-plus:
 
 app:
   jwt:
-    # HS256 签名密钥，生产环境务必更换并通过环境变量 FRUIT_JWT_SECRET 注入
-    secret: fruit-mall-dev-jwt-secret-change-me-please-0123456789abcdef
+    # HS256 签名密钥：生产环境必须通过环境变量 FRUIT_JWT_SECRET 注入并定期轮换
+    secret: ${FRUIT_JWT_SECRET:fruit-mall-dev-jwt-secret-change-me-please-0123456789abcdef}
     expire-hours: 168
   wechat:
     # 小程序 AppID/Secret；两者都配置后走真实 code2Session，留空则进入开发模式（openid = dev-<code>）
-    appid: ""
-    secret: ""
+    appid: ${FRUIT_WX_APPID:}
+    secret: ${FRUIT_WX_SECRET:}
