@@ -36,6 +36,12 @@
       </div>
 
       <div class="d-actions">
+        <button class="btn btn-fav" :class="{ on: isFav }" @click="toggleFav">
+          <svg viewBox="0 0 24 24" width="16" height="16" :fill="isFav ? 'currentColor' : 'none'"
+               stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px">
+            <path d="M12 21C7 16.5 3 13.3 3 9.3 3 6.4 5.2 4 8 4c1.6 0 3.1.8 4 2 0.9-1.2 2.4-2 4-2 2.8 0 5 2.4 5 5.3 0 4-4 7.2-9 11.7z"/>
+          </svg>{{ isFav ? '已收藏' : '收藏' }}
+        </button>
         <button class="btn btn-warn" :disabled="!currentSku || currentSku.stock <= 0" @click="addToCart">加入购物车</button>
         <button class="btn" :disabled="!currentSku || currentSku.stock <= 0" @click="buyNow">立即购买</button>
       </div>
@@ -47,7 +53,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api, toast, yuan } from '../api'
-import { refreshMe } from '../store'
+import { refreshMe, useStore } from '../store'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,10 +61,30 @@ const product = ref(null)
 const currentSku = ref(null)
 const qty = ref(1)
 
+const isFav = ref(false)
+
 onMounted(async () => {
   product.value = await api.get(`/api/v1/products/${route.params.id}`)
   currentSku.value = product.value.skus.find((s) => s.stock > 0) || product.value.skus[0]
+  if (useStore.token) {
+    isFav.value = await api.get(`/api/v1/favorites/${route.params.id}/exists`)
+  }
 })
+
+async function toggleFav() {
+  if (!useStore.token) {
+    return router.push({ name: 'login', query: { redirect: route.fullPath } })
+  }
+  if (isFav.value) {
+    await api.delete(`/api/v1/favorites/${route.params.id}`)
+    isFav.value = false
+    toast('已取消收藏')
+  } else {
+    await api.post(`/api/v1/favorites/${route.params.id}`)
+    isFav.value = true
+    toast('已加入收藏')
+  }
+}
 
 async function addToCart() {
   await api.post('/api/v1/cart/items', { skuId: currentSku.value.id, quantity: qty.value })

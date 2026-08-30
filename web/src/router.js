@@ -8,6 +8,8 @@ const routes = [
   { path: '/cart', name: 'cart', component: () => import('./views/Cart.vue'), meta: { requiresAuth: true } },
   { path: '/checkout', name: 'checkout', component: () => import('./views/Checkout.vue'), meta: { requiresAuth: true } },
   { path: '/orders', name: 'orders', component: () => import('./views/Orders.vue'), meta: { requiresAuth: true } },
+  { path: '/mine', name: 'mine', component: () => import('./views/Mine.vue'), meta: { requiresAuth: true } },
+  { path: '/favorites', name: 'favorites', component: () => import('./views/Favorites.vue'), meta: { requiresAuth: true } },
 ]
 
 const router = createRouter({ history: createWebHistory(), routes })
