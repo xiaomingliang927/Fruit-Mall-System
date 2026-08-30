@@ -11,18 +11,13 @@
       </div>
       <el-menu :default-active="$route.path" router class="menu"
                background-color="transparent" text-color="#9aa8b8" active-text-color="#ffffff">
-        <el-menu-item index="/dashboard">
-          <el-icon><Odometer /></el-icon><span>数据看板</span>
-        </el-menu-item>
-        <el-menu-item index="/revenue">
-          <el-icon><TrendCharts /></el-icon><span>营业统计</span>
-        </el-menu-item>
-        <el-menu-item index="/products">
-          <el-icon><Goods /></el-icon><span>商品管理</span>
-        </el-menu-item>
-        <el-menu-item index="/orders">
-          <el-icon><List /></el-icon><span>订单管理</span>
-        </el-menu-item>
+        <template v-for="group in menuGroups" :key="group.title">
+          <el-menu-item-group :title="group.title">
+            <el-menu-item v-for="item in group.items" :key="item.path" :index="item.path">
+              <el-icon><component :is="item.icon" /></el-icon><span>{{ item.title }}</span>
+            </el-menu-item>
+          </el-menu-item-group>
+        </template>
       </el-menu>
       <div class="side-foot">v0.1.0</div>
     </aside>
@@ -55,6 +50,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { adminStore } from '../store'
+import { menuGroups } from '../menu'
 
 const router = useRouter()
 
@@ -76,7 +72,7 @@ function onCommand(cmd) {
   background: #1d2733;
   position: sticky; top: 0; height: 100vh;
 }
-.brand { display: flex; align-items: center; gap: 11px; padding: 18px 18px 16px; }
+.brand { display: flex; align-items: center; gap: 11px; padding: 18px 18px 14px; }
 .mark {
   width: 36px; height: 36px; border-radius: 8px; flex: none;
   background: #4080ff; color: #fff; font-size: 17px; font-weight: 700;
@@ -85,9 +81,12 @@ function onCommand(cmd) {
 .bt .t1 { color: #fff; font-size: 16px; font-weight: 600; letter-spacing: 1px; }
 .bt .t2 { color: #7d8b9c; font-size: 11px; letter-spacing: 1px; margin-top: 1px; }
 
-.menu { border: none; flex: 1; padding: 6px 10px; }
+.menu { border: none; flex: 1; padding: 2px 10px; overflow-y: auto; }
+.menu :deep(.el-menu-item-group__title) {
+  color: #66768a; font-size: 11.5px; padding: 14px 8px 4px; letter-spacing: 1px;
+}
 .menu :deep(.el-menu-item) {
-  height: 42px; margin: 3px 0; border-radius: 6px; font-size: 14px;
+  height: 40px; margin: 2px 0; border-radius: 6px; font-size: 14px;
   transition: background 0.15s;
 }
 .menu :deep(.el-menu-item:hover) { background: rgba(255, 255, 255, 0.06); }

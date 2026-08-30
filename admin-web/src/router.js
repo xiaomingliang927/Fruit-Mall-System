@@ -14,8 +14,9 @@ const routes = [
     children: [
       { path: 'dashboard', name: 'dashboard', component: () => import('./views/Dashboard.vue'), meta: { title: '数据看板' } },
       { path: 'revenue', name: 'revenue', component: () => import('./views/Revenue.vue'), meta: { title: '营业统计' } },
-      { path: 'products', name: 'products', component: () => import('./views/Products.vue'), meta: { title: '商品管理' } },
-      { path: 'orders', name: 'orders', component: () => import('./views/Orders.vue'), meta: { title: '订单管理' } },
+      { path: 'products', name: 'products', component: () => import('./views/Products.vue'), meta: { title: '商品列表' } },
+      { path: 'orders', name: 'orders', component: () => import('./views/Orders.vue'), meta: { title: '订单列表' } },
+      { path: 'members', name: 'members', component: () => import('./views/Members.vue'), meta: { title: '会员列表' } },
     ],
   },
 ]
