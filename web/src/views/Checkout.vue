@@ -34,8 +34,22 @@
       </div>
     </div>
 
+    <div class="panel">
+      <h3>优惠券</h3>
+      <div v-if="!usableCoupons.length" class="check-line"><span class="lab">无可用优惠券（可在领券中心领取）</span></div>
+      <label v-for="c in usableCoupons" :key="c.userCouponId" class="check-line coupon-line"
+             :class="{ selected: userCouponId === c.userCouponId }"
+             @click="userCouponId = userCouponId === c.userCouponId ? null : c.userCouponId">
+        <span><b>{{ c.name }}</b>（{{ c.typeText }}）<span class="lab"> · 有效期至 {{ (c.expireAt || '').slice(0, 10) }}</span></span>
+        <span class="price">-¥{{ ((c.type === 2 ? Math.floor(totalAmount * (100 - c.discountPercent) / 100) : Math.min(c.discountAmount || 0, totalAmount)) / 100).toFixed(2) }}</span>
+      </label>
+    </div>
+
     <div class="submit-row">
-      <span class="amount">应付总额：<b class="price">¥{{ yuan(totalAmount) }}</b></span>
+      <span class="amount">商品合计：<b>¥{{ yuan(totalAmount) }}</b>
+        <template v-if="couponDiscount > 0"><span style="margin-left:10px">券已减</span><b class="price" style="font-size:15px">¥{{ yuan(couponDiscount) }}</b></template>
+      </span>
+      <span class="amount">应付总额：<b class="price">¥{{ yuan(payAmount) }}</b></span>
       <button class="btn" style="padding:12px 40px" :disabled="submitting || !addressId" @click="submitOrder">
         {{ submitting ? '提交中…' : '提交订单' }}
       </button>
@@ -47,7 +61,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api, toast, yuan } from '../api'
-import { refreshMe } from '../store'
+import { refreshMe, useStore } from '../store'
 
 const route = useRoute()
 const router = useRouter()
@@ -59,6 +73,20 @@ const submitting = ref(false)
 const form = reactive({ receiver: '', phone: '', province: '', city: '', district: '', detail: '' })
 
 const totalAmount = computed(() => lines.value.reduce((s, l) => s + l.amount, 0))
+const usableCoupons = ref([])
+const userCouponId = ref(null)
+const couponDiscount = computed(() => {
+  if (!userCouponId.value) return 0
+  const c = usableCoupons.value.find((x) => x.userCouponId === userCouponId.value)
+  if (!c) return 0
+  if (c.type === 2) return Math.floor(totalAmount.value * (100 - c.discountPercent) / 100)
+  return Math.min(c.discountAmount || 0, totalAmount.value)
+})
+const payAmount = computed(() => Math.max(totalAmount.value - couponDiscount.value, 1))
+async function loadUsable() {
+  if (!useStore.token) return
+  try { usableCoupons.value = await api.get(`/api/v1/coupons/usable?amount=${totalAmount.value}`) } catch (e) { /* 静默 */ }
+}
 
 onMounted(async () => {
   addresses.value = await api.get('/api/v1/users/me/addresses')
@@ -108,10 +136,11 @@ async function submitOrder() {
     const orderNo = await api.post('/api/v1/orders', {
       addressId: addressId.value,
       items: lines.value.map((l) => ({ skuId: l.skuId, quantity: l.qty })),
+      userCouponId: userCouponId.value || undefined,
     })
     if (fromCart) await api.delete('/api/v1/cart/items/checked')
     await refreshMe()
-    toast('下单成功，去支付')
+    toast(couponDiscount.value > 0 ? `下单成功，已优惠 ¥${yuan(couponDiscount.value)}` : '下单成功，去支付')
     router.push({ name: 'orders', query: { pay: orderNo } })
   } catch (e) {
     toast(e.message, 'err')

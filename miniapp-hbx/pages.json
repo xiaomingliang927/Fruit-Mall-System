@@ -31,6 +31,12 @@
       }
     },
     {
+      "path": "pages/coupon/coupon",
+      "style": {
+        "navigationBarTitleText": "领券中心"
+      }
+    },
+    {
       "path": "pages/detail/detail",
       "style": {
         "navigationStyle": "custom"
@@ -52,6 +58,12 @@
       "path": "pages/login/login",
       "style": {
         "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/refund/refund",
+      "style": {
+        "navigationBarTitleText": "申请售后"
       }
     }
   ],

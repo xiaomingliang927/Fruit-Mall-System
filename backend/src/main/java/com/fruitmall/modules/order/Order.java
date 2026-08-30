@@ -42,6 +42,9 @@ public class Order {
     /** 快递运单号，发货时录入 */
     private String trackingNo;
 
+    /** 使用的用户优惠券ID（取消订单时退回） */
+    private Long userCouponId;
+
     private String remark;
 
     private LocalDateTime paidAt;

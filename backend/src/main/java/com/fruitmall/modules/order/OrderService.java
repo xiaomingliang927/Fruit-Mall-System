@@ -38,6 +38,7 @@ public class OrderService {
     private final UserAddressMapper addressMapper;
     private final PaymentMapper paymentMapper;
     private final ObjectMapper objectMapper;
+    private final com.fruitmall.modules.coupon.CouponService couponService;
 
     public record OrderListVO(Long id, String orderNo, Integer status, String statusText,
                               Integer totalAmount, Integer payAmount, LocalDateTime createdAt) {
@@ -86,13 +87,19 @@ public class OrderService {
             items.add(item);
             totalAmount += item.getSubtotal();
         }
+        String orderNo = generateOrderNo();
+        int couponDiscount = 0;
+        if (request.userCouponId() != null) {
+            couponDiscount = couponService.useForOrder(userId, request.userCouponId(), totalAmount, orderNo);
+        }
         Order order = new Order();
-        order.setOrderNo(generateOrderNo());
+        order.setOrderNo(orderNo);
         order.setUserId(userId);
         order.setStatus(OrderStatus.PENDING_PAY);
         order.setTotalAmount(totalAmount);
         order.setFreight(0);
-        order.setPayAmount(totalAmount);
+        order.setPayAmount(Math.max(totalAmount - couponDiscount, 1));
+        order.setUserCouponId(request.userCouponId());
         order.setDeliveryType(1);
         order.setRemark(request.remark());
         order.setAddressSnapshot(toAddressJson(address));
@@ -113,6 +120,7 @@ public class OrderService {
         }
         order.setStatus(OrderStatus.CANCELLED);
         orderMapper.updateById(order);
+        couponService.returnCoupon(order.getUserCouponId());
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getOrderId, order.getId()));
         for (OrderItem item : items) {

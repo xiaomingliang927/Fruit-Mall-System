@@ -305,3 +305,8 @@ body {
   .cart-head, .cart-row { grid-template-columns: 44px 80px 1fr 100px; }
   .addr-grid, .addr-form { grid-template-columns: 1fr; }
 }
+
+/* ===== 结算页选券 ===== */
+.coupon-line { cursor: pointer; border-radius: 6px; padding-left: 10px !important; padding-right: 10px !important; }
+.coupon-line:hover { background: #fafbfc; }
+.coupon-line.selected { background: var(--green-100); outline: 1px solid var(--green-700); }

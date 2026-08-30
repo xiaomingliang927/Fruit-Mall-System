@@ -9,6 +9,7 @@ const routes = [
   { path: '/checkout', name: 'checkout', component: () => import('./views/Checkout.vue'), meta: { requiresAuth: true } },
   { path: '/orders', name: 'orders', component: () => import('./views/Orders.vue'), meta: { requiresAuth: true } },
   { path: '/mine', name: 'mine', component: () => import('./views/Mine.vue'), meta: { requiresAuth: true } },
+  { path: '/coupons', name: 'coupons', component: () => import('./views/Coupons.vue') },
   { path: '/favorites', name: 'favorites', component: () => import('./views/Favorites.vue'), meta: { requiresAuth: true } },
 ]
 

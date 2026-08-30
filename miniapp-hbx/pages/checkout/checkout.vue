@@ -21,6 +21,18 @@
     </view>
 
     <view class="card">
+      <view class="h">优惠券</view>
+      <view v-if="!usableCoupons.length" class="no-cpn">无可用优惠券</view>
+      <view v-for="cp in usableCoupons" :key="cp.userCouponId" class="cpn-line" :class="{ on: userCouponId === cp.userCouponId }" @tap="userCouponId = userCouponId === cp.userCouponId ? null : cp.userCouponId">
+        <view>
+          <view class="cpn-line-name">{{ cp.name }}（{{ cp.typeText }}）</view>
+          <view class="cpn-line-sub">有效期至 {{ (cp.expireAt || '').slice(0, 10) }}</view>
+        </view>
+        <view class="cpn-line-amt">-¥{{ yuan(cp.discountAmount || 0) }}</view>
+      </view>
+    </view>
+
+    <view class="card">
       <view class="h">商品清单（{{ lines.length }} 种）</view>
       <view v-for="l in lines" :key="l.skuId" class="line">
         <text class="lname"><text class="bold">{{ l.name }}</text>（{{ l.spec }}）× {{ l.qty }}</text>
@@ -29,7 +41,7 @@
     </view>
 
     <view class="foot">
-      <view class="sum">应付 <text class="total">¥{{ yuan(totalAmount) }}</text></view>
+      <view class="sum">应付 <text class="total">¥{{ yuan(payAmount) }}</text><text v-if="couponDiscount > 0" class="cut"> 券已减 ¥{{ yuan(couponDiscount) }}</text></view>
       <view class="submit" @tap="submit">提交订单</view>
     </view>
   </view>
@@ -44,10 +56,20 @@ const addresses = ref([])
 const addressId = ref(null)
 const showForm = ref(false)
 const lines = ref([])
+		const usableCoupons = ref([])
+		const userCouponId = ref(null)
 const buyNowMode = ref(false)
 const form = ref({ receiver: '', phone: '', province: '', city: '', district: '', detail: '' })
 
 const totalAmount = computed(() => lines.value.reduce((s, l) => s + l.amount, 0))
+const couponDiscount = computed(() => {
+  if (!userCouponId.value) return 0
+  const cp = usableCoupons.value.find((x) => x.userCouponId === userCouponId.value)
+  if (!cp) return 0
+  if (cp.type === 2) return Math.floor(totalAmount.value * (100 - cp.discountPercent) / 100)
+  return Math.min(cp.discountAmount || 0, totalAmount.value)
+})
+const payAmount = computed(() => Math.max(totalAmount.value - couponDiscount.value, 1))
 
 onLoad(async (opt) => {
   addresses.value = await api.get('/api/v1/users/me/addresses')
@@ -65,9 +87,17 @@ onLoad(async (opt) => {
       .filter((it) => it.checked && it.stock > 0)
       .map((it) => ({ skuId: it.skuId, name: it.productName, spec: it.spec, qty: it.quantity, amount: it.subtotal }))
   }
+  loadUsable()
 })
 
-async function saveAddress() {
+async function loadUsable() {
+      if (!uni.getStorageSync('token')) return
+      const total = lines.value.reduce((sum, l) => sum + l.amount, 0)
+      if (total <= 0) return
+      try { usableCoupons.value = await api.get('/api/v1/coupons/usable?amount=' + total) } catch (e) { /* 静默 */ }
+    }
+
+    async function saveAddress() {
   const f = form.value
   if (!f.receiver || !f.phone || !f.province || !f.city || !f.detail) {
     return uni.showToast({ title: '请完整填写地址信息', icon: 'none' })
@@ -85,6 +115,7 @@ async function submit() {
     const orderNo = await api.post('/api/v1/orders', {
       addressId: addressId.value,
       items: lines.value.map((l) => ({ skuId: l.skuId, quantity: l.qty })),
+      userCouponId: userCouponId.value || undefined,
     })
     if (!buyNowMode.value) await api.delete('/api/v1/cart/items/checked')
     const { confirm } = await uni.showModal({
@@ -126,6 +157,16 @@ async function submit() {
   padding: 20rpx 30rpx calc(20rpx + env(safe-area-inset-bottom));
   box-shadow: 0 -4rpx 16rpx rgba(30, 41, 59, 0.08);
 }
-.total { color: #dc2626; font-size: 36rpx; font-weight: 800; }
+.total { color: #e4393c; font-size: 36rpx; font-weight: 800; }
+.cut { color: #2e9e6b; font-size: 22rpx; font-weight: 400; }
 .submit { background: #2e9e5b; color: #fff; border-radius: 40rpx; padding: 18rpx 56rpx; font-size: 29rpx; font-weight: 600; }
+	.no-cpn { color: #a5aca1; font-size: 24rpx; padding: 6rpx 0; }
+	.cpn-line {
+		display: flex; justify-content: space-between; align-items: center;
+		border: 2rpx solid #e5e7eb; border-radius: 12rpx; padding: 16rpx 20rpx; margin-bottom: 12rpx;
+	}
+	.cpn-line.on { border-color: #f24e3e; background: #fef4f4; }
+	.cpn-line-name { font-size: 25rpx; font-weight: 600; }
+	.cpn-line-sub { font-size: 21rpx; color: #a5aca1; margin-top: 4rpx; }
+	.cpn-line-amt { color: #f24e3e; font-weight: 700; font-size: 26rpx; }
 </style>

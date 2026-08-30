@@ -80,7 +80,7 @@ class OrderFlowIntegrationTest {
 
     private String createOrder(int quantity) {
         return orderService.createOrder(userId,
-                new CreateOrderRequest(addressId, List.of(new CreateOrderRequest.Item(skuId, quantity)), null));
+                new CreateOrderRequest(addressId, List.of(new CreateOrderRequest.Item(skuId, quantity)), null, null));
     }
 
     @Test

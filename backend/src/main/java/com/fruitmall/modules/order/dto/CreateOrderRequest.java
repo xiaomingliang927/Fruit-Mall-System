@@ -10,7 +10,8 @@ import java.util.List;
 public record CreateOrderRequest(
         @NotNull(message = "收货地址不能为空") Long addressId,
         @NotEmpty(message = "订单商品不能为空") List<Item> items,
-        String remark
+        String remark,
+        Long userCouponId
 ) {
 
     public record Item(

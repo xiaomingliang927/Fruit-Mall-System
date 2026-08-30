@@ -75,7 +75,7 @@ class RefundFlowIntegrationTest {
     /** 创建已支付订单（待发货，可申请售后） */
     private String paidOrder(int qty) {
         String orderNo = orderService.createOrder(userId,
-                new CreateOrderRequest(addressId, List.of(new CreateOrderRequest.Item(skuId, qty)), null));
+                new CreateOrderRequest(addressId, List.of(new CreateOrderRequest.Item(skuId, qty)), null, null));
         orderService.markPaid(orderNo, "TX-" + orderNo, "MOCK");
         return orderNo;
     }

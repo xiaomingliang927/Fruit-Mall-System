@@ -10,6 +10,7 @@
       </div>
       <div class="nav-right">
         <a class="nav-link" @click="$router.push('/cart')">购物车<span v-if="globalState.cartCount" class="badge">{{ globalState.cartCount }}</span></a>
+        <a class="nav-link" @click="$router.push('/coupons')">领券中心</a>
         <a class="nav-link" @click="$router.push('/orders')">我的订单</a>
         <a class="nav-link" @click="$router.push('/mine')">我的账户</a>
         <template v-if="globalState.nickname">

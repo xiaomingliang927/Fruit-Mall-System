@@ -81,7 +81,7 @@
 				tools: [
 					{ img: '/static/icon/svg/heart.svg', lb: '我的收藏' },
 					{ img: '/static/icon/svg/map-pin.svg', lb: '收货地址' },
-					{ img: '/static/icon/svg/ticket.svg', lb: '优惠券' },
+					{ img: '/static/icon/svg/ticket.svg', lb: '优惠券', tap: goCoupons },
 					{ img: '/static/icon/svg/gift.svg', lb: '邀请有礼' },
 					{ img: '/static/icon/svg/headset.svg', lb: '联系客服' },
 					{ img: '/static/icon/svg/help.svg', lb: '帮助中心' },
@@ -105,6 +105,9 @@
 			},
 			levelText(level) {
 				return { 1: '普通会员', 2: '白银会员', 3: '黄金会员', 4: '钻石会员' }[level] || '普通会员'
+			},
+			goCoupons() {
+				uni.navigateTo({ url: '/pages/coupon/coupon' })
 			},
 			goLogin() {
 				uni.navigateTo({ url: '/pages/login/login' })
