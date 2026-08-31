@@ -27,7 +27,7 @@
 			<view class="row" @click="clearCache">
 				<view class="row-c">
 					<text class="row-k">清除缓存</text>
-					<text class="row-d">只清商品图和购物车暂存，不会退出登录</text>
+					<text class="row-d">只清购物车等本地暂存，不会退出登录</text>
 				</view>
 				<text class="row-v">{{ cacheSize }}</text>
 				<text class="arrow">›</text>
@@ -129,7 +129,7 @@
 			clearCache() {
 				uni.showModal({
 					title: '清除缓存',
-					content: '会清掉购物车暂存和图片缓存，登录状态保留。已登录的话购物车在服务器上，不会丢。',
+					content: '会清掉购物车等本地暂存，登录状态保留。已同步到服务器的商品不受影响；只在本地暂存、还没同步的商品会被清掉。',
 					confirmText: '清除',
 					success: (r) => {
 						if (!r.confirm) return
@@ -171,7 +171,7 @@
 			confirmLogout() {
 				uni.showModal({
 					title: '退出登录',
-					content: '退出后购物车会清空本地暂存，重新登录还能找回。',
+					content: '退出后会清空本地购物车暂存。已同步到服务器的商品，重新登录后还在；只在本地暂存、还没同步的商品会被清掉。',
 					confirmText: '退出',
 					confirmColor: '#e54d42',
 					success: (r) => { if (r.confirm) this.logout() }
