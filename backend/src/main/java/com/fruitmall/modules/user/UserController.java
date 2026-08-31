@@ -1,6 +1,7 @@
 package com.fruitmall.modules.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fruitmall.admin.AdminMemberService;
 import com.fruitmall.auth.UserContext;
 import com.fruitmall.common.ApiResponse;
@@ -9,6 +10,7 @@ import com.fruitmall.common.HtmlSanitizer;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -119,9 +121,35 @@ public class UserController {
     }
 
     @PostMapping("/me/addresses")
+    @Transactional
     public ApiResponse<Long> addAddress(@Valid @RequestBody AddAddressRequest request) {
         UserAddress address = new UserAddress();
         address.setUserId(UserContext.requireUserId());
+        fillAddress(address, request);
+        if (Boolean.TRUE.equals(request.isDefault())) {
+            clearOtherDefaults(null);
+        }
+        addressMapper.insert(address);
+        return ApiResponse.ok(address.getId());
+    }
+
+    @PutMapping("/me/addresses/{id}")
+    @Transactional
+    public ApiResponse<Void> updateAddress(@PathVariable Long id, @Valid @RequestBody AddAddressRequest request) {
+        UserAddress address = addressMapper.selectById(id);
+        if (address == null || !address.getUserId().equals(UserContext.requireUserId())) {
+            throw new BizException("地址不存在");
+        }
+        fillAddress(address, request);
+        if (Boolean.TRUE.equals(request.isDefault())) {
+            clearOtherDefaults(id);
+        }
+        addressMapper.updateById(address);
+        return ApiResponse.ok();
+    }
+
+    /** 填充/覆盖地址字段（入库前统一做 XSS 清洗） */
+    private void fillAddress(UserAddress address, AddAddressRequest request) {
         address.setReceiver(HtmlSanitizer.sanitize(request.receiver()));
         address.setPhone(HtmlSanitizer.sanitize(request.phone()));
         address.setProvince(HtmlSanitizer.sanitize(request.province()));
@@ -129,8 +157,18 @@ public class UserController {
         address.setDistrict(HtmlSanitizer.sanitize(request.district()));
         address.setDetail(HtmlSanitizer.sanitize(request.detail()));
         address.setIsDefault(Boolean.TRUE.equals(request.isDefault()));
-        addressMapper.insert(address);
-        return ApiResponse.ok(address.getId());
+    }
+
+    /** 保证同一用户最多一条默认地址；excludeId 用于修改场景排除自身 */
+    private void clearOtherDefaults(Long excludeId) {
+        LambdaUpdateWrapper<UserAddress> wrapper = new LambdaUpdateWrapper<UserAddress>()
+                .eq(UserAddress::getUserId, UserContext.requireUserId())
+                .eq(UserAddress::getIsDefault, true)
+                .set(UserAddress::getIsDefault, false);
+        if (excludeId != null) {
+            wrapper.ne(UserAddress::getId, excludeId);
+        }
+        addressMapper.update(null, wrapper);
     }
 
     @DeleteMapping("/me/addresses/{id}")

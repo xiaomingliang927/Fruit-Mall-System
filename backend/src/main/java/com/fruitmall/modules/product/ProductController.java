@@ -28,6 +28,13 @@ public class ProductController {
         return ApiResponse.ok(productService.pageProducts(categoryId, keyword, page, Math.min(size, 50)));
     }
 
+    /** 热销推荐：首页推荐位/热销榜专用端点，按销量取在售前 N（limit 夹在 1~20） */
+    @GetMapping("/products/hot")
+    public ApiResponse<List<ProductService.ProductListVO>> hot(
+            @RequestParam(defaultValue = "8") int limit) {
+        return ApiResponse.ok(productService.hotProducts(Math.min(Math.max(limit, 1), 20)));
+    }
+
     @GetMapping("/products/{id}")
     public ApiResponse<ProductService.ProductDetailVO> detail(@PathVariable Long id) {
         return ApiResponse.ok(productService.detail(id));

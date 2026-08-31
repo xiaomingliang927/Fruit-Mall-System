@@ -10,8 +10,9 @@
           <div class="receiver">{{ a.receiver }} {{ a.phone }}</div>
           <div>{{ a.province }}{{ a.city }}{{ a.district }} {{ a.detail }}</div>
           <span v-if="a.isDefault" class="tag" style="margin-top:4px">默认</span>
+          <span class="addr-edit" @click.stop="editAddress(a)">编辑</span>
         </div>
-        <div class="addr-card" style="text-align:center;color:var(--green-700)" @click="showForm = !showForm">
+        <div class="addr-card" style="text-align:center;color:var(--green-700)" @click="newAddress">
           <div style="font-size:22px">＋</div>新增地址
         </div>
       </div>
@@ -22,7 +23,7 @@
         <input v-model.trim="form.city" placeholder="城市" />
         <input v-model.trim="form.district" placeholder="区/县" />
         <input v-model.trim="form.detail" placeholder="详细地址（街道、门牌号）" />
-        <button class="btn btn-sm" style="justify-self:start" @click="saveAddress">保存地址</button>
+        <button class="btn btn-sm" style="justify-self:start" @click="saveAddress">{{ editingId ? '更新地址' : '保存地址' }}</button>
       </div>
     </div>
 
@@ -71,6 +72,21 @@ const showForm = ref(false)
 const lines = ref([])
 const submitting = ref(false)
 const form = reactive({ receiver: '', phone: '', province: '', city: '', district: '', detail: '' })
+const editingId = ref(null)
+
+/** 新增入口：清空表单与编辑态 */
+function newAddress() {
+  editingId.value = null
+  Object.assign(form, { receiver: '', phone: '', province: '', city: '', district: '', detail: '' })
+  showForm.value = true
+}
+
+/** 编辑入口：回填现有地址 */
+function editAddress(a) {
+  editingId.value = a.id
+  Object.assign(form, { receiver: a.receiver, phone: a.phone, province: a.province, city: a.city, district: a.district, detail: a.detail })
+  showForm.value = true
+}
 
 const totalAmount = computed(() => lines.value.reduce((s, l) => s + l.amount, 0))
 const usableCoupons = ref([])
@@ -122,6 +138,17 @@ async function saveAddress() {
     toast('请完整填写收货人/手机号/省市/详细地址', 'err')
     return
   }
+  if (editingId.value) {
+    // 修改：保持原默认态（要改默认走小程序地址页的「设为默认」）
+    const target = addresses.value.find((a) => a.id === editingId.value)
+    await api.put(`/api/v1/users/me/addresses/${editingId.value}`, { ...form, isDefault: !!target?.isDefault })
+    addresses.value = await api.get('/api/v1/users/me/addresses')
+    addressId.value = editingId.value
+    showForm.value = false
+    editingId.value = null
+    toast('地址已更新')
+    return
+  }
   const id = await api.post('/api/v1/users/me/addresses', { ...form, isDefault: addresses.value.length === 0 })
   addresses.value = await api.get('/api/v1/users/me/addresses')
   addressId.value = id
@@ -149,3 +176,15 @@ async function submitOrder() {
   }
 }
 </script>
+
+<style scoped>
+.addr-edit {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  font-size: 12px;
+  color: var(--green-700, #17704a);
+  cursor: pointer;
+}
+.addr-card { position: relative; }
+</style>

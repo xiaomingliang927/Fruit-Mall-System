@@ -47,8 +47,9 @@ export function loadProducts() {
 	if (loading) return loading
 	loading = Promise.all([
 		fetchJson('/api/v1/categories'),
-		fetchJson('/api/v1/products?page=1&size=50')
-	]).then(([cats, page]) => {
+		fetchJson('/api/v1/products?page=1&size=50'),
+		fetchJson('/api/v1/products/hot?limit=12')
+	]).then(([cats, page, hot]) => {
 		cats = cats || []
 		const products = (page && page.records) || []
 		cats.forEach((c) => { catNameById[c.id] = c.name })
@@ -65,9 +66,17 @@ export function loadProducts() {
 			cat: catNameById[p.categoryId] || '',
 			sales: p.sales
 		})))
-		const bySales = [...PRODUCTS].sort((a, b) => b.sales - a.sales)
-		FLASH_IDS.splice(0, FLASH_IDS.length, ...bySales.slice(0, 4).map((p) => p.id))
-		HOT_IDS.splice(0, HOT_IDS.length, ...bySales.slice(4, 12).map((p) => p.id))
+		// 秒杀/热销位：优先用专用热销端点的服务端排序，失败回落前端按销量排
+		const inList = (id) => PRODUCTS.some((p) => p.id === id)
+		const hotIds = (hot || []).map((p) => p.id).filter(inList)
+		if (hotIds.length >= 4) {
+			FLASH_IDS.splice(0, FLASH_IDS.length, ...hotIds.slice(0, 4))
+			HOT_IDS.splice(0, HOT_IDS.length, ...hotIds.slice(4, 12))
+		} else {
+			const bySales = [...PRODUCTS].sort((a, b) => b.sales - a.sales)
+			FLASH_IDS.splice(0, FLASH_IDS.length, ...bySales.slice(0, 4).map((p) => p.id))
+			HOT_IDS.splice(0, HOT_IDS.length, ...bySales.slice(4, 12).map((p) => p.id))
+		}
 		loaded = true
 	}).catch(() => {
 		loading = null

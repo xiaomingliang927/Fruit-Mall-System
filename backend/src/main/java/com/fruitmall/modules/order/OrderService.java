@@ -114,6 +114,50 @@ public class OrderService {
         return order.getOrderNo();
     }
 
+    /**
+     * 秒杀下单：按秒杀价落单（不走优惠券），秒杀活动库存的校验与扣减由 SeckillService 负责，
+     * 这里只扣商品真实库存并生成订单/明细快照。与 buy() 同处一个事务，任一步失败整体回滚。
+     */
+    @Transactional
+    public String createSeckillOrder(Long userId, Long addressId, ProductSku sku, int quantity, int unitPrice) {
+        UserAddress address = addressMapper.selectById(addressId);
+        if (address == null || !address.getUserId().equals(userId)) {
+            throw new BizException("收货地址不存在");
+        }
+        Product product = productMapper.selectById(sku.getProductId());
+        if (product == null || product.getStatus() == 0) {
+            throw new BizException("商品已下架");
+        }
+        if (skuMapper.decreaseStock(sku.getId(), quantity) == 0) {
+            throw new BizException("「" + product.getName() + "」库存不足");
+        }
+        int totalAmount = unitPrice * quantity;
+        Order order = new Order();
+        order.setOrderNo(generateOrderNo());
+        order.setUserId(userId);
+        order.setStatus(OrderStatus.PENDING_PAY);
+        order.setTotalAmount(totalAmount);
+        order.setFreight(0);
+        order.setPayAmount(totalAmount);
+        order.setDeliveryType(1);
+        order.setRemark("秒杀订单");
+        order.setAddressSnapshot(toAddressJson(address));
+        orderMapper.insert(order);
+
+        OrderItem item = new OrderItem();
+        item.setOrderId(order.getId());
+        item.setProductId(product.getId());
+        item.setSkuId(sku.getId());
+        item.setProductName(product.getName());
+        item.setSkuSpec(sku.getSpec());
+        item.setImage(product.getMainImage());
+        item.setPrice(unitPrice);
+        item.setQuantity(quantity);
+        item.setSubtotal(totalAmount);
+        orderItemMapper.insert(item);
+        return order.getOrderNo();
+    }
+
     /** 取消订单：仅待支付可取消，回补库存 */
     @Transactional
     public void cancelOrder(Long userId, String orderNo) {

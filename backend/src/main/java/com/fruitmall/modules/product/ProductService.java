@@ -49,6 +49,32 @@ public class ProductService {
         return new CategoryNode(category.getId(), category.getName(), category.getIcon(), children);
     }
 
+    /** 批量取每个商品的默认 SKU（优先有库存中 ID 最小者），列表/热销共用 */
+    private Map<Long, Long> firstSkuByProduct(List<Long> productIds) {
+        return productIds.isEmpty() ? Map.of()
+                : skuMapper.selectList(new LambdaQueryWrapper<ProductSku>()
+                                .in(ProductSku::getProductId, productIds)
+                                .orderByAsc(ProductSku::getId))
+                        .stream()
+                        .collect(Collectors.toMap(ProductSku::getProductId, ProductSku::getId,
+                                (a, b) -> a));
+    }
+
+    /** 热销推荐：按销量降序取在售前 N（首页推荐位/热销榜专用，不依赖列表接口的默认排序约定） */
+    public List<ProductListVO> hotProducts(int limit) {
+        List<Product> products = productMapper.selectList(new LambdaQueryWrapper<Product>()
+                .eq(Product::getStatus, 1)
+                .orderByDesc(Product::getSales)
+                .orderByDesc(Product::getId)
+                .last("LIMIT " + limit));
+        Map<Long, Long> firstSkuByProduct = firstSkuByProduct(
+                products.stream().map(Product::getId).toList());
+        return products.stream().map(p -> new ProductListVO(
+                p.getId(), p.getCategoryId(), p.getName(), p.getSubtitle(), p.getMainImage(),
+                p.getOrigin(), p.getUnit(), p.getTags(), p.getSales(), minPrice(p.getId()),
+                firstSkuByProduct.get(p.getId()))).toList();
+    }
+
     public PageResult<ProductListVO> pageProducts(Long categoryId, String keyword, long page, long size) {
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<Product>()
                 .eq(Product::getStatus, 1)
@@ -56,15 +82,8 @@ public class ProductService {
                 .like(StringUtils.hasText(keyword), Product::getName, keyword)
                 .orderByDesc(Product::getSales);
         Page<Product> result = productMapper.selectPage(new Page<>(page, size), wrapper);
-        List<Long> productIds = result.getRecords().stream().map(Product::getId).toList();
-        // 批量取每个商品的默认 SKU（优先有库存中 ID 最小者）
-        Map<Long, Long> firstSkuByProduct = productIds.isEmpty() ? Map.of()
-                : skuMapper.selectList(new LambdaQueryWrapper<ProductSku>()
-                                .in(ProductSku::getProductId, productIds)
-                                .orderByAsc(ProductSku::getId))
-                        .stream()
-                        .collect(Collectors.toMap(ProductSku::getProductId, ProductSku::getId,
-                                (a, b) -> a));
+        Map<Long, Long> firstSkuByProduct = firstSkuByProduct(
+                result.getRecords().stream().map(Product::getId).toList());
         return PageResult.of(result, p -> new ProductListVO(
                 p.getId(), p.getCategoryId(), p.getName(), p.getSubtitle(), p.getMainImage(),
                 p.getOrigin(), p.getUnit(), p.getTags(), p.getSales(), minPrice(p.getId()),

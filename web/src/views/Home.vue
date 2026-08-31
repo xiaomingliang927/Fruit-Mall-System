@@ -10,7 +10,7 @@
           <button class="btn hero-ghost" @click="scrollToAll">浏览全部商品</button>
         </div>
       </div>
-      <img class="hero-img" :src="'/images/products/fruit-strawberry.jpg'" alt="当季草莓" />
+      <img class="hero-img" :src="heroImg" alt="当季鲜果" />
     </div>
 
     <!-- 首页轮播（后台「营销中心 → 轮播图」配置） -->
@@ -97,6 +97,8 @@ const router = useRouter()
 const categories = ref([])
 const products = ref([])
 const top = ref([])
+// 首屏大图：跟热销榜第一名的真实商品图走，未加载完用静态兜底
+const heroImg = computed(() => top.value[0]?.mainImage || '/images/products/fruit-strawberry.jpg')
 const categoryId = ref(null)
 const keyword = ref(route.query.keyword || '')
 const page = ref(1)
@@ -187,8 +189,10 @@ watch(() => route.query.keyword, (v) => {
 onMounted(async () => {
   categories.value = await api.get('/api/v1/categories')
   load()
-  // 热销榜：默认按销量降序取前 4
-  api.get('/api/v1/products?page=1&size=4').then((d) => (top.value = d.records))
+  // 热销榜：专用热销端点（后端按销量取在售前 N），失败时回落通用列表
+  api.get('/api/v1/products/hot?limit=4')
+    .then((d) => (top.value = d))
+    .catch(() => api.get('/api/v1/products?page=1&size=4').then((d) => (top.value = d.records)))
   // 首页轮播：后台配置，拉取失败则整体不展示该区块
   api.get('/api/v1/banners?position=home')
     .then((d) => { banners.value = d || []; startSlide() })

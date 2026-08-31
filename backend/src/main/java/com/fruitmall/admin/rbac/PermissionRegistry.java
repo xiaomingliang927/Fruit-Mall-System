@@ -51,6 +51,12 @@ public class PermissionRegistry {
         RULES.put("PUT /api/admin/banners/{id}", "banner:update");
         RULES.put("PUT /api/admin/banners/{id}/status", "banner:update");
         RULES.put("DELETE /api/admin/banners/{id}", "banner:delete");
+        // 营销 · 秒杀
+        RULES.put("GET /api/admin/seckill", "seckill:list");
+        RULES.put("POST /api/admin/seckill", "seckill:create");
+        RULES.put("PUT /api/admin/seckill/{id}", "seckill:update");
+        RULES.put("PUT /api/admin/seckill/{id}/status", "seckill:update");
+        RULES.put("DELETE /api/admin/seckill/{id}", "seckill:delete");
         // 系统 · 角色权限
         RULES.put("GET /api/admin/roles", "role:list");
         RULES.put("POST /api/admin/roles", "role:create");

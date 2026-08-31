@@ -36,7 +36,8 @@ export const menuGroups = [
     items: [
       { path: '/coupons', title: '优惠券', icon: 'Ticket', perm: 'coupon:list' },
       { path: '/banners', title: '轮播图', icon: 'Picture', perm: 'banner:list' },
-      // 秒杀拼团 —— M3 完成后追加
+      { path: '/seckill', title: '秒杀活动', icon: 'AlarmClock', perm: 'seckill:list' },
+      // 拼团等 —— 后续追加
     ],
   },
   {

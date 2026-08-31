@@ -21,6 +21,7 @@ const routes = [
       { path: 'reviews', name: 'reviews', component: () => import('./views/Reviews.vue'), meta: { title: '评价管理' } },
       { path: 'members', name: 'members', component: () => import('./views/Members.vue'), meta: { title: '会员列表' } },
       { path: 'banners', name: 'banners', component: () => import('./views/Banners.vue'), meta: { title: '轮播图' } },
+      { path: 'seckill', name: 'seckill', component: () => import('./views/Seckill.vue'), meta: { title: '秒杀活动' } },
       { path: 'roles', name: 'roles', component: () => import('./views/Roles.vue'), meta: { title: '角色权限' } },
     ],
   },

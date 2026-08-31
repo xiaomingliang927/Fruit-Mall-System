@@ -35,7 +35,7 @@
 				<text class="lbl">设为默认</text>
 				<switch :checked="form.isDefault" color="#17704a" @change="form.isDefault = $event.detail.value" />
 			</view>
-			<button class="save-btn" @click="save">保存地址</button>
+			<button class="save-btn" @click="save">{{ editingId ? '更新地址' : '保存地址' }}</button>
 		</view>
 
 		<!-- 列表 -->
@@ -48,6 +48,8 @@
 			</view>
 			<view class="addr-detail">{{ a.province }}{{ a.city }}{{ a.district }} {{ a.detail }}</view>
 			<view class="addr-ops">
+				<text class="op" @click="setDefault(a)">设为默认</text>
+				<text class="op op-edit" @click="edit(a)">编辑</text>
 				<text class="op op-danger" @click="remove(a)">删除</text>
 			</view>
 		</view>
@@ -63,6 +65,7 @@
 				addresses: [],
 				loading: true,
 				showForm: false,
+				editingId: null,
 				form: this.blankForm()
 			}
 		},
@@ -76,10 +79,38 @@
 			blankForm() {
 				return { receiver: '', phone: '', province: '', city: '', district: '', detail: '', isDefault: false }
 			},
-			toggleForm() {
-				this.showForm = !this.showForm
-				if (!this.showForm) this.form = this.blankForm()
-			},
+		toggleForm() {
+			this.showForm = !this.showForm
+			if (!this.showForm) {
+				this.form = this.blankForm()
+				this.editingId = null
+			}
+		},
+		/** 编辑已有地址：回填表单并展开 */
+		edit(a) {
+			this.editingId = a.id
+			this.form = {
+				receiver: a.receiver, phone: a.phone, province: a.province,
+				city: a.city, district: a.district, detail: a.detail,
+				isDefault: !!a.isDefault
+			}
+			this.showForm = true
+		},
+		/** 快捷设为默认：PUT 全量提交，后端会清掉其他默认 */
+		async setDefault(a) {
+			if (a.isDefault) return
+			try {
+				await api.put(`/api/v1/users/me/addresses/${a.id}`, {
+					receiver: a.receiver, phone: a.phone, province: a.province,
+					city: a.city, district: a.district, detail: a.detail,
+					isDefault: true
+				})
+				uni.showToast({ title: '已设为默认', icon: 'none' })
+				this.load()
+			} catch (e) {
+				uni.showToast({ title: e.message, icon: 'none' })
+			}
+		},
 			async load() {
 				try {
 					this.addresses = await api.get('/api/v1/users/me/addresses')
@@ -95,11 +126,18 @@
 					return uni.showToast({ title: '请完整填写收货信息', icon: 'none' })
 				}
 				try {
-					// 第一条地址自动设为默认（后端未提供修改接口，新增时处理）
-					const payload = { ...f, isDefault: this.addresses.length === 0 ? true : f.isDefault }
-					await api.post('/api/v1/users/me/addresses', payload)
-					uni.showToast({ title: '已保存', icon: 'none' })
+					if (this.editingId) {
+						// 修改：PUT 全量提交，后端保证默认地址唯一
+						await api.put(`/api/v1/users/me/addresses/${this.editingId}`, f)
+						uni.showToast({ title: '已更新', icon: 'none' })
+					} else {
+						// 第一条地址自动设为默认
+						const payload = { ...f, isDefault: this.addresses.length === 0 ? true : f.isDefault }
+						await api.post('/api/v1/users/me/addresses', payload)
+						uni.showToast({ title: '已保存', icon: 'none' })
+					}
 					this.showForm = false
+					this.editingId = null
 					this.form = this.blankForm()
 					this.load()
 				} catch (e) {
@@ -164,9 +202,10 @@
 	}
 	.addr-detail { margin-top: 14rpx; font-size: 26rpx; color: #555; line-height: 1.5; }
 	.addr-ops {
-		display: flex; justify-content: flex-end; margin-top: 18rpx;
+		display: flex; justify-content: flex-end; gap: 36rpx; margin-top: 18rpx;
 		border-top: 1rpx solid #f0f2f4; padding-top: 18rpx;
 	}
 	.op { font-size: 26rpx; color: #555; }
+	.op-edit { color: #17704a; font-weight: 600; }
 	.op-danger { color: #e54d42; font-weight: 600; }
 </style>
