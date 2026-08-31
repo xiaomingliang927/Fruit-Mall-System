@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -213,9 +213,14 @@ public class OrderService {
         return order;
     }
 
+    /** 订单号：FM + 秒级时间戳 + 进程内原子自增序号（6 位，容量 100 万单/秒）。
+     *  早期版本用 4 位随机数，高并发下同秒碰撞撞唯一索引（压测复现，DuplicateKeyException），
+     *  改为确定性递增序号，同 JVM 内同秒必不重复；DB 唯一索引仍是最终兜底。 */
+    private final AtomicInteger orderSeq = new AtomicInteger(0);
+
     private String generateOrderNo() {
         return "FM" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss"))
-                + String.format("%04d", ThreadLocalRandom.current().nextInt(10000));
+                + String.format("%06d", orderSeq.getAndIncrement() % 1_000_000);
     }
 
     private String toAddressJson(UserAddress address) {
