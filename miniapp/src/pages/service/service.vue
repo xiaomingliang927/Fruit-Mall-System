@@ -5,7 +5,7 @@
 			<view class="hero-ic"><image src="/static/icon/png/headset.png" mode="aspectFit" class="hero-img"></image></view>
 			<view class="hero-c">
 				<view class="hero-t">
-					<text class="hero-name">果小满客服</text>
+					<text class="hero-name">鲜果集客服</text>
 					<text class="dot" :class="{ off: !online }"></text>
 					<text class="hero-st" :class="{ off: !online }">{{ online ? '在线' : '已下班' }}</text>
 				</view>
