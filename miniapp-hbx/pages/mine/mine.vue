@@ -51,7 +51,7 @@
 				<text class="card-title">常用工具</text>
 			</view>
 			<view class="tool-grid">
-				<view class="tool-it" v-for="t in tools" :key="t.lb" @click="t.tap ? t.tap() : showToast(t.lb)">
+				<view class="tool-it" v-for="t in tools" :key="t.lb" @click="onToolTap(t)">
 					<view class="tool-ic"><image :src="t.img" mode="aspectFit" class="tool-img"></image></view>
 					<text class="tool-lb">{{ t.lb }}</text>
 				</view>
@@ -81,16 +81,29 @@
 					{ img: '/static/icon/png/star.png', lb: '待评价', status: 40 },
 					{ img: '/static/icon/png/headset.png', lb: '退款/售后', status: null }
 				],
-			tools: [
-				{ img: '/static/icon/png/heart.png', lb: '我的收藏', tap: goFavorite },
-				{ img: '/static/icon/png/map-pin.png', lb: '收货地址', tap: goAddress },
-				{ img: '/static/icon/png/ticket.png', lb: '优惠券', tap: goCoupons },
-				{ img: '/static/icon/png/gift.png', lb: '邀请有礼', tap: goInvite },
-				{ img: '/static/icon/png/headset.png', lb: '联系客服', tap: goService },
-				{ img: '/static/icon/png/help.png', lb: '帮助中心', tap: goHelp },
-				{ img: '/static/icon/png/settings.png', lb: '设置', tap: goSettings },
-				{ img: '/static/icon/png/person.png', lb: '关于我们', tap: goAbout }
-			]
+				// 注意：data() 里不能引用裸方法名（如 tap: goFavorite），
+				// 方法只挂在实例上、不在 data() 的局部作用域内，会抛 ReferenceError 导致整页数据为空。
+				// 统一用 action 字符串，点击时由 onToolTap 分发。
+				tools: [
+					{ img: '/static/icon/png/heart.png', lb: '我的收藏', action: 'favorite', needLogin: true },
+					{ img: '/static/icon/png/map-pin.png', lb: '收货地址', action: 'address', needLogin: true },
+					{ img: '/static/icon/png/ticket.png', lb: '优惠券', action: 'coupon' },
+					{ img: '/static/icon/png/gift.png', lb: '邀请有礼', action: 'invite' },
+					{ img: '/static/icon/png/headset.png', lb: '联系客服', action: 'service' },
+					{ img: '/static/icon/png/help.png', lb: '帮助中心', action: 'help' },
+					{ img: '/static/icon/png/settings.png', lb: '设置', action: 'settings' },
+					{ img: '/static/icon/png/person.png', lb: '关于我们', action: 'about' }
+				],
+				toolRoutes: {
+					favorite: '/pages/favorite/favorite',
+					address: '/pages/address/address',
+					coupon: '/pages/coupon/coupon',
+					invite: '/pages/invite/invite',
+					service: '/pages/service/service',
+					help: '/pages/help/help',
+					settings: '/pages/settings/settings',
+					about: '/pages/about/about'
+				}
 			}
 		},
 		onShow() {
@@ -120,31 +133,15 @@
 			goVip() {
 				uni.navigateTo({ url: '/pages/vip/vip' })
 			},
-			goInvite() {
-				uni.navigateTo({ url: '/pages/invite/invite' })
-			},
-			goService() {
-				uni.navigateTo({ url: '/pages/service/service' })
-			},
-			goHelp() {
-				uni.navigateTo({ url: '/pages/help/help' })
-			},
 			goSettings() {
 				uni.navigateTo({ url: '/pages/settings/settings' })
 			},
-			goAbout() {
-				uni.navigateTo({ url: '/pages/about/about' })
-			},
-			goCoupons() {
-				uni.navigateTo({ url: '/pages/coupon/coupon' })
-			},
-			goFavorite() {
-				if (!this.me.nickname) return this.goLogin()
-				uni.navigateTo({ url: '/pages/favorite/favorite' })
-			},
-			goAddress() {
-				if (!this.me.nickname) return this.goLogin()
-				uni.navigateTo({ url: '/pages/address/address' })
+			/** 常用工具统一分发：data 里只存 action 字符串，避免 data() 引用裸方法名 */
+			onToolTap(t) {
+				const url = this.toolRoutes[t.action]
+				if (!url) return this.showToast(t.lb)
+				if (t.needLogin && !this.me.nickname) return this.goLogin()
+				uni.navigateTo({ url })
 			},
 			goLogin() {
 				uni.navigateTo({ url: '/pages/login/login' })
