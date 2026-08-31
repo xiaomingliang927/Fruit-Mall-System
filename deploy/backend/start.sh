@@ -7,6 +7,7 @@ export FRUIT_DB_NAME=fruit_mall
 export FRUIT_DB_USER=root
 export FRUIT_DB_PASSWORD=CHANGE_ME_MYSQL_PASSWORD
 export FRUIT_JWT_SECRET=CHANGE_ME_random_64char_secret_0123456789abcdef
+export FRUIT_CORS_ORIGINS=${FRUIT_CORS_ORIGINS:-http://116.62.60.53:5173,http://116.62.60.53:5174}
 export FRUIT_WX_APPID=wxa0baa0a3ac856f2d
 export FRUIT_WX_SECRET=
 export FRUIT_UPLOAD_DIR=/www/fruitmall/uploads

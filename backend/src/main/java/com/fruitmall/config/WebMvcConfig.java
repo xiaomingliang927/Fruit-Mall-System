@@ -61,8 +61,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .filter(s -> !s.isBlank())
                 .collect(Collectors.toList());
         if (origins.isEmpty()) {
-            // 默认仅放行本地三端（网站/后台/小程序 H5），生产通过 FRUIT_CORS_ORIGINS 注入正式域名
-            origins = List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175");
+            // 默认放行本地三端与线上 IP 站点；正式域名通过 FRUIT_CORS_ORIGINS 注入
+            origins = List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175",
+                    "http://116.62.60.53:5173", "http://116.62.60.53:5174");
         }
         registry.addMapping("/api/**")
                 .allowedOrigins(origins.toArray(new String[0]))
