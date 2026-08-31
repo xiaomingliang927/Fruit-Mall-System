@@ -58,7 +58,10 @@
 			</view>
 		</view>
 
-
+		<!-- 退出登录 -->
+		<view v-if="me.nickname" class="mine-card logout-card">
+			<view class="logout-btn" @click="confirmLogout">退出登录</view>
+		</view>
 
 		<view style="height: 40rpx;"></view>
 	</view>
@@ -78,16 +81,16 @@
 					{ img: '/static/icon/svg/star.svg', lb: '待评价', status: 40 },
 					{ img: '/static/icon/svg/headset.svg', lb: '退款/售后', status: null }
 				],
-				tools: [
-					{ img: '/static/icon/svg/heart.svg', lb: '我的收藏' },
-					{ img: '/static/icon/svg/map-pin.svg', lb: '收货地址' },
-					{ img: '/static/icon/svg/ticket.svg', lb: '优惠券', tap: goCoupons },
-					{ img: '/static/icon/svg/gift.svg', lb: '邀请有礼' },
-					{ img: '/static/icon/svg/headset.svg', lb: '联系客服' },
-					{ img: '/static/icon/svg/help.svg', lb: '帮助中心' },
-					{ img: '/static/icon/svg/settings.svg', lb: '设置' },
-					{ img: '/static/icon/svg/person.svg', lb: '关于我们' }
-				]
+			tools: [
+				{ img: '/static/icon/svg/heart.svg', lb: '我的收藏', tap: goFavorite },
+				{ img: '/static/icon/svg/map-pin.svg', lb: '收货地址', tap: goAddress },
+				{ img: '/static/icon/svg/ticket.svg', lb: '优惠券', tap: goCoupons },
+				{ img: '/static/icon/svg/gift.svg', lb: '邀请有礼' },
+				{ img: '/static/icon/svg/headset.svg', lb: '联系客服' },
+				{ img: '/static/icon/svg/help.svg', lb: '帮助中心' },
+				{ img: '/static/icon/svg/settings.svg', lb: '设置' },
+				{ img: '/static/icon/svg/person.svg', lb: '关于我们' }
+			]
 			}
 		},
 		onShow() {
@@ -109,6 +112,14 @@
 			goCoupons() {
 				uni.navigateTo({ url: '/pages/coupon/coupon' })
 			},
+			goFavorite() {
+				if (!this.me.nickname) return this.goLogin()
+				uni.navigateTo({ url: '/pages/favorite/favorite' })
+			},
+			goAddress() {
+				if (!this.me.nickname) return this.goLogin()
+				uni.navigateTo({ url: '/pages/address/address' })
+			},
 			goLogin() {
 				uni.navigateTo({ url: '/pages/login/login' })
 			},
@@ -128,6 +139,15 @@
 				updateCartBadge()
 				this.me = {}
 				uni.showToast({ title: '已退出登录', icon: 'none' })
+			},
+			confirmLogout() {
+				uni.showModal({
+					title: '退出登录',
+					content: '确定要退出当前账号吗？',
+					confirmText: '退出',
+					confirmColor: '#e54d42',
+					success: (r) => { if (r.confirm) this.logout() }
+				})
 			}
 		}
 	}
@@ -312,5 +332,22 @@
 	.vip-entry-arrow {
 		color: #f5e6c8;
 		font-size: 36rpx;
+	}
+	.logout-card {
+		padding: 24rpx;
+	}
+	.logout-btn {
+		text-align: center;
+		line-height: 84rpx;
+		height: 84rpx;
+		border-radius: 20rpx;
+		background: #fff;
+		color: #e54d42;
+		font-size: 30rpx;
+		font-weight: 600;
+		border: 2rpx solid #f3d6d2;
+	}
+	.logout-btn:active {
+		background: #fff5f4;
 	}
 </style>
