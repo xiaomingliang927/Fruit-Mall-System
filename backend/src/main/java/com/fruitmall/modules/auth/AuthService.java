@@ -27,12 +27,10 @@ import java.util.concurrent.ThreadLocalRandom;
 @RequiredArgsConstructor
 public class AuthService {
 
-    /** 开发模式万能验证码 123456；接入短信服务后替换为真实校验 */
-    private static final String DEV_SMS_CODE = "123456";
-
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
+    private final SmsCodeService smsCodeService;
 
     @Value("${app.wechat.appid:}")
     private String wxAppid;
@@ -40,10 +38,13 @@ public class AuthService {
     @Value("${app.wechat.secret:}")
     private String wxSecret;
 
+    /** 下发短信验证码（带频率限制/试错上限），供前端「获取验证码」按钮调用 */
+    public SmsCodeService.SendResult sendSmsCode(String phone, String clientIp) {
+        return smsCodeService.send(phone, clientIp);
+    }
+
     public LoginResponse loginBySms(LoginRequest request) {
-        if (!DEV_SMS_CODE.equals(request.code())) {
-            throw new BizException("验证码错误（开发环境请使用 123456）");
-        }
+        smsCodeService.verify(request.phone(), request.code());
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getPhone, request.phone()));
         if (user == null) {

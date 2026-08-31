@@ -3,6 +3,7 @@ package com.fruitmall.modules.review;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fruitmall.common.BizException;
+import com.fruitmall.common.HtmlSanitizer;
 import com.fruitmall.common.PageResult;
 import com.fruitmall.modules.order.Order;
 import com.fruitmall.modules.order.OrderItem;
@@ -66,7 +67,7 @@ public class ReviewService {
         review.setUserId(userId);
         review.setProductId(item.getProductId());
         review.setRating(rating);
-        review.setContent(content);
+        review.setContent(HtmlSanitizer.sanitize(content));
         review.setIsAnonymous(Boolean.TRUE.equals(isAnonymous));
         review.setStatus(Review.STATUS_VISIBLE);
         reviewMapper.insert(review);

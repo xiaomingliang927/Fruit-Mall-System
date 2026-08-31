@@ -45,3 +45,13 @@ app:
     # TODO: 填入小程序 AppSecret（mp.weixin.qq.com → 开发管理 → 开发设置），
     #       填入后同一微信用户在任意设备登录都会得到同一 openid，实现跨设备账号互通
     secret: ${FRUIT_WX_SECRET:}
+  sms:
+    # 短信验证码风控；接入真实短信网关后把 dev-mode 设为 false（关闭万能码 123456）
+    dev-mode: ${FRUIT_SMS_DEV_MODE:true}
+    code-ttl-seconds: ${FRUIT_SMS_TTL:300}
+    resend-seconds: ${FRUIT_SMS_RESEND:60}
+    max-per-hour: ${FRUIT_SMS_MAX_PER_HOUR:10}
+    max-attempts: ${FRUIT_SMS_MAX_ATTEMPTS:5}
+  cors:
+    # 允许跨域的前端来源（逗号分隔）；留空默认仅本地三端。生产务必改为正式域名，避免通配符+凭证
+    allowed-origins: ${FRUIT_CORS_ORIGINS:}

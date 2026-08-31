@@ -11,6 +11,9 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
@@ -21,6 +24,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Value("${app.upload.dir:./uploads}")
     private String uploadDir;
+
+    /** 允许跨域的前端来源（逗号分隔）；留空则默认仅放行本地三端，避免使用通配符 + 凭证的危险组合 */
+    @Value("${app.cors.allowed-origins:}")
+    private String allowedOriginsCsv;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -49,8 +56,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        List<String> origins = Arrays.stream(allowedOriginsCsv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.toList());
+        if (origins.isEmpty()) {
+            // 默认仅放行本地三端（网站/后台/小程序 H5），生产通过 FRUIT_CORS_ORIGINS 注入正式域名
+            origins = List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175");
+        }
         registry.addMapping("/api/**")
-                .allowedOriginPatterns("*")
+                .allowedOrigins(origins.toArray(new String[0]))
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

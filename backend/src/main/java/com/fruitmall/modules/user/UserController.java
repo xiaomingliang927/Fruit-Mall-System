@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fruitmall.auth.UserContext;
 import com.fruitmall.common.ApiResponse;
 import com.fruitmall.common.BizException;
+import com.fruitmall.common.HtmlSanitizer;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -62,12 +63,12 @@ public class UserController {
     public ApiResponse<Long> addAddress(@Valid @RequestBody AddAddressRequest request) {
         UserAddress address = new UserAddress();
         address.setUserId(UserContext.requireUserId());
-        address.setReceiver(request.receiver());
-        address.setPhone(request.phone());
-        address.setProvince(request.province());
-        address.setCity(request.city());
-        address.setDistrict(request.district());
-        address.setDetail(request.detail());
+        address.setReceiver(HtmlSanitizer.sanitize(request.receiver()));
+        address.setPhone(HtmlSanitizer.sanitize(request.phone()));
+        address.setProvince(HtmlSanitizer.sanitize(request.province()));
+        address.setCity(HtmlSanitizer.sanitize(request.city()));
+        address.setDistrict(HtmlSanitizer.sanitize(request.district()));
+        address.setDetail(HtmlSanitizer.sanitize(request.detail()));
         address.setIsDefault(Boolean.TRUE.equals(request.isDefault()));
         addressMapper.insert(address);
         return ApiResponse.ok(address.getId());

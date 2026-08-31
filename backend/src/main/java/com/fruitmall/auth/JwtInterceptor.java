@@ -3,6 +3,7 @@ package com.fruitmall.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fruitmall.common.ApiResponse;
 import com.fruitmall.common.ErrorCode;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
         String auth = request.getHeader("Authorization");
         if (auth != null && auth.startsWith("Bearer ")) {
-            Long userId = jwtUtil.parseUserId(auth.substring(7));
-            if (userId != null) {
-                UserContext.set(userId);
+            Claims claims = jwtUtil.parseClaims(auth.substring(7));
+            // 无效/过期 token 直接拒绝；管理端 token（role=admin）不可用于 C 端接口
+            if (claims != null && !"admin".equals(claims.get("role", String.class))) {
+                UserContext.set(Long.valueOf(claims.getSubject()));
                 return true;
             }
         }

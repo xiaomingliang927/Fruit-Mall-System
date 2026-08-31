@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fruitmall.common.BizException;
+import com.fruitmall.common.HtmlSanitizer;
 import com.fruitmall.common.PageResult;
 import com.fruitmall.modules.order.dto.CreateOrderRequest;
 import com.fruitmall.modules.pay.Payment;
@@ -101,7 +102,7 @@ public class OrderService {
         order.setPayAmount(Math.max(totalAmount - couponDiscount, 1));
         order.setUserCouponId(request.userCouponId());
         order.setDeliveryType(1);
-        order.setRemark(request.remark());
+        order.setRemark(HtmlSanitizer.sanitize(request.remark()));
         order.setAddressSnapshot(toAddressJson(address));
         orderMapper.insert(order);
         for (OrderItem item : items) {
