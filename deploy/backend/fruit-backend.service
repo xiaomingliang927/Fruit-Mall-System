@@ -1,0 +1,14 @@
+[Unit]
+Description=Fruit Mall Spring Boot Backend
+After=network.target mysql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/www/fruitmall/backend
+ExecStart=/bin/bash /www/fruitmall/backend/start.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
