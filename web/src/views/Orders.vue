@@ -17,7 +17,7 @@
         <span class="st" :class="`st-${o.status}`">{{ o.statusText }}</span>
       </div>
       <div class="oc-body">
-        <span style="color:var(--muted);font-size:13px">共 {{ o.count }} 件</span>
+        <span style="color:var(--muted);font-size:13px">共 {{ o.itemCount ?? 0 }} 件</span>
         <span class="oc-sum">
           实付 <b class="price" style="font-size:18px">¥{{ yuan(o.payAmount) }}</b>
         </span>

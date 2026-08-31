@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +43,8 @@ public class OrderService {
     private final com.fruitmall.modules.coupon.CouponService couponService;
 
     public record OrderListVO(Long id, String orderNo, Integer status, String statusText,
-                              Integer totalAmount, Integer payAmount, LocalDateTime createdAt) {
+                              Integer totalAmount, Integer payAmount, Integer itemCount,
+                              LocalDateTime createdAt) {
     }
 
     public record ItemVO(String productName, String skuSpec, String image,
@@ -172,9 +174,19 @@ public class OrderService {
                         .eq(Order::getUserId, userId)
                         .eq(status != null, Order::getStatus, status)
                         .orderByDesc(Order::getId));
+        // 一次查出本页订单的商品件数，避免列表页拿不到「共 N 件」
+        List<Long> orderIds = result.getRecords().stream().map(Order::getId).toList();
+        Map<Long, Integer> itemCountByOrder = orderIds.isEmpty() ? Map.of()
+                : orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
+                                .in(OrderItem::getOrderId, orderIds))
+                        .stream()
+                        .collect(Collectors.groupingBy(OrderItem::getOrderId,
+                                Collectors.summingInt(OrderItem::getQuantity)));
         return PageResult.of(result, o -> new OrderListVO(
                 o.getId(), o.getOrderNo(), o.getStatus(), OrderStatus.textOf(o.getStatus()),
-                o.getTotalAmount(), o.getPayAmount(), o.getCreatedAt()));
+                o.getTotalAmount(), o.getPayAmount(),
+                itemCountByOrder.getOrDefault(o.getId(), 0),
+                o.getCreatedAt()));
     }
 
     public OrderDetailVO orderDetail(Long userId, String orderNo) {

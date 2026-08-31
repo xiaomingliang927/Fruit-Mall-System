@@ -12,7 +12,7 @@
         <text class="st" :class="`s${o.status}`">{{ o.statusText }}</text>
       </view>
       <view class="obody">
-        <text class="ocnt">共 {{ o.count }} 件</text>
+        <text class="ocnt">共 {{ o.itemCount ?? 0 }} 件</text>
         <text class="oamt">实付 <text class="money">¥{{ yuan(o.payAmount) }}</text></text>
       </view>
       <view class="oacts">
@@ -54,11 +54,13 @@ onLoad((opt) => {
 })
 
 async function load() {
-  const qs = new URLSearchParams({ page: 1, size: 20 })
-  if (status.value) qs.append('status', status.value)
-  const data = await api.get(`/api/v1/orders?${qs}`)
-  // 保留已展开状态
-  const old = Object.fromEntries(orders.value.map((o) => [o.orderNo, o]))
+  // 小程序 JSCore 没有 URLSearchParams，手动拼查询串
+  const params = ['page=1', 'size=20']
+  if (status.value) params.push(`status=${status.value}`)
+  const data = await api.get(`/api/v1/orders?${params.join('&')}`)
+  // 保留已展开状态（不用 Object.fromEntries，避免 ES2019 依赖）
+  const old = {}
+  orders.value.forEach((o) => { old[o.orderNo] = o })
   orders.value = data.records.map((o) => ({ ...o, _open: old[o.orderNo]?._open, _detail: old[o.orderNo]?._detail }))
 }
 

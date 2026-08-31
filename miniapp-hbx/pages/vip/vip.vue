@@ -30,6 +30,8 @@
 </template>
 
 <script>
+	import { api } from '../../api'
+
 	export default {
 		data() {
 			return {
@@ -43,9 +45,18 @@
 				]
 			}
 		},
-		onShow() {
-			const u = uni.getStorageSync('userLevel')
-			if (u) this.level = Number(u) || 1
+		async onShow() {
+			// 会员等级来自真实接口（原来读的 userLevel 缓存从没人写入，永远显示普通会员）
+			if (!uni.getStorageSync('token')) {
+				this.level = 1
+				return
+			}
+			try {
+				const me = await api.get('/api/v1/users/me')
+				this.level = me.level || 1
+			} catch (e) {
+				this.level = 1
+			}
 		},
 		methods: {
 			levelText(level) {
