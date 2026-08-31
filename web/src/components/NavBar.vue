@@ -2,7 +2,7 @@
   <header class="nav">
     <div class="nav-inner">
       <div class="logo" @click="$router.push('/')">
-        <span class="mark">鲜</span><span class="name">鲜果集</span>
+        <span class="mark">鲜</span><span class="name">果上选</span>
       </div>
       <div class="nav-search">
         <input v-model="keyword" placeholder="搜索水果：苹果 / 车厘子 / 草莓…" @keyup.enter="goSearch" />

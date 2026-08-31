@@ -4,7 +4,7 @@
       <div class="brand">
         <div class="mark">鲜</div>
         <div>
-          <div class="bt1">鲜果集 · 管理后台</div>
+          <div class="bt1">果上选 · 管理后台</div>
           <div class="bt2">商家运营一体化工作台</div>
         </div>
       </div>

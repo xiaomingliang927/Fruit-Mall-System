@@ -5,7 +5,7 @@
       <div class="brand">
         <div class="mark">鲜</div>
         <div class="bt">
-          <div class="t1">鲜果集</div>
+          <div class="t1">果上选</div>
           <div class="t2">商家管理后台</div>
         </div>
       </div>

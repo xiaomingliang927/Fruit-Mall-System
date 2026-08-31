@@ -3,7 +3,7 @@
 		<!-- 品牌头 -->
 		<view class="hero">
 			<view class="logo"><text class="logo-t">果</text></view>
-			<text class="brand">鲜果集</text>
+			<text class="brand">果上选</text>
 			<text class="slogan">水果这行没什么秘密，好吃就是好吃</text>
 		</view>
 
@@ -76,7 +76,7 @@
 			<text class="note">正式接入微信支付需要营业执照办下来才能申请商户号，办好后会在这里更新。</text>
 		</view>
 
-		<text class="copy">© 2026 鲜果集</text>
+		<text class="copy">© 2026 果上选</text>
 		<view style="height: 40rpx;"></view>
 	</view>
 </template>

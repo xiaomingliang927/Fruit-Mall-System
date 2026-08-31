@@ -1,7 +1,7 @@
 {
-    "name" : "鲜果集",
+    "name" : "果上选",
     "appid" : "__UNI__FRUITMALL",
-    "description" : "鲜果集 - 水果商城小程序",
+    "description" : "果上选 - 水果商城小程序",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,

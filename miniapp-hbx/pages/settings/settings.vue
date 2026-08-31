@@ -47,7 +47,7 @@
 				<text class="arrow">›</text>
 			</view>
 			<view class="row" @click="goAbout">
-				<text class="row-k">关于鲜果集</text>
+				<text class="row-k">关于果上选</text>
 				<text class="arrow">›</text>
 			</view>
 			<view class="row" @click="copyVersion">
@@ -142,7 +142,7 @@
 			},
 			copyVersion() {
 				const sys = uni.getSystemInfoSync()
-				const txt = '鲜果集 v' + VERSION + ' / ' + (sys.platform || '') + ' / 微信 ' + (sys.version || '')
+				const txt = '果上选 v' + VERSION + ' / ' + (sys.platform || '') + ' / 微信 ' + (sys.version || '')
 				uni.setClipboardData({
 					data: txt,
 					success: () => uni.showToast({ title: '版本信息已复制', icon: 'none' })

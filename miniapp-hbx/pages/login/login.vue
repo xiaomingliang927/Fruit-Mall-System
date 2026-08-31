@@ -1,7 +1,7 @@
 <template>
   <view class="wrap">
     <view class="mark">鲜</view>
-    <view class="t1">鲜果集</view>
+    <view class="t1">果上选</view>
     <view class="t2">产地直采 · 新鲜到家</view>
 
     <button class="wxbtn" @tap="wxLogin">微信一键登录</button>

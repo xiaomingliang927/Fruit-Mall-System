@@ -5,7 +5,7 @@
 			<view class="nav-topline">
 				<view class="brand">
 					<view class="logo"><text class="logo-text">果</text></view>
-					<text>鲜果集</text>
+					<text>果上选</text>
 				</view>
 				<view class="loc"><image src="/static/icon/png/map-pin-white.png" mode="aspectFit" class="loc-icon"></image><text>湘西州·滨江公寓</text></view>
 				<view class="head-icons">

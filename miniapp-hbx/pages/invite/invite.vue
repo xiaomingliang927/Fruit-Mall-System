@@ -36,7 +36,7 @@
 		},
 		onShareAppMessage() {
 			return {
-				title: '鲜果集新人礼，一起买新鲜水果',
+				title: '果上选新人礼，一起买新鲜水果',
 				path: '/pages/index/index?inviteCode=' + this.code
 			}
 		},

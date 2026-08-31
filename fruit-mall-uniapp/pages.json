@@ -39,7 +39,7 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "鲜果集",
+		"navigationBarTitleText": "果上选",
 		"navigationBarBackgroundColor": "#ffffff",
 		"backgroundColor": "#f5f5f5"
 	},

@@ -18,7 +18,7 @@ async function pay(o) {`);
 }
 console.log('orders goReview:', o.includes('goReview'));
 
-// 2) 详情页（options API，鲜果集原版结构）
+// 2) 详情页（options API，果上选原版结构）
 const dp = 'C:/Users/季/Desktop/fruit/miniapp/src/pages/detail/detail.vue';
 let d = fs.readFileSync(dp, 'utf8');
 
