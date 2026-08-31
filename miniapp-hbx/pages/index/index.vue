@@ -7,9 +7,9 @@
 					<view class="logo"><text class="logo-text">果</text></view>
 					<text>果小满</text>
 				</view>
-				<view class="loc"><image src="/static/icon/svg/map-pin-white.svg" mode="aspectFit" class="loc-icon"></image><text>湘西州·滨江公寓</text></view>
+				<view class="loc"><image src="/static/icon/png/map-pin-white.png" mode="aspectFit" class="loc-icon"></image><text>湘西州·滨江公寓</text></view>
 				<view class="head-icons">
-					<view class="icon-btn" @click="showToast('暂无新消息')"><image src="/static/icon/svg/bell-white.svg" mode="aspectFit" class="bell-icon"></image></view>
+					<view class="icon-btn" @click="showToast('暂无新消息')"><image src="/static/icon/png/bell-white.png" mode="aspectFit" class="bell-icon"></image></view>
 				</view>
 			</view>
 			<view class="searchbar" @click="showToast('搜索功能开发中')">

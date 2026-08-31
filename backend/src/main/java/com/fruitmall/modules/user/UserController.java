@@ -48,6 +48,26 @@ public class UserController {
                 .orderByDesc(UserAddress::getId)));
     }
 
+    public record UpdateProfileRequest(
+            @NotBlank(message = "昵称不能为空") String nickname,
+            String avatar
+    ) {
+    }
+
+    @PutMapping("/me")
+    public ApiResponse<UserVO> updateMe(@Valid @RequestBody UpdateProfileRequest request) {
+        User user = userMapper.selectById(UserContext.requireUserId());
+        if (user == null) {
+            throw new BizException("用户不存在");
+        }
+        user.setNickname(HtmlSanitizer.sanitize(request.nickname()));
+        if (request.avatar() != null) {
+            user.setAvatar(HtmlSanitizer.sanitize(request.avatar()));
+        }
+        userMapper.updateById(user);
+        return ApiResponse.ok(UserVO.of(user));
+    }
+
     public record AddAddressRequest(
             @NotBlank(message = "收货人不能为空") String receiver,
             @NotBlank(message = "手机号不能为空") String phone,

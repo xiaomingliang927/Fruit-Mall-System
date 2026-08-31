@@ -2,10 +2,10 @@
 	<view class="page">
 		<!-- 顶部用户区 -->
 		<view class="mine-header">
-			<view class="mine-user" @click="me.nickname ? showToast('个人资料') : goLogin()">
+			<view class="mine-user" @click="me.nickname ? goProfile() : goLogin()">
 				<view class="mine-avatar">
 					<text v-if="me.nickname" class="avatar-text">{{ me.nickname[0] }}</text>
-					<image v-else src="/static/icon/svg/person.svg" mode="aspectFit" class="avatar-icon"></image>
+					<image v-else src="/static/icon/png/person.png" mode="aspectFit" class="avatar-icon"></image>
 				</view>
 				<view class="mine-info">
 					<text class="mine-name">{{ me.nickname || '点击登录' }}</text>
@@ -13,19 +13,19 @@
 				</view>
 			</view>
 			<view class="mine-actions">
-				<view class="action-btn" @click="showToast('消息')">
-					<image src="/static/icon/svg/chat.svg" mode="aspectFit" class="action-img"></image>
+				<view class="action-btn" @click="goMessages()">
+					<image src="/static/icon/png/chat.png" mode="aspectFit" class="action-img"></image>
 				</view>
-				<view class="action-btn" @click="showToast('设置')">
-					<image src="/static/icon/svg/settings.svg" mode="aspectFit" class="action-img"></image>
+				<view class="action-btn" @click="goSettings()">
+					<image src="/static/icon/png/settings.png" mode="aspectFit" class="action-img"></image>
 				</view>
 			</view>
 		</view>
 
 		<!-- 会员入口 -->
-		<view class="mine-vip-entry" @click="showToast('开通会员')">
+		<view class="mine-vip-entry" @click="goVip()">
 			<view class="vip-entry-l">
-				<image src="/static/icon/svg/crown.svg" mode="aspectFit" class="vip-icon"></image>
+				<image src="/static/icon/png/crown.png" mode="aspectFit" class="vip-icon"></image>
 				<text class="vip-entry-t">开通会员享专属优惠</text>
 			</view>
 			<text class="vip-entry-arrow">›</text>
@@ -75,21 +75,21 @@
 			return {
 				me: {},
 				orders: [
-					{ img: '/static/icon/svg/wallet.svg', lb: '待付款', status: 10 },
-					{ img: '/static/icon/svg/box.svg', lb: '待发货', status: 20 },
-					{ img: '/static/icon/svg/truck.svg', lb: '待收货', status: 30 },
-					{ img: '/static/icon/svg/star.svg', lb: '待评价', status: 40 },
-					{ img: '/static/icon/svg/headset.svg', lb: '退款/售后', status: null }
+					{ img: '/static/icon/png/wallet.png', lb: '待付款', status: 10 },
+					{ img: '/static/icon/png/box.png', lb: '待发货', status: 20 },
+					{ img: '/static/icon/png/truck.png', lb: '待收货', status: 30 },
+					{ img: '/static/icon/png/star.png', lb: '待评价', status: 40 },
+					{ img: '/static/icon/png/headset.png', lb: '退款/售后', status: null }
 				],
 			tools: [
-				{ img: '/static/icon/svg/heart.svg', lb: '我的收藏', tap: goFavorite },
-				{ img: '/static/icon/svg/map-pin.svg', lb: '收货地址', tap: goAddress },
-				{ img: '/static/icon/svg/ticket.svg', lb: '优惠券', tap: goCoupons },
-				{ img: '/static/icon/svg/gift.svg', lb: '邀请有礼' },
-				{ img: '/static/icon/svg/headset.svg', lb: '联系客服' },
-				{ img: '/static/icon/svg/help.svg', lb: '帮助中心' },
-				{ img: '/static/icon/svg/settings.svg', lb: '设置' },
-				{ img: '/static/icon/svg/person.svg', lb: '关于我们' }
+				{ img: '/static/icon/png/heart.png', lb: '我的收藏', tap: goFavorite },
+				{ img: '/static/icon/png/map-pin.png', lb: '收货地址', tap: goAddress },
+				{ img: '/static/icon/png/ticket.png', lb: '优惠券', tap: goCoupons },
+				{ img: '/static/icon/png/gift.png', lb: '邀请有礼', tap: goInvite },
+				{ img: '/static/icon/png/headset.png', lb: '联系客服', tap: goService },
+				{ img: '/static/icon/png/help.png', lb: '帮助中心', tap: goHelp },
+				{ img: '/static/icon/png/settings.png', lb: '设置', tap: goSettings },
+				{ img: '/static/icon/png/person.png', lb: '关于我们', tap: goAbout }
 			]
 			}
 		},
@@ -108,6 +108,32 @@
 			},
 			levelText(level) {
 				return { 1: '普通会员', 2: '白银会员', 3: '黄金会员', 4: '钻石会员' }[level] || '普通会员'
+			},
+			goProfile() {
+				if (!this.me.nickname) return this.goLogin()
+				uni.navigateTo({ url: '/pages/profile/profile' })
+			},
+			goMessages() {
+				if (!this.me.nickname) return this.goLogin()
+				uni.navigateTo({ url: '/pages/messages/messages' })
+			},
+			goVip() {
+				uni.navigateTo({ url: '/pages/vip/vip' })
+			},
+			goInvite() {
+				uni.navigateTo({ url: '/pages/invite/invite' })
+			},
+			goService() {
+				uni.navigateTo({ url: '/pages/service/service' })
+			},
+			goHelp() {
+				uni.navigateTo({ url: '/pages/help/help' })
+			},
+			goSettings() {
+				uni.navigateTo({ url: '/pages/settings/settings' })
+			},
+			goAbout() {
+				uni.navigateTo({ url: '/pages/about/about' })
 			},
 			goCoupons() {
 				uni.navigateTo({ url: '/pages/coupon/coupon' })
