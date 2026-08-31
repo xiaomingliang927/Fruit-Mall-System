@@ -100,6 +100,7 @@ export function decQty(id) {
 	snap.qty = (snap.qty || 0) - 1
 	if (snap.qty <= 0) {
 		delete cart[id]
+		saveCart(cart)
 		const sel = getSelected(); delete sel[id]; saveSelected(sel)
 		const serverId = snap.itemId || snap.skuId
 		if (serverId && loggedIn()) api.delete('/api/v1/cart/items/' + serverId).catch(() => {})
