@@ -93,10 +93,10 @@ async function doLogin() {
 /* 右半侧玻璃面板 */
 .glass-side {
   margin-left: auto; width: 46%; min-width: 400px; height: 100vh;
-  background: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
-  border-left: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(9, 34, 20, 0.82);
+  backdrop-filter: blur(24px) saturate(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(1.1);
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   position: relative; z-index: 2; padding: 40px 24px; color: #fff;
 }
@@ -115,13 +115,13 @@ async function doLogin() {
 
 /* 输入框：玻璃质感 */
 .form-box :deep(.el-input__wrapper) {
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow: none; backdrop-filter: blur(6px);
 }
 .form-box :deep(.el-input__wrapper.is-focus) {
-  background: rgba(255, 255, 255, 0.24);
-  border-color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.55);
 }
 .form-box :deep(.el-input__inner) { color: #fff; }
 .form-box :deep(.el-input__inner::placeholder) { color: rgba(255, 255, 255, 0.65); }

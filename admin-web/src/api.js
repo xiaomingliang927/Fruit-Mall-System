@@ -3,8 +3,17 @@ import { adminStore } from './store'
 async function request(url, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) }
   if (adminStore.token) headers.Authorization = `Bearer ${adminStore.token}`
-  const res = await fetch(url, { ...options, headers })
-  const body = await res.json().catch(() => ({ code: res.status, message: '网络异常' }))
+  let res
+  try {
+    res = await fetch(url, { ...options, headers })
+  } catch (e) {
+    // fetch 抛错 = 网络层不通（后端未启动 / 断网 / 代理拒绝）
+    throw new Error('无法连接服务器，请确认后端服务已启动')
+  }
+  const body = await res.json().catch(() => {
+    // 收到响应但不是 JSON（多为 Nginx 502/504 页面 = 后端瞬时不可用）
+    throw new Error(res.status >= 500 ? `服务暂不可用（${res.status}），请稍后重试` : `请求失败（${res.status}）`)
+  })
   if (body.code === 0) return body.data
   if (body.code === 401) {
     adminStore.token = ''
