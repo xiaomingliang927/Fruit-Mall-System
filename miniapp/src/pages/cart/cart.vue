@@ -91,12 +91,10 @@
 			}
 		},
 		computed: {
-			cartList() {
-				return PRODUCTS.filter(p => this.cart[p.id]).map(p => ({
-					...p,
-					qty: this.cart[p.id]
-				}))
-			},
+		cartList() {
+			// 直接渲染本地购物车快照，不再依赖 PRODUCTS 是否包含该 id
+			return Object.keys(this.cart).map((id) => this.cart[id])
+		},
 			allSelected() {
 				const ids = Object.keys(this.cart)
 				return ids.length > 0 && ids.every(id => this.selected[id])
