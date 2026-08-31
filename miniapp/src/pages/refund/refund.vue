@@ -44,7 +44,7 @@
 </template>
 
 <script>
-	import { api, yuan, imgUrl, uploadImage } from '../../api'
+	import { api, yuan, imgUrl, uploadImage, getBaseUrl } from '../../api'
 
 	export default {
 		data() {
@@ -96,6 +96,31 @@
 			},
 			preview(i) {
 				uni.previewImage({ current: i, urls: this.images.map((p) => imgUrl(p)) })
+			},
+			chooseImage() {
+				const left = 3 - this.images.length
+				if (left <= 0) return
+				uni.chooseImage({
+					count: left,
+					sizeType: ['compressed'],
+					success: (res) => {
+						for (const path of res.tempFilePaths) this.upload(path)
+					}
+				})
+			},
+			upload(path) {
+				uni.uploadFile({
+					url: getBaseUrl() + '/api/v1/upload/image',
+					filePath: path,
+					name: 'file',
+					header: { Authorization: 'Bearer ' + (uni.getStorageSync('token') || '') },
+					success: (res) => {
+						const body = JSON.parse(res.data)
+						if (body.code === 0) this.images.push(body.data.url)
+						else uni.showToast({ title: body.message || '上传失败', icon: 'none' })
+					},
+					fail: () => uni.showToast({ title: '上传失败', icon: 'none' })
+				})
 			},
 			async submit() {
 				if (!this.reason.trim()) {
@@ -173,4 +198,18 @@
 		border-radius: 44rpx; padding: 20rpx 0; font-size: 29rpx; font-weight: 600;
 	}
 	.submit.off { opacity: 0.6; }
+	.ups { display: flex; gap: 16rpx; flex-wrap: wrap; }
+	.up-thumb { position: relative; width: 150rpx; height: 150rpx; border-radius: 12rpx; overflow: hidden; }
+	.up-img { width: 100%; height: 100%; }
+	.up-del {
+		position: absolute; top: 0; right: 0; width: 40rpx; height: 40rpx; line-height: 36rpx;
+		background: rgba(0,0,0,.55); color: #fff; font-size: 26rpx; text-align: center;
+	}
+	.up-add {
+		width: 150rpx; height: 150rpx; border: 2rpx dashed #c6ced6; border-radius: 12rpx;
+		display: flex; flex-direction: column; align-items: center; justify-content: center;
+		color: #a5aca1;
+	}
+	.up-plus { font-size: 44rpx; line-height: 1; }
+	.up-txt { font-size: 20rpx; margin-top: 6rpx; }
 </style>

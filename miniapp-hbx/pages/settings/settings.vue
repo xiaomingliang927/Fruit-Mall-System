@@ -24,6 +24,14 @@
 				</view>
 				<switch :checked="notice" color="#17704a" @change="onNoticeChange" />
 			</view>
+			<view class="row" @click="openApiPanel">
+				<view class="row-c">
+					<text class="row-k">API 地址</text>
+					<text class="row-d">真机预览时改为电脑局域网 IP（手机和电脑需同一 WiFi）</text>
+				</view>
+				<text class="row-v" style="max-width: 280rpx;">{{ apiCurrent }}</text>
+				<text class="arrow">›</text>
+			</view>
 			<view class="row" @click="clearCache">
 				<view class="row-c">
 					<text class="row-k">清除缓存</text>
@@ -64,15 +72,34 @@
 		<view v-else class="login-tip" @click="goLogin">还没登录，点这里登录 ›</view>
 
 		<view style="height: 60rpx;"></view>
+
+		<!-- API 地址面板 -->
+		<view v-if="showApiPanel" class="mask" @click="closeApiPanel">
+			<view class="modal" @click.stop="">
+				<view class="modal-t">API 地址</view>
+				<view class="modal-d">
+					开发工具里默认 <text style="color:#17704a">http://localhost:8080</text> 即可；真机预览请把 <text style="color:#17704a">localhost</text> 换成电脑的局域网 IP（如 <text style="color:#17704a">http://192.168.1.5:8080</text>），手机和电脑必须在同一 WiFi。
+				</view>
+				<input v-model="apiDraft" class="modal-input" placeholder="http://192.168.1.5:8080" :maxlength="64" />
+				<view v-if="apiStatus" class="modal-status" :style="{ color: apiStatus.ok ? '#0a7c2f' : '#e54d42' }">{{ apiStatus.text }}</view>
+				<view class="modal-btns">
+					<view class="btn ghost" @click="resetApi">恢复默认</view>
+					<view class="btn ghost" @click="testApi" :class="{ disabled: apiTesting }">{{ apiTesting ? '测试中…' : '测试连接' }}</view>
+					<view class="btn primary" @click="saveApi">保存</view>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script>
-	import { api, setToken } from '../../api'
+	import { api, setToken, getBaseUrl, setBaseUrl } from '../../api'
 	import { clearLocalMirror, updateCartBadge } from '../../utils/cart.js'
 
 	const NOTICE_KEY = 'fruit_mall_notice'
 	const VERSION = '1.0.0'
+	const API_KEY = 'fruit_mall_base_url'
+	const DEFAULT_API = 'http://localhost:8080'
 
 	export default {
 		data() {
@@ -81,7 +108,12 @@
 				isLogin: false,
 				nickname: '',
 				cacheSize: '',
-				version: VERSION
+				version: VERSION,
+				showApiPanel: false,
+				apiDraft: '',
+				apiCurrent: '',
+				apiTesting: false,
+				apiStatus: null
 			}
 		},
 		async onShow() {
@@ -90,9 +122,69 @@
 			const saved = uni.getStorageSync(NOTICE_KEY)
 			this.notice = saved === '' || saved === null || saved === undefined ? true : !!saved
 			this.refreshCacheSize()
+			this.refreshApiDisplay()
 			await this.loadMe()
 		},
 		methods: {
+			refreshApiDisplay() {
+				const v = getBaseUrl() || DEFAULT_API
+				this.apiCurrent = v === DEFAULT_API ? '默认 (' + DEFAULT_API + ')' : v
+			},
+			openApiPanel() {
+				const v = getBaseUrl() || DEFAULT_API
+				this.apiDraft = v === DEFAULT_API ? '' : v
+				this.apiStatus = null
+				this.showApiPanel = true
+			},
+			closeApiPanel() {
+				this.showApiPanel = false
+				this.apiTesting = false
+			},
+			saveApi() {
+				const v = this.apiDraft.trim()
+				if (v && !/^https?:\/\//i.test(v)) {
+					this.apiStatus = { ok: false, text: '地址必须以 http:// 或 https:// 开头' }
+					return
+				}
+				setBaseUrl(v)
+				this.apiStatus = { ok: true, text: '已保存，下次请求生效' }
+				this.refreshApiDisplay()
+				setTimeout(() => { this.showApiPanel = false }, 700)
+			},
+			resetApi() {
+				setBaseUrl('')
+				this.apiDraft = ''
+				this.apiStatus = { ok: true, text: '已恢复默认' + (DEFAULT_API ? ' ' + DEFAULT_API : '') }
+				this.refreshApiDisplay()
+				setTimeout(() => { this.showApiPanel = false }, 700)
+			},
+			testApi() {
+				if (this.apiTesting) return
+				const url = (this.apiDraft.trim() || getBaseUrl() || DEFAULT_API)
+				if (!/^https?:\/\//i.test(url)) {
+					this.apiStatus = { ok: false, text: '地址必须以 http:// 或 https:// 开头' }
+					return
+				}
+				this.apiTesting = true
+				this.apiStatus = null
+				// 不走全局基地址：临时发一次请求验证
+				uni.request({
+					url: url.replace(/\/$/, '') + '/api/v1/products/hot?size=1',
+					method: 'GET',
+					timeout: 4000,
+					success: (r) => {
+						const body = r.data || {}
+						this.apiStatus = body.code === 0
+							? { ok: true, text: '连接成功（HTTP ' + r.statusCode + '）' }
+							: { ok: false, text: '后端响应异常：HTTP ' + r.statusCode + ' / code=' + body.code }
+					},
+					fail: (e) => {
+						const m = (e && e.errMsg) || '网络不可达'
+						this.apiStatus = { ok: false, text: '连接失败：' + m + '（检查 IP、WiFi 和后端进程）' }
+					},
+					complete: () => { this.apiTesting = false }
+				})
+			},
 			/** 昵称从接口拿（不要读缓存 key，项目里没人写入过，读了永远是空） */
 			async loadMe() {
 				if (!this.isLogin) {
@@ -220,4 +312,28 @@
 		margin: 36rpx 24rpx 0; text-align: center; line-height: 88rpx; height: 88rpx;
 		background: #fff; color: #17704a; font-size: 28rpx; font-weight: 600; border-radius: 24rpx;
 	}
+
+	/* API 地址面板 */
+	.mask {
+		position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+		display: flex; align-items: center; justify-content: center; z-index: 99;
+	}
+	.modal {
+		width: 640rpx; background: #fff; border-radius: 24rpx; padding: 36rpx 40rpx 32rpx;
+	}
+	.modal-t { font-size: 32rpx; font-weight: 600; color: #222; }
+	.modal-d { margin-top: 16rpx; font-size: 24rpx; color: #5e6760; line-height: 1.6; }
+	.modal-input {
+		margin-top: 22rpx; padding: 18rpx 22rpx; border: 1rpx solid #dde4dd; border-radius: 16rpx;
+		font-size: 28rpx; color: #222; background: #f6f8f5;
+	}
+	.modal-status { margin-top: 16rpx; font-size: 25rpx; line-height: 1.5; }
+	.modal-btns { display: flex; gap: 18rpx; margin-top: 30rpx; }
+	.btn {
+		flex: 1; text-align: center; line-height: 72rpx; height: 72rpx; border-radius: 20rpx;
+		font-size: 28rpx; font-weight: 600;
+	}
+	.btn.ghost { background: #f1f4ef; color: #5e6760; }
+	.btn.primary { background: #17704a; color: #fff; }
+	.btn.disabled { opacity: 0.6; }
 </style>

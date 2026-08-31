@@ -1,7 +1,21 @@
 // 后端接口基地址：
 //  - 微信开发者工具里 localhost 可用（需在「详情-本地设置」勾选「不校验合法域名」）
-//  - 真机预览时改为电脑局域网 IP，如 http://192.168.1.5:8080
-export const BASE_URL = 'http://localhost:8080'
+//  - 真机预览时改为电脑局域网 IP，如 http://192.168.1.5:8080（手机和电脑需同一 WiFi）
+//  - 真机用户可在「设置 → API 地址」自行配置，覆盖默认 localhost
+const BASE_URL_KEY = 'fruit_mall_base_url'
+const DEFAULT_BASE_URL = 'http://localhost:8080'
+
+export function getBaseUrl() {
+  return uni.getStorageSync(BASE_URL_KEY) || DEFAULT_BASE_URL
+}
+
+export function setBaseUrl(url) {
+  if (url && url.trim()) {
+    uni.setStorageSync(BASE_URL_KEY, url.trim())
+  } else {
+    uni.removeStorageSync(BASE_URL_KEY)
+  }
+}
 
 export function getToken() {
   return uni.getStorageSync('token') || ''
@@ -18,7 +32,7 @@ function request(url, method = 'GET', data) {
     const token = getToken()
     if (token) header.Authorization = `Bearer ${token}`
     uni.request({
-      url: BASE_URL + url,
+      url: getBaseUrl() + url,
       method,
       data,
       header,
@@ -52,7 +66,7 @@ export function uploadImage(filePath) {
     const token = getToken()
     if (token) header.Authorization = `Bearer ${token}`
     uni.uploadFile({
-      url: BASE_URL + '/api/v1/upload/image',
+      url: getBaseUrl() + '/api/v1/upload/image',
       filePath,
       name: 'file',
       header,
@@ -74,7 +88,7 @@ export function uploadImage(filePath) {
 }
 
 /** 商品图：数据库存相对路径，小程序需拼绝对地址 */
-export const imgUrl = (p) => (p ? (p.startsWith('http') ? p : BASE_URL + p) : '')
+export const imgUrl = (p) => (p ? (p.startsWith('http') ? p : getBaseUrl() + p) : '')
 
 /** 金额：分 → 元字符串 */
 export const yuan = (fen) => (fen / 100).toFixed(2).replace(/\.?0+$/, '')

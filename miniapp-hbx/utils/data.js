@@ -3,9 +3,9 @@
  * 商品/分类/图片全部来自后端；PRODUCTS 携带 skuId 供购物车直接同步
  */
 import { reactive } from 'vue'
-import { BASE_URL, imgUrl } from '../api.js'
+import { getBaseUrl, imgUrl } from '../api.js'
 
-const photo = (name) => BASE_URL + '/images/products/' + name
+const photo = (name) => getBaseUrl() + '/images/products/' + name
 
 export const IMG = {
 	banner: photo('fruit-banner.jpg'),
@@ -33,7 +33,7 @@ const catNameById = {}
 function fetchJson(url) {
 	return new Promise((resolve) => {
 		uni.request({
-			url: BASE_URL + url,
+			url: getBaseUrl() + url,
 			method: 'GET',
 			header: { 'Content-Type': 'application/json' },
 			success: (r) => resolve(r.data && r.data.code === 0 ? r.data.data : null),
