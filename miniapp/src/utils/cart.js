@@ -181,10 +181,12 @@ export async function syncFromServer() {
 			const pid = it.productId
 			if (!cart[pid] || typeof cart[pid] !== 'object') {
 				// 本地没有该项（如其他端加的），按服务端快照补进来
+				// 注意单位：后端 CartVO.price 是「分」，前端本地快照 price 是「元」，
+				// 必须 /100，否则同步进来的商品单价/合计会放大 100 倍（¥590 的香蕉）。
 				cart[pid] = {
 					id: pid,
 					name: it.productName || '商品',
-					price: it.price || 0,
+					price: (it.price || 0) / 100,
 					img: it.image || '',
 					spec: it.spec || '',
 					skuId: it.skuId,
