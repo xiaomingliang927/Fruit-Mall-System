@@ -10,7 +10,7 @@
 							<image src="/static/icon/png/crown.png" mode="aspectFit" class="crown"></image>
 							<text class="lv-txt">{{ levelText }}</text>
 						</view>
-						<text class="mcard-name">{{ nickname || '未登录' }}</text>
+						<text class="mcard-name">{{ nickname || '游客' }}</text>
 					</view>
 					<text class="mcard-badge">{{ badgeText }}</text>
 				</view>
