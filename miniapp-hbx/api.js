@@ -45,6 +45,34 @@ export const api = {
   delete: (url) => request(url, 'DELETE'),
 }
 
+/** 凭证图上传：uni.uploadFile → 返回后端相对路径（展示时用 imgUrl 拼绝对地址） */
+export function uploadImage(filePath) {
+  return new Promise((resolve, reject) => {
+    const header = {}
+    const token = getToken()
+    if (token) header.Authorization = `Bearer ${token}`
+    uni.uploadFile({
+      url: BASE_URL + '/api/v1/upload/image',
+      filePath,
+      name: 'file',
+      header,
+      success: (res) => {
+        let body = res.data
+        if (typeof body === 'string') {
+          try { body = JSON.parse(body) } catch (e) { body = {} }
+        }
+        if (body && body.code === 0 && body.data) return resolve(body.data.url)
+        if (body && body.code === 401) {
+          setToken('')
+          uni.navigateTo({ url: '/pages/login/login' })
+        }
+        reject(new Error((body && body.message) || '上传失败'))
+      },
+      fail: () => reject(new Error('上传失败，请确认后端已启动')),
+    })
+  })
+}
+
 /** 商品图：数据库存相对路径，小程序需拼绝对地址 */
 export const imgUrl = (p) => (p ? (p.startsWith('http') ? p : BASE_URL + p) : '')
 

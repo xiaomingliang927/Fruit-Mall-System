@@ -3,10 +3,14 @@ package com.fruitmall.config;
 import com.fruitmall.admin.AdminInterceptor;
 import com.fruitmall.auth.JwtInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.nio.file.Paths;
 
 @Configuration
 @RequiredArgsConstructor
@@ -15,16 +19,26 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final JwtInterceptor jwtInterceptor;
     private final AdminInterceptor adminInterceptor;
 
+    @Value("${app.upload.dir:./uploads}")
+    private String uploadDir;
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 上传图片的磁盘目录映射（/uploads/** 直接静态访问）
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + Paths.get(uploadDir).toAbsolutePath() + "/");
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // C 端接口鉴权
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/api/v1/**")
                 .excludePathPatterns(
-                        "/api/v1/auth/**",      // 登录
-                        "/api/v1/categories/**",
-                        "/api/v1/coupons/list",// 分类浏览
-                        "/api/v1/products/**"   // 商品浏览
+                        "/api/v1/auth/**",       // 登录
+                        "/api/v1/categories/**", // 分类浏览
+                        "/api/v1/coupons/list",  // 领券中心（匿名可见）
+                        "/api/v1/products/**"    // 商品浏览
                 );
         // 管理端接口鉴权（独立身份，与 C 端 token 不通用）
         registry.addInterceptor(adminInterceptor)

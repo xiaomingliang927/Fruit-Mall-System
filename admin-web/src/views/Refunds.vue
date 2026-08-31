@@ -35,8 +35,18 @@
             <el-tag :type="statusType(row.status)" size="small" effect="light">{{ row.statusText }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="申请原因" min-width="180" show-overflow-tooltip>
+        <el-table-column label="申请原因" min-width="170" show-overflow-tooltip>
           <template #default="{ row }">{{ row.reason }}</template>
+        </el-table-column>
+        <el-table-column label="凭证" width="132" align="center">
+          <template #default="{ row }">
+            <div v-if="imgList(row).length" class="proofs">
+              <el-image v-for="(src, i) in imgList(row)" :key="src" class="proof"
+                        :src="src" :preview-src-list="imgList(row)" :initial-index="i"
+                        fit="cover" preview-teleported hide-on-click-modal />
+            </div>
+            <span v-else class="proof-none">无凭证</span>
+          </template>
         </el-table-column>
         <el-table-column label="申请时间" width="150">
           <template #default="{ row }">{{ fmtTime(row.createdAt) }}</template>
@@ -77,6 +87,19 @@ function statusType(s) {
   return { 0: 'warning', 1: 'primary', 2: 'danger', 3: 'info', 4: 'success', 5: 'info' }[s] || 'info'
 }
 
+/** 凭证图：数据库存 JSON 字符串（兼容已是数组的场景），解析为可访问的路径数组 */
+function imgList(row) {
+  const raw = row.images
+  if (!raw) return []
+  if (Array.isArray(raw)) return raw.filter(Boolean)
+  try {
+    const arr = JSON.parse(raw)
+    return Array.isArray(arr) ? arr.filter(Boolean) : []
+  } catch (e) {
+    return []
+  }
+}
+
 async function load() {
   loading.value = true
   try {
@@ -106,8 +129,9 @@ async function audit(row, approve) {
   try {
     let remark = ''
     if (approve) {
-      const r = await ElMessageBox.confirm(
-        `通过「${row.refundNo}」的售后申请？退款 ¥${yuan(row.amount).toFixed(2)} 将原路退回，订单转已退款并回补库存。`,
+      const proofTip = imgList(row).length ? `（用户上传了 ${imgList(row).length} 张凭证图，请核对后再处理）` : '（该申请未上传凭证图）'
+      await ElMessageBox.confirm(
+        `通过「${row.refundNo}」的售后申请？退款 ¥${yuan(row.amount).toFixed(2)} 将原路退回，订单转已退款并回补库存。${proofTip}`,
         '审核通过', { confirmButtonText: '通过并退款', cancelButtonText: '取消', type: 'warning' })
       remark = '审核通过'
     } else {
@@ -133,4 +157,10 @@ onMounted(load)
 .toolbar :deep(.el-card__body) { padding: 14px 16px; }
 .bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .panel { border-radius: 8px; border: 1px solid #e8ebee; box-shadow: none; }
+.proofs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.proof {
+  width: 46px; height: 46px; border-radius: 6px; border: 1px solid #e8ebee;
+  background: #fafbfc; cursor: zoom-in;
+}
+.proof-none { color: #c0c4cc; font-size: 12px; }
 </style>

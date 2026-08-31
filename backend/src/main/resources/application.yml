@@ -18,6 +18,11 @@ spring:
     baseline-version: 2
   jackson:
     default-property-inclusion: non_null
+  servlet:
+    multipart:
+      # 与 UploadController 的 5MB 校验保持一致（Spring 默认仅 1MB，手机照片普遍超限）
+      max-file-size: 5MB
+      max-request-size: 20MB
 
 mybatis-plus:
   configuration:
@@ -31,6 +36,9 @@ app:
     # HS256 签名密钥：生产环境必须通过环境变量 FRUIT_JWT_SECRET 注入并定期轮换
     secret: ${FRUIT_JWT_SECRET:fruit-mall-dev-jwt-secret-change-me-please-0123456789abcdef}
     expire-hours: 168
+  upload:
+    # 图片上传存储目录（本地磁盘；生产可换 OSS，同步调整 WebMvcConfig 映射）
+    dir: ${FRUIT_UPLOAD_DIR:./uploads}
   wechat:
     # 小程序 AppID/Secret；两者都配置后走真实 code2Session，留空则进入开发模式（openid = dev-<code>）
     appid: ${FRUIT_WX_APPID:wxa0baa0a3ac856f2d}

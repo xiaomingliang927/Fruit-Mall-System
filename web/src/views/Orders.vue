@@ -80,6 +80,18 @@
         </div>
         <textarea class="refund-reason" v-model="refundForm.reason" maxlength="200"
                   placeholder="请填写申请原因（必填），如：坏果/腐烂/少件…"></textarea>
+        <div class="rf-uploads">
+          <div v-for="(img, i) in refundForm.images" :key="img" class="rf-thumb">
+            <img :src="img" alt="凭证" />
+            <span class="rf-del" @click="refundForm.images.splice(i, 1)">×</span>
+          </div>
+          <label v-if="refundForm.images.length < 3" class="rf-upload" :class="{ off: uploading }">
+            <input type="file" accept="image/jpeg,image/png,image/webp" hidden @change="onUpload" />
+            ＋<span class="rf-upload-txt">凭证</span>
+          </label>
+          <span v-if="uploading" class="rf-uploading">上传中…</span>
+        </div>
+        <div class="rf-up-tip">凭证图 ≤3 张（坏果请拍照），每张 ≤5MB；≤50 元自动秒审</div>
         <div style="text-align:right;margin-top:14px">
           <button class="btn btn-sm btn-ghost" @click="refundOrder = null">取消</button>
           <button class="btn btn-sm" style="margin-left:10px" :disabled="refundSubmitting" @click="submitRefund">提交申请</button>
@@ -115,7 +127,7 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { api, toast, fmtTime, yuan } from '../api'
+import { api, toast, fmtTime, yuan, uploadImage } from '../api'
 import { refreshMe } from '../store'
 
 const route = useRoute()
@@ -132,8 +144,9 @@ const totalPages = ref(1)
 const orders = ref([])
 const detail = ref(null)
 const refundOrder = ref(null)
-const refundForm = reactive({ type: 1, reason: '' })
+const refundForm = reactive({ type: 1, reason: '', images: [] })
 const refundSubmitting = ref(false)
+const uploading = ref(false)
 const reviewOrder = ref(null)
 const reviewItems = ref([])
 const reviewSubmitting = ref(false)
@@ -174,17 +187,37 @@ async function submitReview() {
 function openRefund(o) {
   refundForm.type = 1
   refundForm.reason = ''
+  refundForm.images = []
   refundOrder.value = o
+}
+
+/** 选择凭证图 → 立即上传（最多 3 张，单张 ≤5MB），提交前可删除重选 */
+async function onUpload(e) {
+  const file = e.target.files?.[0]
+  e.target.value = '' // 允许重复选同一张
+  if (!file || uploading.value) return
+  if (refundForm.images.length >= 3) return toast('最多上传 3 张凭证图', 'err')
+  if (file.size > 5 * 1024 * 1024) return toast('单张图片不能超过 5MB', 'err')
+  uploading.value = true
+  try {
+    refundForm.images.push(await uploadImage(file))
+  } catch (err) {
+    toast(err.message, 'err')
+  } finally {
+    uploading.value = false
+  }
 }
 
 async function submitRefund() {
   if (!refundForm.reason.trim()) return toast('请填写申请原因', 'err')
+  if (uploading.value) return toast('凭证图上传中，请稍候', 'err')
   refundSubmitting.value = true
   try {
     const data = await api.post('/api/v1/refunds', {
       orderNo: refundOrder.value.orderNo,
       type: refundForm.type,
       reason: refundForm.reason.trim(),
+      images: refundForm.images,
     })
     refundOrder.value = null
     toast(data.statusText === '已退款' ? '坏果包赔审核通过，退款原路返回' : '已提交，等待审核')

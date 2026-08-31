@@ -48,3 +48,15 @@ export function toast(message, type = 'ok') {
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => el.classList.remove('show'), 2200)
 }
+
+/** 图片上传（multipart，后端返回 /uploads/ 访问路径） */
+export async function uploadImage(file) {
+  const fd = new FormData()
+  fd.append('file', file)
+  const headers = { Authorization: '' }
+  if (useStore.token) headers.Authorization = `Bearer ${useStore.token}`
+  const res = await fetch('/api/v1/upload/image', { method: 'POST', headers, body: fd })
+  const body = await res.json().catch(() => ({ code: res.status, message: '上传失败' }))
+  if (body.code === 0) return body.data.url
+  throw new Error(body.message || '上传失败')
+}

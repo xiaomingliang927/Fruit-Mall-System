@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 
 @RestController
@@ -17,19 +18,27 @@ import java.util.List;
 public class RefundController {
 
     private final RefundService refundService;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     public record ApplyRequest(
             @NotBlank(message = "订单号不能为空") String orderNo,
             @NotNull(message = "请选择售后类型") Integer type,
-            @NotBlank(message = "请填写申请原因") String reason
+            @NotBlank(message = "请填写申请原因") String reason,
+            List<String> images
     ) {
     }
 
     /** 申请售后（≤50 元自动秒审退款） */
     @PostMapping
     public ApiResponse<RefundService.RefundVO> apply(@Valid @RequestBody ApplyRequest request) {
+                String imagesJson = null;
+        try {
+            if (request.images() != null && !request.images().isEmpty()) {
+                imagesJson = objectMapper.writeValueAsString(request.images());
+            }
+        } catch (Exception e) { throw new com.fruitmall.common.BizException("凭证图参数不合法"); }
         return ApiResponse.ok(refundService.apply(
-                UserContext.requireUserId(), request.orderNo(), request.type(), request.reason()));
+                UserContext.requireUserId(), request.orderNo(), request.type(), request.reason(), imagesJson));
     }
 
     /** 我的售后单 */

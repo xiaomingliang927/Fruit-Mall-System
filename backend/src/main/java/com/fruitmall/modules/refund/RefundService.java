@@ -37,7 +37,7 @@ public class RefundService {
     private final UserMapper userMapper;
 
     public record RefundVO(Long id, String refundNo, String orderNo, String typeText, String statusText,
-                           Integer type, Integer status, String reason, Integer amount,
+                           Integer type, Integer status, String reason, String images, Integer amount,
                            String auditRemark, LocalDateTime createdAt,
                            Long productId, String productName, String productImage) {
     }
@@ -46,7 +46,7 @@ public class RefundService {
 
     /** 申请售后：整单退款；≤50 元自动秒审退款，否则进入人工审核 */
     @Transactional
-    public RefundVO apply(Long userId, String orderNo, Integer type, String reason) {
+    public RefundVO apply(Long userId, String orderNo, Integer type, String reason, String imagesJson) {
         if (type == null || (type != Refund.TYPE_ONLY_REFUND && type != Refund.TYPE_RETURN_REFUND)) {
             throw new BizException("请选择售后类型");
         }
@@ -77,6 +77,7 @@ public class RefundService {
         refund.setUserId(userId);
         refund.setType(type);
         refund.setReason(reason);
+        refund.setImages(imagesJson);
         refund.setAmount(order.getPayAmount());
         refund.setStatus(Refund.STATUS_PENDING);
         refund.setPrevStatus(order.getStatus());
@@ -123,7 +124,7 @@ public class RefundService {
 
     public record AdminRefundVO(Long id, String refundNo, String orderNo, Integer type, String typeText,
                                 Integer status, String statusText, String reason, Integer amount,
-                                String auditRemark, LocalDateTime createdAt,
+                                String images, String auditRemark, LocalDateTime createdAt,
                                 Long userId, String userNickname, String userPhone) {
     }
 
@@ -143,7 +144,7 @@ public class RefundService {
             User u = userMap.get(r.getUserId());
             return new AdminRefundVO(r.getId(), r.getRefundNo(), r.getOrderNo(), r.getType(),
                     typeText(r.getType()), r.getStatus(), statusText(r.getStatus()), r.getReason(),
-                    r.getAmount(), r.getAuditRemark(), r.getCreatedAt(),
+                    r.getAmount(), r.getImages(), r.getAuditRemark(), r.getCreatedAt(),
                     r.getUserId(), u == null ? null : u.getNickname(), u == null ? null : u.getPhone());
         });
     }
@@ -221,15 +222,15 @@ public class RefundService {
 
     private RefundVO toVOBasic(Refund r) {
         return new RefundVO(r.getId(), r.getRefundNo(), r.getOrderNo(), typeText(r.getType()),
-                statusText(r.getStatus()), r.getType(), r.getStatus(), r.getReason(), r.getAmount(),
-                r.getAuditRemark(), r.getCreatedAt(), null, null, null);
+                statusText(r.getStatus()), r.getType(), r.getStatus(), r.getReason(), r.getImages(),
+                r.getAmount(), r.getAuditRemark(), r.getCreatedAt(), null, null, null);
     }
 
     private RefundVO toVO(Refund r, List<OrderItem> items) {
         OrderItem first = items.isEmpty() ? null : items.get(0);
         return new RefundVO(r.getId(), r.getRefundNo(), r.getOrderNo(), typeText(r.getType()),
-                statusText(r.getStatus()), r.getType(), r.getStatus(), r.getReason(), r.getAmount(),
-                r.getAuditRemark(), r.getCreatedAt(),
+                statusText(r.getStatus()), r.getType(), r.getStatus(), r.getReason(), r.getImages(),
+                r.getAmount(), r.getAuditRemark(), r.getCreatedAt(),
                 first == null ? null : first.getProductId(),
                 first == null ? null : first.getProductName(),
                 first == null ? null : first.getImage());
