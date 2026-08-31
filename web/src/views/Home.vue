@@ -13,6 +13,19 @@
       <img class="hero-img" :src="'/images/products/fruit-strawberry.jpg'" alt="当季草莓" />
     </div>
 
+    <!-- 首页轮播（后台「营销中心 → 轮播图」配置） -->
+    <div v-if="banners.length" class="slider" @mouseenter="stopSlide" @mouseleave="startSlide">
+      <div class="sl-track" :style="{ transform: `translateX(-${slideIndex * 100}%)` }">
+        <div v-for="b in banners" :key="b.id" class="sl-item" @click="goBanner(b)">
+          <img :src="b.image" :alt="b.title" />
+        </div>
+      </div>
+      <div class="sl-dots">
+        <span v-for="(b, i) in banners" :key="b.id" class="sl-dot"
+              :class="{ on: i === slideIndex }" @click.stop="slideIndex = i"></span>
+      </div>
+    </div>
+
     <!-- 服务保障 -->
     <div class="serve">
       <div class="s-item" v-for="s in services" :key="s.title">
@@ -75,7 +88,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api, yuan } from '../api'
 
@@ -92,8 +105,38 @@ const total = ref(0)
 const totalPages = ref(1)
 const loading = ref(true)
 const allRef = ref(null)
+const banners = ref([])
+const slideIndex = ref(0)
+let slideTimer = null
 
 const allCategories = computed(() => [{ id: null, name: '全部' }, ...categories.value])
+
+/** 轮播点击：1=商品详情、2=站内页面路径（小程序专属路径在网站忽略） */
+function goBanner(b) {
+  if (!b) return
+  if (b.linkType === 1 && b.linkValue) {
+    router.push(`/product/${b.linkValue}`)
+  } else if (b.linkType === 2 && b.linkValue
+      && b.linkValue.startsWith('/') && !b.linkValue.startsWith('/pages/')) {
+    router.push(b.linkValue)
+  }
+}
+
+function startSlide() {
+  stopSlide()
+  if (banners.value.length > 1) {
+    slideTimer = setInterval(() => {
+      slideIndex.value = (slideIndex.value + 1) % banners.value.length
+    }, 4000)
+  }
+}
+
+function stopSlide() {
+  if (slideTimer) {
+    clearInterval(slideTimer)
+    slideTimer = null
+  }
+}
 
 const services = [
   { title: '产地直采', desc: '优选产区直发', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 21c7 0 14-5 15-16H16C8 5 5 11 5 17v4z"/><path d="M5 21c2-6 6-9 11-11"/></svg>' },
@@ -146,5 +189,11 @@ onMounted(async () => {
   load()
   // 热销榜：默认按销量降序取前 4
   api.get('/api/v1/products?page=1&size=4').then((d) => (top.value = d.records))
+  // 首页轮播：后台配置，拉取失败则整体不展示该区块
+  api.get('/api/v1/banners?position=home')
+    .then((d) => { banners.value = d || []; startSlide() })
+    .catch(() => {})
 })
+
+onUnmounted(stopSlide)
 </script>

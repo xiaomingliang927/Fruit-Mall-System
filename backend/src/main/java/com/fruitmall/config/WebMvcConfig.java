@@ -36,6 +36,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/v1/**")
                 .excludePathPatterns(
                         "/api/v1/auth/**",       // 登录
+                        "/api/v1/banners",       // 首页轮播（匿名可见）
                         "/api/v1/categories/**", // 分类浏览
                         "/api/v1/coupons/list",  // 领券中心（匿名可见）
                         "/api/v1/products/**"    // 商品浏览

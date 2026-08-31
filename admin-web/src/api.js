@@ -30,6 +30,18 @@ export function toFen(y) {
   return Math.round(Number(y) * 100)
 }
 
+/** 图片上传（管理端，multipart）→ 返回 /uploads/ 访问路径 */
+export async function uploadImage(file) {
+  const fd = new FormData()
+  fd.append('file', file)
+  const headers = {}
+  if (adminStore.token) headers.Authorization = `Bearer ${adminStore.token}`
+  const res = await fetch('/api/admin/upload/image', { method: 'POST', headers, body: fd })
+  const body = await res.json().catch(() => ({ code: res.status, message: '上传失败' }))
+  if (body.code === 0) return body.data.url
+  throw new Error(body.message || '上传失败')
+}
+
 /** 下载文件（Excel 导出等）：带 token 请求 → blob 触发浏览器保存 */
 export async function exportFile(url, filename) {
   const headers = {}

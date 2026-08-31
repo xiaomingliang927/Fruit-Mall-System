@@ -31,6 +31,13 @@ export const menuGroups = [
       // 消费统计 / 标签与黑名单 —— M2 完成后追加
     ],
   },
-  // 营销中心（优惠券/秒杀拼团/推荐位）—— M2/M3 完成后启用
+  {
+    title: '营销中心',
+    items: [
+      { path: '/coupons', title: '优惠券', icon: 'Ticket', perm: 'coupon:list' },
+      { path: '/banners', title: '轮播图', icon: 'Picture', perm: 'banner:list' },
+      // 秒杀拼团 —— M3 完成后追加
+    ],
+  },
   // 系统设置（账号角色 RBAC/运费模板/支付参数/操作日志）—— M2 完成后启用
 ]

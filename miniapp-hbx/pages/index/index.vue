@@ -52,8 +52,15 @@
 				<view class="grid-dots"><text class="dot on"></text><text class="dot"></text></view>
 			</view>
 
-			<!-- 活动横幅 -->
-			<view class="promo-banner" @click="showToast('活动详情（原型占位）')">
+			<!-- 首页轮播（后台「营销中心 → 轮播图」配置；无数据时回落静态图） -->
+			<swiper v-if="banners.length" class="banner-sw" :indicator-dots="true"
+			        indicator-color="rgba(255,255,255,.55)" indicator-active-color="#f24e3e"
+			        :autoplay="true" :interval="4000" :circular="true">
+				<swiper-item v-for="b in banners" :key="b.id" @click="onBanner(b)">
+					<image :src="imgUrl(b.image)" mode="aspectFill" class="banner-img"></image>
+				</swiper-item>
+			</swiper>
+			<view v-else class="promo-banner" @click="showToast('活动详情（原型占位）')">
 				<image :src="IMG.banner" mode="aspectFill" class="promo-img"></image>
 				<view class="promo-tag"><text class="promo-tag-t">免费领</text><text class="promo-tag-s">福利中心</text></view>
 			</view>
@@ -86,6 +93,7 @@
 <script>
 	import { IMG, PRODUCTS, FLASH_IDS, HOT_IDS, getProduct } from '@/utils/data.js'
 	import { addToCart, updateCartBadge } from '@/utils/cart.js'
+	import { api, imgUrl } from '@/api'
 
 	export default {
 		data() {
@@ -93,6 +101,7 @@
 				IMG,
 				FLASH_IDS,
 				HOT_IDS,
+				banners: [],
 				statusBarHeight: 20,
 				countdown: 2 * 3600 + 59 * 60 + 59,
 				countdownText: '02:59:59',
@@ -124,6 +133,7 @@
 			const sysInfo = uni.getSystemInfoSync()
 			this.statusBarHeight = sysInfo.statusBarHeight || 20
 			this.startCountdown()
+			this.loadBanners()
 		},
 		onShow() {
 			this.updateTabBar()
@@ -133,6 +143,21 @@
 		},
 		methods: {
 			getProduct,
+			imgUrl,
+			loadBanners() {
+				api.get('/api/v1/banners?position=home')
+					.then((list) => { this.banners = Array.isArray(list) ? list : [] })
+					.catch(() => {})
+			},
+			onBanner(b) {
+				if (!b) return
+				if (b.linkType === 1 && b.linkValue) {
+					uni.navigateTo({ url: '/pages/detail/detail?id=' + b.linkValue })
+				} else if (b.linkType === 2 && b.linkValue) {
+					if (b.linkValue.indexOf('/pages/') === 0) uni.navigateTo({ url: b.linkValue })
+					else this.showToast(b.title || '活动详情')
+				}
+			},
 			updateTabBar() {
 				if (typeof this.getTabBar === 'function' && this.getTabBar()) {
 					this.getTabBar().selected = 0
@@ -196,6 +221,8 @@
 	.grid-dots { display: flex; justify-content: center; gap: 8rpx; margin-top: 16rpx; }
 	.dot { width: 8rpx; height: 8rpx; border-radius: 4rpx; background: #ddd; }
 	.dot.on { width: 24rpx; background: #2e9e6b; }
+	.banner-sw { margin: 20rpx 24rpx 0; border-radius: 28rpx; overflow: hidden; height: 220rpx; }
+	.banner-img { width: 100%; height: 100%; display: block; }
 	.promo-banner { margin: 20rpx 24rpx 0; border-radius: 28rpx; overflow: hidden; height: 220rpx; position: relative; }
 	.promo-img { width: 100%; height: 100%; }
 	.promo-tag { position: absolute; right: 0; top: 0; bottom: 0; width: 128rpx; background: linear-gradient(180deg, #ffd700, #ff8c00); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }

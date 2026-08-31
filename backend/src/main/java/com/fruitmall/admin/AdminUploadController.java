@@ -1,5 +1,7 @@
-package com.fruitmall.common;
+package com.fruitmall.admin;
 
+import com.fruitmall.common.ApiResponse;
+import com.fruitmall.common.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,16 +11,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
-/** C 端图片上传（售后凭证等）：需登录，走 /api/v1/** 的 JWT 拦截器 */
+/** 管理端图片上传（轮播图/商品图）：/api/admin/** 已由 AdminInterceptor 鉴权 */
 @RestController
-@RequestMapping("/api/v1/upload")
+@RequestMapping("/api/admin/upload")
 @RequiredArgsConstructor
-public class UploadController {
+public class AdminUploadController {
 
     private final FileStorageService fileStorageService;
 
     @PostMapping("/image")
     public ApiResponse<Map<String, String>> image(@RequestParam("file") MultipartFile file) {
+        AdminContext.requireAdminId();
         return ApiResponse.ok(Map.of("url", fileStorageService.storeImage(file)));
     }
 }

@@ -85,6 +85,15 @@ body {
 .hero2 .hero-ghost:hover { background: rgba(255,255,255,.12); }
 .hero-img { width: 100%; height: 190px; object-fit: cover; border-radius: 8px; display: block; }
 
+/* ===== 首页轮播（后台配置） ===== */
+.slider { position: relative; margin-bottom: 20px; border-radius: 8px; overflow: hidden; background: #f3f4f6; }
+.sl-track { display: flex; transition: transform .45s ease; }
+.sl-item { flex: 0 0 100%; cursor: pointer; }
+.sl-item img { width: 100%; height: 240px; object-fit: cover; display: block; }
+.sl-dots { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 7px; }
+.sl-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.55); cursor: pointer; transition: all .25s; }
+.sl-dot.on { width: 18px; border-radius: 4px; background: #fff; }
+
 /* ===== 服务保障条 ===== */
 .serve {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 4px;
