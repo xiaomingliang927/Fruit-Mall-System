@@ -1,6 +1,7 @@
 package com.fruitmall.modules.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fruitmall.admin.AdminMemberService;
 import com.fruitmall.auth.UserContext;
 import com.fruitmall.common.ApiResponse;
 import com.fruitmall.common.BizException;
@@ -10,7 +11,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -19,6 +24,7 @@ public class UserController {
 
     private final UserMapper userMapper;
     private final UserAddressMapper addressMapper;
+    private final MemberStatMapper memberStatMapper;
 
     public record UserVO(Long id, String phone, String nickname, String avatar, Integer level) {
         static UserVO of(User u) {
@@ -38,6 +44,39 @@ public class UserController {
             throw new BizException("用户不存在");
         }
         return ApiResponse.ok(UserVO.of(user));
+    }
+
+    /**
+     * 会员卡概览（模型 B 限期会员卡）。
+     * status: NONE 未开通 / ACTIVE 生效中 / EXPIRING 7 天内到期 / EXPIRED 已过期；
+     * remainDays 仅在 ACTIVE、EXPIRING 时有意义；totalGmv 单位为分。
+     */
+    public record MemberOverviewVO(Integer level, String memberExpireAt, String memberStatus,
+                                   Long remainDays, Long orderCount, Long totalGmv,
+                                   String joinedAt, Long joinedDays) {
+    }
+
+    @GetMapping("/me/member")
+    public ApiResponse<MemberOverviewVO> myMember() {
+        User user = userMapper.selectById(UserContext.requireUserId());
+        if (user == null) {
+            throw new BizException("用户不存在");
+        }
+        LocalDateTime expire = user.getMemberExpireAt();
+        LocalDateTime now = LocalDateTime.now();
+        Long remainDays = expire == null || expire.isBefore(now)
+                ? null : ChronoUnit.DAYS.between(now, expire);
+        Map<String, Object> agg = memberStatMapper.orderAggByUser(user.getId());
+        LocalDateTime createdAt = user.getCreatedAt();
+        return ApiResponse.ok(new MemberOverviewVO(
+                user.getLevel(),
+                expire == null ? null : expire.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                AdminMemberService.memberStatusOf(expire),
+                remainDays,
+                agg == null ? 0L : ((Number) agg.getOrDefault("orderCount", 0)).longValue(),
+                agg == null ? 0L : ((Number) agg.getOrDefault("totalGmv", 0)).longValue(),
+                createdAt == null ? null : createdAt.toLocalDate().toString(),
+                createdAt == null ? 0L : ChronoUnit.DAYS.between(createdAt.toLocalDate(), now.toLocalDate())));
     }
 
     @GetMapping("/me/addresses")
