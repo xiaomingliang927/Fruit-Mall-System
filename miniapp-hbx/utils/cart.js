@@ -19,13 +19,29 @@ function skuOf(id) {
 }
 function loggedIn() { return !!uni.getStorageSync('token') }
 
+// 角标只能从 TabBar 页面调用，否则 WeChat 抛 "not TabBar page"。
+// 四个 TabBar 页在 onShow 都会重算角标，所以非 TabBar 页跳过也始终一致。
+const TABBAR_ROUTES = ['pages/index/index', 'pages/category/category', 'pages/cart/cart', 'pages/mine/mine']
+function isOnTabBar() {
+	try {
+		const pages = getCurrentPages()
+		const cur = pages[pages.length - 1]
+		return !!(cur && TABBAR_ROUTES.indexOf(cur.route) !== -1)
+	} catch (e) {
+		return false
+	}
+}
+
 export function updateCartBadge() {
 	const count = getCartCount()
-	if (count > 0) {
-		uni.setTabBarBadge({ index: 2, text: count > 99 ? '99+' : String(count) })
-	} else {
-		uni.removeTabBarBadge({ index: 2 })
-	}
+	if (!isOnTabBar()) return
+	try {
+		if (count > 0) {
+			uni.setTabBarBadge({ index: 2, text: count > 99 ? '99+' : String(count) })
+		} else {
+			uni.removeTabBarBadge({ index: 2 })
+		}
+	} catch (e) { /* 非 TabBar 页场景兜底，忽略 */ }
 }
 
 export function addToCart(id, qty = 1) {
@@ -129,5 +145,7 @@ export async function syncFromServer() {
 /** 退出登录：清空本地镜像与角标 */
 export function clearLocalMirror() {
 	saveCart({}); saveSelected({})
-	uni.removeTabBarBadge({ index: 2 })
+	if (isOnTabBar()) {
+		try { uni.removeTabBarBadge({ index: 2 }) } catch (e) { /* 忽略 */ }
+	}
 }
