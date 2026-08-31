@@ -42,6 +42,24 @@
 			<view class="empty-btn" @click="goCategory">去逛逛</view>
 		</view>
 
+		<!-- 空车推荐：填满空状态下方的留白 -->
+		<view class="rec" v-if="cartList.length === 0">
+			<view class="rec-hd">
+				<text class="rec-title">大家都在买</text>
+				<text class="rec-sub">挑点喜欢的，顺手加进购物车</text>
+			</view>
+			<view class="rec-grid">
+				<view class="rec-it" v-for="p in recommends" :key="p.id" @click="goDetail(p.id)">
+					<view class="rec-img"><image :src="p.img" mode="aspectFill" class="rec-img-in"></image></view>
+					<text class="rec-nm">{{ p.name }}</text>
+					<view class="rec-btm">
+						<text class="rec-price">¥{{ p.price }}</text>
+						<view class="rec-add" @click.stop="addRec(p.id)"><text class="rec-add-icon">+</text></view>
+					</view>
+				</view>
+			</view>
+		</view>
+
 		<!-- 底部结算栏 -->
 		<view class="settle-bar" v-if="cartList.length > 0">
 			<view class="settle-all" @click="toggleAll">
@@ -62,7 +80,7 @@
 </template>
 
 <script>
-	import { getCart, getSelected, incQty, decQty, toggleSelect, toggleSelectAll, isAllSelected, getCartTotal, getCartCount, updateCartBadge } from '@/utils/cart.js'
+	import { getCart, getSelected, incQty, decQty, toggleSelect, toggleSelectAll, isAllSelected, getCartTotal, getCartCount, updateCartBadge, addToCart } from '@/utils/cart.js'
 	import { PRODUCTS } from '@/utils/data.js'
 
 	export default {
@@ -92,10 +110,14 @@
 					.reduce((s, p) => s + p.price * p.qty, 0)
 					.toFixed(2)
 			},
-			remainAmount() {
-				const t = Number(this.totalPrice)
-				return t >= 39 ? '0' : (39 - t).toFixed(2)
-			}
+		remainAmount() {
+			const t = Number(this.totalPrice)
+			return t >= 39 ? '0' : (39 - t).toFixed(2)
+		},
+		/** 空车推荐：取前几个商品，购物车为空时展示 */
+		recommends() {
+			return PRODUCTS.slice(0, 4)
+		}
 		},
 		onShow() {
 			this.refresh()
@@ -129,9 +151,15 @@
 					this.getTabBar().refreshCartCount()
 				}
 			},
-			goDetail(id) {
-				uni.navigateTo({ url: '/pages/detail/detail?id=' + id })
-			},
+		goDetail(id) {
+			uni.navigateTo({ url: '/pages/detail/detail?id=' + id })
+		},
+		/** 空车推荐一键加购：加完刷新，页面切回购物车列表 */
+		addRec(id) {
+			addToCart(id)
+			uni.showToast({ title: '已加入购物车', icon: 'none' })
+			this.refresh()
+		},
 			goCategory() {
 				uni.switchTab({ url: '/pages/category/category' })
 			},
@@ -318,6 +346,36 @@
 		border-radius: 44rpx;
 		font-size: 28rpx;
 	}
+
+	/* 空车推荐 */
+	.rec {
+		background: #fff;
+		border-radius: 28rpx;
+		margin: 24rpx;
+		padding: 28rpx;
+	}
+	.rec-hd { margin-bottom: 22rpx; }
+	.rec-title { display: block; font-size: 30rpx; font-weight: 700; color: #222; }
+	.rec-sub { display: block; margin-top: 6rpx; font-size: 22rpx; color: #a5aca1; }
+	.rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20rpx; }
+	.rec-it {
+		background: #fafbf9; border-radius: 20rpx; padding: 16rpx;
+	}
+	.rec-it:active { background: #f2f5f0; }
+	.rec-img { width: 100%; height: 200rpx; border-radius: 16rpx; overflow: hidden; }
+	.rec-img-in { width: 100%; height: 100%; }
+	.rec-nm {
+		display: block; margin-top: 14rpx; font-size: 25rpx; color: #222;
+		overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+	}
+	.rec-btm { display: flex; align-items: center; justify-content: space-between; margin-top: 12rpx; }
+	.rec-price { color: #f24e3e; font-size: 28rpx; font-weight: 700; }
+	.rec-add {
+		width: 48rpx; height: 48rpx; border-radius: 50%;
+		background: #2e9e6b; display: flex; align-items: center; justify-content: center;
+	}
+	.rec-add:active { opacity: 0.85; }
+	.rec-add-icon { color: #fff; font-size: 34rpx; font-weight: 300; line-height: 1; }
 
 	.settle-bar {
 		position: fixed;
