@@ -53,6 +53,8 @@ async function doLogin() {
     })
     adminStore.token = data.token
     adminStore.name = data.realName || data.username
+    adminStore.permissions = data.permissions || []
+    adminStore.superAdmin = !!data.superAdmin
     router.push('/dashboard')
   } catch (e) {
     ElMessage.error(e.message)

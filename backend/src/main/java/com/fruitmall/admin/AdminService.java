@@ -1,6 +1,7 @@
 package com.fruitmall.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fruitmall.admin.rbac.RbacService;
 import com.fruitmall.auth.JwtUtil;
 import com.fruitmall.common.BizException;
 import lombok.RequiredArgsConstructor;
@@ -13,15 +14,18 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HexFormat;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AdminService implements ApplicationRunner {
 
     private final AdminUserMapper adminUserMapper;
+    private final RbacService rbacService;
     private final JwtUtil jwtUtil;
 
-    public record LoginResponse(String token, Long adminId, String username, String realName) {
+    public record LoginResponse(String token, Long adminId, String username, String realName,
+                                List<String> permissions, Boolean superAdmin) {
     }
 
     public LoginResponse login(String username, String password) {
@@ -33,24 +37,33 @@ public class AdminService implements ApplicationRunner {
         if (admin.getStatus() == null || admin.getStatus() == 0) {
             throw new BizException("账号已被禁用");
         }
+        boolean isSuper = rbacService.isSuperAdmin(admin.getId());
+        List<String> permissions = isSuper
+                ? rbacService.listPermissions().stream().map(RbacService.PermissionVO::code).toList()
+                : rbacService.permCodesOf(admin.getId());
         return new LoginResponse(jwtUtil.generateAdmin(admin.getId()),
-                admin.getId(), admin.getUsername(), admin.getRealName());
+                admin.getId(), admin.getUsername(), admin.getRealName(), permissions, isSuper);
     }
 
     /** 首次启动自动创建默认管理员 admin / admin123（生产环境务必首登改密） */
     @Override
     public void run(ApplicationArguments args) {
-        if (adminUserMapper.selectCount(null) > 0) {
-            return;
+        if (adminUserMapper.selectCount(null) == 0) {
+            AdminUser admin = new AdminUser();
+            admin.setUsername("admin");
+            admin.setRealName("超级管理员");
+            admin.setStatus(1);
+            String salt = randomSalt();
+            admin.setSalt(salt);
+            admin.setPasswordHash(sha256(salt + "admin123"));
+            adminUserMapper.insert(admin);
         }
-        AdminUser admin = new AdminUser();
-        admin.setUsername("admin");
-        admin.setRealName("超级管理员");
-        admin.setStatus(1);
-        String salt = randomSalt();
-        admin.setSalt(salt);
-        admin.setPasswordHash(sha256(salt + "admin123"));
-        adminUserMapper.insert(admin);
+        // RBAC 兜底：若所有账号都还没配过角色（全新安装或刚升级到 RBAC 版本），
+        // 把超级管理员角色挂给第一个账号，避免 admin 登录后被权限挡在门外。
+        List<AdminUser> all = adminUserMapper.selectList(null);
+        if (!all.isEmpty() && all.stream().noneMatch(a -> !rbacService.roleIdsOf(a.getId()).isEmpty())) {
+            rbacService.ensureRoleBinding(all.get(0).getId());
+        }
     }
 
     private boolean verify(String rawPassword, String salt, String expectedHash) {

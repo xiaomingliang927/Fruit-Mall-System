@@ -21,7 +21,7 @@ export const menuGroups = [
     items: [
       { path: '/orders', title: '订单列表', icon: 'List', perm: 'order:list' },
       { path: '/refunds', title: '售后管理', icon: 'Headset', perm: 'refund:list' },
-      // 售后管理 / 评价管理 —— M2 完成后追加
+      { path: '/reviews', title: '评价管理', icon: 'ChatDotRound', perm: 'review:list' }
     ],
   },
   {
@@ -39,5 +39,24 @@ export const menuGroups = [
       // 秒杀拼团 —— M3 完成后追加
     ],
   },
-  // 系统设置（账号角色 RBAC/运费模板/支付参数/操作日志）—— M2 完成后启用
+  {
+    title: '系统设置',
+    items: [
+      { path: '/roles', title: '角色权限', icon: 'UserFilled', perm: 'role:list' },
+      // 操作日志 / 支付参数 / 运费模板 —— 后续追加
+    ],
+  },
 ]
+
+/**
+ * 按当前账号的权限点过滤菜单：
+ * - 未取到权限（老 token）或超级管理员 → 全展示；
+ * - 其余账号隐藏无权限的菜单项，空分组整体不显示。
+ */
+export function visibleMenuGroups(perms) {
+  const owned = Array.isArray(perms) ? perms : []
+  if (!owned.length) return menuGroups
+  return menuGroups
+    .map((g) => ({ ...g, items: g.items.filter((i) => !i.perm || owned.includes(i.perm)) }))
+    .filter((g) => g.items.length)
+}

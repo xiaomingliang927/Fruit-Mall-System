@@ -11,7 +11,7 @@
       </div>
       <el-menu :default-active="$route.path" router class="menu"
                background-color="transparent" text-color="#9aa8b8" active-text-color="#ffffff">
-        <template v-for="group in menuGroups" :key="group.title">
+        <template v-for="group in groups" :key="group.title">
           <el-menu-item-group :title="group.title">
             <el-menu-item v-for="item in group.items" :key="item.path" :index="item.path">
               <el-icon><component :is="item.icon" /></el-icon><span>{{ item.title }}</span>
@@ -48,16 +48,20 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { adminStore } from '../store'
-import { menuGroups } from '../menu'
+import { visibleMenuGroups } from '../menu'
 
 const router = useRouter()
+const groups = computed(() => visibleMenuGroups(adminStore.permissions))
 
 function onCommand(cmd) {
   if (cmd === 'logout') {
     adminStore.token = ''
     adminStore.name = ''
+    adminStore.permissions = []
+    adminStore.superAdmin = false
     router.push('/login')
   }
 }
