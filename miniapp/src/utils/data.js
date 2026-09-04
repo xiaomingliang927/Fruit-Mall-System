@@ -5,7 +5,7 @@
 import { reactive } from 'vue'
 import { getBaseUrl, imgUrl } from '../api.js'
 
-const photo = (name) => getBaseUrl() + '/images/products/' + name
+const photo = (name) => imgUrl('/images/products/' + name)
 
 export const IMG = {
 	banner: photo('fruit-banner.jpg'),
@@ -25,6 +25,10 @@ export const PRODUCTS = reactive([])
 export const CATS = reactive(['推荐'])
 export const FLASH_IDS = reactive([])
 export const HOT_IDS = reactive([])
+
+/** 首页分类宫格 → 分类页的跳转意图。
+ *  switchTab 不能带参数，用模块状态把"要点哪个分类"传给分类页。 */
+export const CAT_LINK = { pending: '' }
 
 let loaded = false
 let loading = null

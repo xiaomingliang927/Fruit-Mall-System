@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#f8fafc; padding:36px; color:#1e293b; }
+  .canvas { width:900px; margin:0 auto; }
+  .layer { border-radius:22px; padding:22px 26px 26px; }
+  .layer h3 { text-align:center; font-size:23px; letter-spacing:2px; margin-bottom:16px; }
+  .l1 { background:#eff6ff; border:2.5px solid #bfdbfe; }
+  .l1 h3 { color:#2563eb; }
+  .l2 { background:#f0fdf4; border:2.5px solid #bbf7d0; }
+  .l2 h3 { color:#16a34a; }
+  .l3 { background:#fff7ed; border:2.5px solid #fed7aa; }
+  .l3 h3 { color:#ea580c; }
+  .row { display:flex; gap:14px; justify-content:center; }
+  .card { background:#fff; border:2px solid #e2e8f0; border-radius:14px; padding:14px 16px; text-align:center; flex:1; }
+  .card .em { font-size:30px; display:block; margin-bottom:6px; }
+  .card b { font-size:16px; display:block; }
+  .card span { font-size:12.5px; color:#64748b; display:block; margin-top:3px; line-height:1.5; }
+  .arrow { text-align:center; padding:10px 0; }
+  .arrow .a { font-size:30px; color:#94a3b8; font-weight:700; }
+  .arrow .t { display:inline-block; margin-left:10px; background:#f1f5f9; border:1px solid #e2e8f0; color:#475569;
+              font-size:13px; border-radius:999px; padding:3px 14px; vertical-align:6px; }
+  .chips { display:flex; flex-wrap:wrap; gap:9px; justify-content:center; }
+  .chip { background:#fff; border:1.5px solid #bbf7d0; color:#166534; font-size:13.5px; border-radius:999px; padding:7px 15px; }
+  .db { display:flex; align-items:center; justify-content:center; gap:12px; background:#fff; border:2px solid #e2e8f0; border-radius:14px; padding:13px; }
+  .db .em { font-size:30px; }
+  .db b { font-size:16px; }
+  .db span { font-size:12.5px; color:#64748b; margin-left:8px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="layer l1">
+    <h3>📱 用户触点层</h3>
+    <div class="row">
+      <div class="card"><span class="em">🖥️</span><b>用户网站</b><span>Vue 3 + Vite<br>PC / H5</span></div>
+      <div class="card"><span class="em">📱</span><b>微信小程序</b><span>uni-app<br>同一套代码可出 H5</span></div>
+      <div class="card"><span class="em">🛠️</span><b>管理后台</b><span>Vue 3 + Element Plus<br>商家运营</span></div>
+    </div>
+  </div>
+
+  <div class="arrow"><span class="a">⬇</span><span class="t">三个端共用同一套 RESTful API</span></div>
+
+  <div class="layer l2">
+    <h3>⚙️ 后端服务层</h3>
+    <div class="row" style="margin-bottom:12px">
+      <div class="card"><span class="em">☕</span><b>Spring Boot 3</b><span>Java 17 · MyBatis-Plus</span></div>
+    </div>
+    <div class="chips">
+      <span class="chip">👤 用户 / 鉴权</span><span class="chip">🍎 商品 / 库存</span><span class="chip">🛒 购物车</span>
+      <span class="chip">📦 订单状态机</span><span class="chip">💰 支付</span><span class="chip">🎁 优惠券 / 秒杀</span>
+      <span class="chip">🧾 售后退款</span><span class="chip">⭐ 评价</span><span class="chip">🔐 RBAC 权限</span>
+    </div>
+  </div>
+
+  <div class="arrow"><span class="a">⬇</span><span class="t">数据读写</span></div>
+
+  <div class="layer l3">
+    <h3>🗄️ 数据层</h3>
+    <div class="db"><span class="em">🐬</span><b>MySQL 8</b><span>24 张表 · 六大业务域 · 金额按「分」存储</span></div>
+  </div>
+
+</div>
+</body>
+</html>

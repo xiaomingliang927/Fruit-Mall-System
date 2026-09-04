@@ -13,5 +13,12 @@
       "minified": true
     },
     "usingComponents": true
+  },
+  "h5": {
+    "title": "果上选",
+    "router": {
+      "mode": "hash",
+      "base": "/mp/"
+    }
   }
 }

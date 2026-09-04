@@ -81,7 +81,7 @@
 <script>
 	import { api } from '../../api'
 	import { getProduct } from '@/utils/data.js'
-	import { addToCart, getCartCount, updateCartBadge } from '@/utils/cart.js'
+	import { addToCart, getCart, getCartCount, updateCartBadge } from '@/utils/cart.js'
 
 	export default {
 		data() {
@@ -137,7 +137,12 @@
 			},
 			buyNow() {
 				addToCart(this.productId)
-				this.showToast('已加入购物车，去结算（原型）')
+				const snap = getCart()[this.productId]
+				if (!snap || !snap.skuId) {
+					this.showToast('商品信息加载中，稍后再试')
+					return
+				}
+				uni.navigateTo({ url: '/pages/checkout/checkout?productId=' + this.productId + '&skuId=' + snap.skuId + '&qty=' + (snap.qty || 1) })
 			},
 			showToast(msg) {
 				uni.showToast({ title: msg, icon: 'none' })

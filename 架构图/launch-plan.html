@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#f8fafc; padding:36px; color:#1e293b; }
+  .canvas { width:960px; margin:0 auto; display:flex; gap:14px; }
+  .card { flex:1; border-radius:16px; padding:18px 16px; text-align:center; border:2.5px solid; }
+  .card .em { font-size:34px; display:block; }
+  .card b { font-size:16px; display:block; margin-top:8px; }
+  .card .st { display:inline-block; margin-top:8px; font-size:12.5px; font-weight:700; border-radius:999px; padding:4px 14px; }
+  .card p { font-size:12.5px; color:#475569; margin-top:9px; line-height:1.65; }
+  .c-on  { background:#f0fdf4; border-color:#86efac; }
+  .c-on .st { background:#16a34a; color:#fff; }
+  .c-off { background:#fff7ed; border-color:#fdba74; }
+  .c-off .st { background:#f59e0b; color:#fff; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="card c-on">
+    <span class="em">🖥️</span><b>用户网站</b>
+    <span class="st">✅ 已上线</span>
+    <p>部署在云服务器<br>Nginx 反代，随时随地可访问<br>5173 端口</p>
+  </div>
+
+  <div class="card c-on">
+    <span class="em">🛠️</span><b>管理后台</b>
+    <span class="st">✅ 已上线</span>
+    <p>和网站同一台服务器<br>商家管店的入口<br>5174 端口</p>
+  </div>
+
+  <div class="card c-off">
+    <span class="em">📱</span><b>微信小程序</b>
+    <span class="st">⏸ 等资质</span>
+    <p>开发完成、真机验证通过<br>提审需要营业执照 + 食品经营许可证<br>材料一交就能上线</p>
+  </div>
+
+  <div class="card c-off">
+    <span class="em">💰</span><b>微信支付</b>
+    <span class="st">⏸ 等商户号</span>
+    <p>目前是模拟支付<br>商户号下来换成真实支付<br>前端按钮一个都不用改</p>
+  </div>
+
+</div>
+</body>
+</html>

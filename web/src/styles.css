@@ -374,3 +374,42 @@ body {
   background: #fafbfc; border-left: 3px solid var(--green-700); border-radius: 4px;
   padding: 8px 12px; font-size: 12.5px; color: #6b7280; margin-top: 8px;
 }
+
+/* ===== 移动端适配（手机） ===== */
+@media (max-width: 900px) {
+  .nav-inner { flex-wrap: wrap; height: auto; padding: 8px 12px; row-gap: 8px; }
+  .logo .name { font-size: 17px; }
+  .nav-search { order: 3; flex-basis: 100%; max-width: none; }
+  .nav-right { gap: 12px; }
+  .nav-link { font-size: 13px; }
+  .hero2 { grid-template-columns: 1fr; padding: 22px 20px; }
+  .hero-img { height: 150px; margin-top: 4px; }
+  .serve { grid-template-columns: repeat(2, 1fr); }
+  .rank { grid-template-columns: repeat(2, 1fr); }
+  .cats { overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+  .order-tabs { overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+  .pager { flex-wrap: wrap; }
+}
+@media (max-width: 640px) {
+  .page { padding: 12px 10px 30px; }
+  .hero2 h1 { font-size: 21px; }
+  .promo { padding: 16px 18px; }
+  .promo h1 { font-size: 18px; }
+  .grid { gap: 10px; }
+  .p-body { padding: 10px 11px 12px; }
+  .p-price { font-size: 16px; }
+  .detail { padding: 14px; gap: 16px; }
+  .d-title { font-size: 19px; }
+  .d-price { font-size: 23px; }
+  .d-actions { flex-wrap: wrap; }
+  .d-actions .btn { flex: 1 1 40%; padding: 11px 8px; }
+  .cart-head { display: none; }
+  .cart-row { grid-template-columns: 30px 72px 1fr auto; padding: 12px; }
+  .cart-row img { width: 72px; height: 56px; }
+  .cart-footer { flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .addr-grid, .addr-form { grid-template-columns: 1fr; }
+  .submit-row { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 12px 14px; }
+  .mine-grid { grid-template-columns: 1fr; }
+  .coupon-list { grid-template-columns: 1fr; }
+  .modal { padding: 16px; }
+}

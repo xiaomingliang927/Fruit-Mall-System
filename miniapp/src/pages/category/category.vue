@@ -39,6 +39,7 @@
 								</view>
 								<view class="product-add" @click.stop="addCart(p.id)">
 									<text class="add-icon">+</text>
+									<view v-if="cartCounts[p.id]" class="add-badge">{{ cartCounts[p.id] }}</view>
 								</view>
 							</view>
 						</view>
@@ -51,15 +52,16 @@
 </template>
 
 <script>
-	import { IMG, CATS, getProductsByCat } from '@/utils/data.js'
-	import { addToCart, updateCartBadge } from '@/utils/cart.js'
+	import { IMG, CATS, CAT_LINK, getProductsByCat } from '@/utils/data.js'
+	import { addToCart, getCartCounts, updateCartBadge } from '@/utils/cart.js'
 
 	export default {
 		data() {
 			return {
 				IMG,
 				CATS,
-				currentCat: 0
+				currentCat: 0,
+				cartCounts: {}
 			}
 		},
 		computed: {
@@ -68,6 +70,13 @@
 			}
 		},
 		onShow() {
+			// 首页分类宫格跳转过来的话，选中对应分类
+			if (CAT_LINK.pending) {
+				const idx = CATS.indexOf(CAT_LINK.pending)
+				this.currentCat = idx >= 0 ? idx : 0
+				CAT_LINK.pending = ''
+			}
+			this.cartCounts = getCartCounts()
 			if (typeof this.getTabBar === 'function' && this.getTabBar()) {
 				this.getTabBar().selected = 1
 			}
@@ -101,7 +110,8 @@
 				uni.navigateTo({ url: '/pages/detail/detail?id=' + id })
 			},
 			addCart(id) {
-				updateCartBadge()
+				addToCart(id)
+				this.cartCounts = getCartCounts()
 				if (typeof this.getTabBar === 'function' && this.getTabBar()) {
 					this.getTabBar().refreshCartCount()
 				}
@@ -288,6 +298,7 @@
 		text-decoration: line-through;
 	}
 	.product-add {
+		position: relative;
 		width: 56rpx;
 		height: 56rpx;
 		border-radius: 50%;
@@ -296,6 +307,22 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+	.add-badge {
+		position: absolute;
+		top: -10rpx;
+		right: -10rpx;
+		min-width: 30rpx;
+		height: 30rpx;
+		border-radius: 15rpx;
+		background: #e54d42;
+		color: #fff;
+		font-size: 19rpx;
+		line-height: 30rpx;
+		text-align: center;
+		padding: 0 5rpx;
+		font-weight: 700;
+		box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.2);
 	}
 	.add-icon {
 		font-size: 32rpx;

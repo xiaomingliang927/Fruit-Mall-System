@@ -160,7 +160,7 @@ onBeforeUnmount(() => {
 .toolbar :deep(.el-card__body) { padding: 14px 16px; }
 .bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 
-.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 12px; }
 .card {
   background: #fff; border: 1px solid #e8ebee; border-radius: 8px; padding: 16px 18px;
 }

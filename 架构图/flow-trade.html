@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; background:#f8fafc; padding:36px; color:#1e293b; }
+  .canvas { width:1240px; margin:0 auto; }
+  .flow { display:flex; align-items:center; gap:7px; flex-wrap:nowrap; justify-content:center; }
+  .step { background:#fff; border:2px solid #16a34a; border-radius:14px; padding:11px 12px; text-align:center;
+          position:relative; min-width:96px; }
+  .step .n { position:absolute; top:-10px; left:-10px; width:22px; height:22px; border-radius:50%;
+             background:#16a34a; color:#fff; font-size:12px; font-weight:700; line-height:22px; }
+  .step .em { font-size:24px; display:block; }
+  .step b { font-size:14.5px; display:block; margin-top:3px; }
+  .fa { color:#16a34a; font-size:20px; font-weight:700; }
+  .after { margin-top:22px; display:flex; align-items:center; justify-content:center; gap:10px; }
+  .branch { background:#fff7ed; border:2px dashed #fdba74; border-radius:14px; padding:10px 18px;
+            font-size:14.5px; color:#9a3412; display:flex; align-items:center; gap:8px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="flow">
+    <div class="step"><span class="n">1</span><span class="em">🔑</span><b>登录</b></div><span class="fa">→</span>
+    <div class="step"><span class="n">2</span><span class="em">🔍</span><b>浏览商品</b></div><span class="fa">→</span>
+    <div class="step"><span class="n">3</span><span class="em">🛒</span><b>加购物车</b></div><span class="fa">→</span>
+    <div class="step"><span class="n">4</span><span class="em">📋</span><b>下单</b></div><span class="fa">→</span>
+    <div class="step"><span class="n">5</span><span class="em">💰</span><b>支付</b></div><span class="fa">→</span>
+    <div class="step"><span class="n">6</span><span class="em">📦</span><b>发货</b></div><span class="fa">→</span>
+    <div class="step"><span class="n">7</span><span class="em">✅</span><b>确认收货</b></div><span class="fa">→</span>
+    <div class="step"><span class="n">8</span><span class="em">⭐</span><b>评价</b></div>
+  </div>
+  <div class="after">
+    <span style="font-size:20px">↳</span>
+    <div class="branch">😔 不满意 → <b>申请售后</b> → 坏果包赔 → 退款</div>
+  </div>
+</div>
+</body>
+</html>

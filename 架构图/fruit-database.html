@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>水果商城数据库设计 · 24 张表</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --green-900: #14532d;
+    --green-700: #1f7a3d;
+    --green-500: #2e9e5b;
+    --orange: #ff8c42;
+    --teal: #0e7490;
+    --violet: #7c3aed;
+    --rose: #d1566f;
+    --slate: #475569;
+    --ink: #1e293b;
+    --muted: #6b7280;
+    --line: #e2e8f0;
+  }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", sans-serif;
+    background: #eef3ec;
+    color: var(--ink);
+    padding: 28px 20px 40px;
+  }
+  .canvas {
+    width: 1320px;
+    max-width: 100%;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(20, 83, 45, 0.14);
+    padding: 0 0 26px;
+    overflow: hidden;
+  }
+  .banner {
+    background: linear-gradient(120deg, #14532d 0%, #1f7a3d 55%, #2e9e5b 100%);
+    color: #fff;
+    padding: 24px 36px 20px;
+    position: relative;
+  }
+  .banner::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: -1px; height: 6px;
+    background: linear-gradient(90deg, #ffd166 0%, var(--orange) 50%, #ffd166 100%);
+  }
+  .banner h1 { font-size: 28px; letter-spacing: 1px; font-weight: 700; }
+  .banner .sub { margin-top: 8px; font-size: 14.5px; opacity: .92; letter-spacing: .5px; }
+  .banner .sub b { color: #ffd166; font-weight: 700; }
+  .banner .badges { position: absolute; right: 34px; top: 28px; text-align: right; }
+  .banner .badges span {
+    display: inline-block; margin-left: 8px; padding: 5px 12px; border-radius: 999px;
+    font-size: 12.5px; border: 1px solid rgba(255,255,255,.55);
+    background: rgba(255,255,255,.14); letter-spacing: 1px;
+  }
+  .content { padding: 26px 34px 0; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .domain {
+    border: 1.5px solid var(--line); border-radius: 14px; overflow: hidden;
+    background: #fff; box-shadow: 0 3px 10px rgba(30, 41, 59, .06);
+  }
+  .d-head {
+    display: flex; align-items: center; gap: 9px;
+    padding: 11px 16px; color: #fff; font-size: 15.5px; font-weight: 700; letter-spacing: 1.5px;
+  }
+  .d-head .em { font-size: 17px; }
+  .d-head .cnt {
+    margin-left: auto; font-size: 11.5px; font-weight: 600;
+    background: rgba(255,255,255,.22); border-radius: 999px; padding: 3px 10px; letter-spacing: 1px;
+  }
+  .d-user .d-head { background: linear-gradient(120deg, #f27b32, #ff9d5c); }
+  .d-prod .d-head { background: linear-gradient(120deg, #1f7a3d, #2e9e5b); }
+  .d-trade .d-head { background: linear-gradient(120deg, #0c637c, #1590ad); }
+  .d-mkt .d-head { background: linear-gradient(120deg, #6d28d9, #8b5cf6); }
+  .d-aftersale .d-head { background: linear-gradient(120deg, #b23a56, #d1566f); }
+  .d-admin .d-head { background: linear-gradient(120deg, #334155, #64748b); }
+
+  .tables { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .tbl { border: 1px solid var(--line); border-radius: 9px; padding: 7px 11px 8px; background: #fbfdfb; }
+  .tbl .row1 { display: flex; align-items: baseline; gap: 8px; }
+  .tbl b { font-family: Consolas, "JetBrains Mono", monospace; font-size: 13.5px; color: var(--green-900); }
+  .tbl .zh { font-size: 12.5px; font-weight: 700; color: var(--ink); }
+  .tbl .note { display: block; margin-top: 2px; font-size: 11.5px; color: var(--muted); line-height: 1.55; }
+  .d-aftersale .tbl b { color: #8f2c44; }
+  .d-trade .tbl b { color: #0c637c; }
+  .d-mkt .tbl b { color: #5b21b6; }
+  .d-user .tbl b { color: #b4531d; }
+  .d-admin .tbl b { color: #334155; }
+
+  .principle {
+    margin: 18px 34px 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    background: linear-gradient(90deg, #f8fafc, #eef7f0);
+    border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 20px;
+  }
+  .principle .item { font-size: 13px; color: #334155; display: flex; align-items: center; gap: 7px; }
+  .principle .item .em { font-size: 16px; }
+  .foot {
+    margin-top: 20px; border-top: 1px solid var(--line); padding: 12px 6px 0;
+    display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; flex-wrap: wrap; gap: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="banner">
+    <h1>🗄️ 水果商城数据库设计 · 24 张表</h1>
+    <div class="sub">不是一次性画出来的，是<b>跟着功能一个一个"长"出来的</b> —— Flyway 版本化管理，V1 ~ V14 每一步可追溯</div>
+    <div class="badges"><span>MySQL 8</span><span>金额按分存储</span><span>订单快照</span></div>
+  </div>
+
+  <div class="content">
+    <div class="grid">
+
+      <div class="domain d-user">
+        <div class="d-head"><span class="em">🧑‍💼</span>用户域<span class="cnt">3 张</span></div>
+        <div class="tables">
+          <div class="tbl"><div class="row1"><b>user</b><span class="zh">会员</span></div><span class="note">openid / 手机号 / 昵称 / 会员等级 / 状态</span></div>
+          <div class="tbl"><div class="row1"><b>user_address</b><span class="zh">收货地址</span></div><span class="note">收件人 / 电话 / 省市区 / 详细地址 / 默认标记</span></div>
+          <div class="tbl"><div class="row1"><b>favorite</b><span class="zh">收藏</span></div><span class="note">用户 × 商品，重复收藏幂等</span></div>
+        </div>
+      </div>
+
+      <div class="domain d-prod">
+        <div class="d-head"><span class="em">🍎</span>商品域<span class="cnt">3 张</span></div>
+        <div class="tables">
+          <div class="tbl"><div class="row1"><b>category</b><span class="zh">分类</span></div><span class="note">parent_id 支持多级 / 排序 / 图标</span></div>
+          <div class="tbl"><div class="row1"><b>product</b><span class="zh">商品 SPU</span></div><span class="note">名称 / 副标题 / 主图 / 产地 / 单位 / 上下架</span></div>
+          <div class="tbl"><div class="row1"><b>product_sku</b><span class="zh">规格 SKU</span></div><span class="note">标准装/礼盒装… 价格 / 库存 / 预警值</span></div>
+        </div>
+      </div>
+
+      <div class="domain d-trade">
+        <div class="d-head"><span class="em">🛒</span>交易域<span class="cnt">4 张</span></div>
+        <div class="tables">
+          <div class="tbl"><div class="row1"><b>cart_item</b><span class="zh">购物车</span></div><span class="note">用户 × SKU × 数量，三端同步就靠它</span></div>
+          <div class="tbl"><div class="row1"><b>order</b><span class="zh">订单主表</span></div><span class="note">订单号 / 状态 / 金额 / 运费 / 地址快照</span></div>
+          <div class="tbl"><div class="row1"><b>order_item</b><span class="zh">订单明细</span></div><span class="note">下单那一刻的名称 / 价格 / 图片快照</span></div>
+          <div class="tbl"><div class="row1"><b>payment</b><span class="zh">支付流水</span></div><span class="note">渠道 / 三方单号 / 金额 / 支付状态</span></div>
+        </div>
+      </div>
+
+      <div class="domain d-mkt">
+        <div class="d-head"><span class="em">🎁</span>营销域<span class="cnt">5 张</span></div>
+        <div class="tables">
+          <div class="tbl"><div class="row1"><b>coupon</b><span class="zh">优惠券模板</span></div><span class="note">满减 / 折扣 / 无门槛 · 限领量 / 总量 / 时间窗</span></div>
+          <div class="tbl"><div class="row1"><b>user_coupon</b><span class="zh">用户持券</span></div><span class="note">领取与使用状态，乐观扣减防超发</span></div>
+          <div class="tbl"><div class="row1"><b>seckill_activity</b><span class="zh">秒杀活动</span></div><span class="note">活动商品 / 秒杀价 / 限购</span></div>
+          <div class="tbl"><div class="row1"><b>seckill_order</b><span class="zh">秒杀订单</span></div><span class="note">秒杀场景独立下单记录，与普通订单隔离</span></div>
+          <div class="tbl"><div class="row1"><b>banner</b><span class="zh">轮播图</span></div><span class="note">后台可配：图片 / 链接 / 排序 / 启停</span></div>
+        </div>
+      </div>
+
+      <div class="domain d-aftersale">
+        <div class="d-head"><span class="em">🧾</span>售后与内容<span class="cnt">3 张</span></div>
+        <div class="tables">
+          <div class="tbl"><div class="row1"><b>refund</b><span class="zh">退款单</span></div><span class="note">仅退款 / 退货退款 · 理由 / 凭证图 / 审核</span></div>
+          <div class="tbl"><div class="row1"><b>review</b><span class="zh">评价</span></div><span class="note">星级 / 内容 / 晒图 / 匿名 / 商家回复</span></div>
+          <div class="tbl"><div class="row1"><b>notice</b><span class="zh">公告</span></div><span class="note">站点公告与消息推送的内容源</span></div>
+        </div>
+      </div>
+
+      <div class="domain d-admin">
+        <div class="d-head"><span class="em">🛠️</span>后台域<span class="cnt">6 张</span></div>
+        <div class="tables">
+          <div class="tbl"><div class="row1"><b>admin_user</b><span class="zh">管理员</span></div><span class="note">后台账号，与 C 端用户完全隔离</span></div>
+          <div class="tbl"><div class="row1"><b>role / permission</b><span class="zh">角色与权限点</span></div><span class="note">26 个权限点，接口、菜单三方对齐</span></div>
+          <div class="tbl"><div class="row1"><b>admin_role / role_permission</b><span class="zh">授权关系</span></div><span class="note">账号 ↔ 角色 ↔ 权限点，RBAC 三层</span></div>
+          <div class="tbl"><div class="row1"><b>operation_log</b><span class="zh">操作日志</span></div><span class="note">谁在什么时候干了什么，全程留痕</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="principle">
+      <span class="item"><span class="em">💰</span>金额一律用「分」存储，避开浮点误差</span>
+      <span class="item"><span class="em">📸</span>订单明细快照化，历史订单不"穿越"</span>
+      <span class="item"><span class="em">🔐</span>库存扣减走原子条件更新，防超卖</span>
+      <span class="item"><span class="em">🧭</span>每次结构变更 = 一个 Flyway 编号文件</span>
+    </div>
+
+    <div class="foot">
+      <span>水果商城系统 · MySQL 8 · 24 张表 · 六大业务域</span>
+      <span>配套文档：docs/数据库设计.md</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

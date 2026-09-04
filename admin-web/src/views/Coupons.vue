@@ -46,7 +46,7 @@
     </el-card>
 
     <!-- 新建优惠券 -->
-    <el-dialog v-model="dlg.visible" title="新建优惠券" width="560px">
+    <el-dialog v-model="dlg.visible" title="新建优惠券" width="min(560px, 94vw)">
       <el-form label-width="90px">
         <el-form-item label="券名" required>
           <el-input v-model="dlg.name" placeholder="如：新人满99减20" />

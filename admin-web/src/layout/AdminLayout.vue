@@ -1,7 +1,7 @@
 <template>
   <el-container class="shell">
     <!-- 侧边栏 -->
-    <aside class="side">
+    <aside class="side" :class="{ open: sidebarOpen }">
       <div class="brand">
         <div class="mark">鲜</div>
         <div class="bt">
@@ -9,7 +9,7 @@
           <div class="t2">商家管理后台</div>
         </div>
       </div>
-      <el-menu :default-active="$route.path" router class="menu"
+      <el-menu :default-active="$route.path" router class="menu" @item-click="sidebarOpen = false"
                background-color="transparent" text-color="#9aa8b8" active-text-color="#ffffff">
         <template v-for="group in groups" :key="group.title">
           <el-menu-item-group :title="group.title">
@@ -25,7 +25,10 @@
     <el-container class="body">
       <!-- 顶栏（必须用 el-header，el-container 才会按纵向排布） -->
       <el-header class="head" height="56px">
-        <div class="crumb">{{ $route.meta.title }}</div>
+        <div class="crumb">
+          <el-icon class="menu-toggle" @click="sidebarOpen = !sidebarOpen"><Menu /></el-icon>
+          {{ $route.meta.title }}
+        </div>
         <el-dropdown trigger="click" @command="onCommand">
           <div class="user">
             <div class="avatar">{{ (adminStore.name || '管')[0] }}</div>
@@ -49,11 +52,13 @@
 
 <script setup>
 import { computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { adminStore } from '../store'
 import { visibleMenuGroups } from '../menu'
 
 const router = useRouter()
+const sidebarOpen = ref(false)
 const groups = computed(() => visibleMenuGroups(adminStore.permissions))
 
 function onCommand(cmd) {
@@ -113,4 +118,15 @@ function onCommand(cmd) {
 
 /* ===== 主区 ===== */
 .main { padding: 16px 18px 28px; }
+.menu-toggle { display: none; font-size: 20px; cursor: pointer; margin-right: 10px; color: #374151; }
+@media (max-width: 768px) {
+  .side {
+    position: fixed; z-index: 300; left: 0; top: 0;
+    transform: translateX(-100%); transition: transform 0.22s ease;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+  }
+  .side.open { transform: none; }
+  .menu-toggle { display: inline-flex; }
+  .main { padding: 12px; }
+}
 </style>

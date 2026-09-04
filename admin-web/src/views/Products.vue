@@ -53,7 +53,7 @@
     </el-card>
 
     <!-- 新增 / 编辑对话框 -->
-    <el-dialog v-model="dialog.visible" :title="dialog.isEdit ? '编辑商品' : '新增商品'" width="720px" top="6vh">
+    <el-dialog v-model="dialog.visible" :title="dialog.isEdit ? '编辑商品' : '新增商品'" width="min(720px, 94vw)" top="6vh">
       <el-form label-width="82px">
         <el-row :gutter="12">
           <el-col :span="12"><el-form-item label="商品分类" required>

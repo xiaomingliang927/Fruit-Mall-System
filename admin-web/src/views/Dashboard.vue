@@ -15,7 +15,7 @@
 
     <!-- 趋势图 + 分类营业额占比 -->
     <el-row :gutter="12" style="margin-top: 12px">
-      <el-col :span="16">
+      <el-col :xs="24" :md="16">
         <el-card shadow="never" class="panel">
           <template #header>
             <div class="ptitle">近 7 日销售趋势<span class="psub">销售额（元）与支付订单数</span></div>
@@ -42,7 +42,7 @@
 
     <!-- 状态分布 + 热销榜 + 最近订单 -->
     <el-row :gutter="12" style="margin-top: 12px">
-      <el-col :span="7">
+      <el-col :xs="24" :sm="12" :md="7">
         <el-card shadow="never" class="panel">
           <template #header><div class="ptitle">订单状态分布</div></template>
           <div ref="donutRef" class="chart" style="height: 250px"></div>
@@ -61,7 +61,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="9">
+      <el-col :xs="24" :md="9">
         <el-card shadow="never" class="panel">
           <template #header>
             <div class="ptitle">最近订单<el-link type="primary" style="margin-left:auto" @click="$router.push('/orders')">全部 →</el-link></div>
@@ -233,7 +233,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 /* 指标卡：平面白卡 + 细边框，去装饰 */
-.cards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 12px; }
 .card {
   background: #fff; border: 1px solid #e8ebee; border-radius: 8px; padding: 16px 18px;
   display: flex; align-items: center; justify-content: space-between;

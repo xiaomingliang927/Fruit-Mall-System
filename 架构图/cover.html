@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Microsoft YaHei","PingFang SC",sans-serif; margin:0; }
+  .cover { width:1400px; height:640px; position:relative; overflow:hidden;
+           background:linear-gradient(120deg,#14532d 0%,#1f7a3d 55%,#2e9e5b 100%); }
+  .deco { position:absolute; font-size:170px; opacity:.14; }
+  .d1 { top:-30px; right:60px; transform:rotate(12deg); }
+  .d2 { bottom:-40px; left:40px; transform:rotate(-10deg); }
+  .d3 { top:180px; right:340px; font-size:110px; opacity:.10; }
+  .content { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; padding:0 90px; }
+  .kicker { display:inline-flex; align-items:center; gap:10px; color:#ffd166; font-size:20px; letter-spacing:6px; font-weight:700; }
+  h1 { color:#fff; font-size:64px; letter-spacing:4px; margin:18px 0 14px; }
+  .sub { color:rgba(255,255,255,.92); font-size:24px; letter-spacing:1px; }
+  .ends { display:flex; gap:16px; margin-top:44px; }
+  .end { background:rgba(255,255,255,.14); border:1.5px solid rgba(255,255,255,.45); color:#fff;
+         border-radius:999px; padding:11px 26px; font-size:20px; letter-spacing:2px; }
+  .stripe { position:absolute; left:0; right:0; bottom:0; height:10px;
+            background:linear-gradient(90deg,#ffd166 0%,#ff8c42 50%,#ffd166 100%); }
+</style>
+</head>
+<body>
+<div class="cover">
+  <span class="deco d1">🍊</span>
+  <span class="deco d2">🍇</span>
+  <span class="deco d3">🍎</span>
+  <div class="content">
+    <span class="kicker">🍎 个人全栈项目实战</span>
+    <h1>我做了一个水果商城</h1>
+    <div class="sub">网站 + 管理后台 + 微信小程序 —— 三端一体，共用一个后端</div>
+    <div class="ends">
+      <span class="end">🖥️ 用户网站</span>
+      <span class="end">📱 微信小程序</span>
+      <span class="end">🛠️ 管理后台</span>
+    </div>
+  </div>
+  <div class="stripe"></div>
+</div>
+</body>
+</html>

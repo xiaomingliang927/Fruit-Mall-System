@@ -166,7 +166,7 @@
 					uni.showToast({ title: '请选择商品', icon: 'none' })
 					return
 				}
-				uni.showToast({ title: '结算功能开发中', icon: 'none' })
+				uni.navigateTo({ url: '/pages/checkout/checkout' })
 			}
 		}
 	}
@@ -388,6 +388,16 @@
 		box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
 		z-index: 99;
 	}
+
+	/* #ifdef H5 */
+	/* uni-h5 的内置 TabBar 悬浮在页面底部（z-index 998），
+	   贴底的结算栏会被它完全盖住——H5 上把结算栏抬到 TabBar 上方 */
+	.settle-bar {
+		bottom: 50px;
+		z-index: 999;
+		padding-bottom: 16rpx;
+	}
+	/* #endif */
 
 	.settle-all {
 		display: flex;

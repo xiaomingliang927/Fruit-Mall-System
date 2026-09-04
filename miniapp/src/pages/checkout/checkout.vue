@@ -44,6 +44,19 @@
       <view class="sum">应付 <text class="total">¥{{ yuan(payAmount) }}</text><text v-if="couponDiscount > 0" class="cut"> 券已减 ¥{{ yuan(couponDiscount) }}</text></view>
       <view class="submit" @tap="submit">提交订单</view>
     </view>
+
+    <!-- 支付确认：uni.showModal 在 H5 上渲染不可见，改用页面内弹窗 -->
+    <view v-if="showPay" class="paymask" @tap="closePay">
+      <view class="paycard" @tap.stop>
+        <view class="pay-emoji">✅</view>
+        <view class="pay-title">下单成功</view>
+        <view class="pay-desc">演示环境：确认后模拟微信支付完成付款</view>
+        <view class="pay-btns">
+          <view class="pay-btn ghost" @tap="closePay">取消</view>
+          <view class="pay-btn primary" @tap="confirmPay">模拟支付</view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -51,6 +64,7 @@
 import { computed, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { api, yuan } from '../../api'
+import { clearCart, removeFromCart, updateCartBadge } from '../../utils/cart.js'
 
 const addresses = ref([])
 const addressId = ref(null)
@@ -59,6 +73,9 @@ const lines = ref([])
 		const usableCoupons = ref([])
 		const userCouponId = ref(null)
 const buyNowMode = ref(false)
+const buyProductId = ref(null)
+const showPay = ref(false)
+const paidOrderNo = ref('')
 const form = ref({ receiver: '', phone: '', province: '', city: '', district: '', detail: '' })
 
 const totalAmount = computed(() => lines.value.reduce((s, l) => s + l.amount, 0))
@@ -77,6 +94,7 @@ onLoad(async (opt) => {
 
   if (opt.skuId) {
     buyNowMode.value = true
+    buyProductId.value = Number(opt.productId)
     const p = await api.get(`/api/v1/products/${opt.productId}`)
     const sku = p.skus.find((s) => s.id === Number(opt.skuId))
     const qty = Number(opt.qty) || 1
@@ -117,20 +135,36 @@ async function submit() {
       items: lines.value.map((l) => ({ skuId: l.skuId, quantity: l.qty })),
       userCouponId: userCouponId.value || undefined,
     })
-    if (!buyNowMode.value) await api.delete('/api/v1/cart/items/checked')
-    const { confirm } = await uni.showModal({
-      title: '下单成功',
-      content: '演示环境：确认后模拟微信支付完成付款',
-      confirmText: '模拟支付',
-    })
-    if (confirm) {
-      await api.post(`/api/v1/payments/${orderNo}/mock-pay`)
-      uni.showToast({ title: '支付成功', icon: 'success' })
+    if (!buyNowMode.value) {
+      // 购物车模式：服务端已删勾选项，本地镜像同步清空
+      await api.delete('/api/v1/cart/items/checked')
+      clearCart()
+    } else if (buyProductId.value) {
+      // 立即购买模式：只移除本商品
+      removeFromCart(buyProductId.value)
     }
-    setTimeout(() => uni.switchTab({ url: '/pages/orders/orders' }), 800)
+    updateCartBadge()
+    paidOrderNo.value = orderNo
+    showPay.value = true
   } catch (e) {
     uni.showToast({ title: e.message, icon: 'none' })
   }
+}
+
+async function confirmPay() {
+  showPay.value = false
+  try {
+    await api.post(`/api/v1/payments/${paidOrderNo.value}/mock-pay`)
+    uni.showToast({ title: '支付成功（演示）', icon: 'success' })
+  } catch (e) {
+    uni.showToast({ title: e.message, icon: 'none' })
+  }
+  setTimeout(() => uni.switchTab({ url: '/pages/orders/orders' }), 800)
+}
+
+function closePay() {
+  showPay.value = false
+  setTimeout(() => uni.switchTab({ url: '/pages/orders/orders' }), 400)
 }
 </script>
 
@@ -169,4 +203,22 @@ async function submit() {
 	.cpn-line-name { font-size: 25rpx; font-weight: 600; }
 	.cpn-line-sub { font-size: 21rpx; color: #a5aca1; margin-top: 4rpx; }
 	.cpn-line-amt { color: #f24e3e; font-weight: 700; font-size: 26rpx; }
+	.paymask {
+		position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); z-index: 9999;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.paycard {
+		width: 560rpx; background: #fff; border-radius: 28rpx; padding: 44rpx 36rpx 36rpx;
+		display: flex; flex-direction: column; align-items: center;
+		box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.25);
+	}
+	.pay-emoji { font-size: 72rpx; line-height: 1; }
+	.pay-title { font-size: 34rpx; font-weight: 700; color: #1f2937; margin-top: 18rpx; letter-spacing: 2rpx; }
+	.pay-desc { font-size: 24rpx; color: #6b7280; margin-top: 12rpx; text-align: center; line-height: 1.6; }
+	.pay-btns { display: flex; gap: 20rpx; margin-top: 34rpx; width: 100%; }
+	.pay-btn {
+		flex: 1; text-align: center; padding: 18rpx 0; border-radius: 40rpx; font-size: 28rpx; font-weight: 600;
+	}
+	.pay-btn.ghost { background: #f3f4f6; color: #4b5563; }
+	.pay-btn.primary { background: #2e9e5b; color: #fff; }
 </style>
