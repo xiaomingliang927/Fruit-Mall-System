@@ -10,16 +10,17 @@
 set -euo pipefail
 
 SERVER="root@116.62.60.53"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../" && pwd)"   # 仓库根目录（scripts→技能→skills→.agents→根）
 # 某些终端环境 HOME 乱码导致读不到 known_hosts，accept-new 保证仍可连接
 # 部分终端 HOME 会被 GBK 破坏导致 ssh 找不到 ~/.ssh 密钥——显式指定密钥路径免疫此问题
-SSH_KEY="$(dirname "$(dirname "$ROOT")")/.ssh/id_ed25519"
-SSH_KNOWN="$(dirname "$(dirname "$ROOT")")/.ssh/known_hosts"
+USER_HOME="$(dirname "$(dirname "$ROOT")")"           # → C:/Users/<用户名>
+SSH_KEY="$USER_HOME/.ssh/id_ed25519"
+SSH_KNOWN="$USER_HOME/.ssh/known_hosts"
 SSH_OPTS="-i $SSH_KEY -o UserKnownHostsFile=$SSH_KNOWN -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
 REMOTE_DIR="/www/fruitmall"
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../" && pwd)"   # 仓库根目录（scripts→技能→skills→.agents→根）
 
 # 兼容部分终端 HOME 变量被 GBK 破坏的情况（否则 ssh 找不到 ~/.ssh 密钥，报 Permission denied）
-export HOME="$(dirname "$(dirname "$ROOT")")"   # → C:/Users/<用户名>
+export HOME="$USER_HOME"
 
 MODE="all"
 [ "${1:-}" = "--frontend-only" ] && MODE="fe"

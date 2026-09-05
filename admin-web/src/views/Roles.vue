@@ -68,7 +68,7 @@
     </el-card>
 
     <!-- 角色编辑 -->
-    <el-dialog v-model="dlg.visible" :title="dlg.id ? '配置权限 · ' + dlg.name : '新建角色'" width="620px">
+    <el-dialog v-model="dlg.visible" :title="dlg.id ? '配置权限 · ' + dlg.name : '新建角色'" width="min(620px, 94vw)">
       <el-form label-width="80px">
         <el-form-item label="角色名" required>
           <el-input v-model="dlg.name" maxlength="32" placeholder="如：商品运营" />
@@ -120,7 +120,7 @@
     </el-dialog>
 
     <!-- 账号分配角色 -->
-    <el-dialog v-model="assignDlg.visible" :title="'分配角色 · ' + assignDlg.username" width="480px">
+    <el-dialog v-model="assignDlg.visible" :title="'分配角色 · ' + assignDlg.username" width="min(480px, 94vw)">
       <el-select v-model="assignDlg.roleIds" multiple style="width: 100%" placeholder="选择角色（可多选）">
         <el-option v-for="r in roles" :key="r.id" :label="r.name" :value="r.id" />
       </el-select>

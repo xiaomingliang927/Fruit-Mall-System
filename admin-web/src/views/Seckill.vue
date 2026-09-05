@@ -56,7 +56,7 @@
     </el-card>
 
     <!-- 新建 / 编辑秒杀 -->
-    <el-dialog v-model="dlg.visible" :title="dlg.id ? '编辑秒杀' : '新建秒杀'" width="560px">
+    <el-dialog v-model="dlg.visible" :title="dlg.id ? '编辑秒杀' : '新建秒杀'" width="min(560px, 94vw)">
       <el-form label-width="90px">
         <el-form-item label="活动名" required>
           <el-input v-model="dlg.name" placeholder="如：智利车厘子 JJ 级 限时秒杀" />

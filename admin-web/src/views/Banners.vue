@@ -53,7 +53,7 @@
       </div>
     </el-card>
 
-    <el-dialog v-model="dlg.visible" :title="dlg.id ? '编辑轮播图' : '新建轮播图'" width="560px">
+    <el-dialog v-model="dlg.visible" :title="dlg.id ? '编辑轮播图' : '新建轮播图'" width="min(560px, 94vw)">
       <el-form label-width="90px">
         <el-form-item label="标题" required>
           <el-input v-model="dlg.title" maxlength="64" placeholder="后台标识用，如：当季西瓜大促" />

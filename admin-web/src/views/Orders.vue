@@ -79,7 +79,7 @@
     </el-drawer>
 
     <!-- 发货对话框 -->
-    <el-dialog v-model="ship.visible" title="订单发货" width="420px">
+    <el-dialog v-model="ship.visible" title="订单发货" width="min(420px, 94vw)">
       <p style="margin-bottom:12px;color:#606266">订单号：{{ ship.orderNo }}</p>
       <el-input v-model="ship.trackingNo" placeholder="请输入快递运单号" />
       <template #footer>

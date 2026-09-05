@@ -1,5 +1,7 @@
 <template>
   <el-container class="shell">
+    <!-- 手机端抽屉遮罩 -->
+    <div class="side-mask" :class="{ show: sidebarOpen }" @click="sidebarOpen = false"></div>
     <!-- 侧边栏 -->
     <aside class="side" :class="{ open: sidebarOpen }">
       <div class="brand">
@@ -119,6 +121,7 @@ function onCommand(cmd) {
 /* ===== 主区 ===== */
 .main { padding: 16px 18px 28px; }
 .menu-toggle { display: none; font-size: 20px; cursor: pointer; margin-right: 10px; color: #374151; }
+.side-mask { display: none; }
 @media (max-width: 768px) {
   .side {
     position: fixed; z-index: 300; left: 0; top: 0;
@@ -127,6 +130,10 @@ function onCommand(cmd) {
   }
   .side.open { transform: none; }
   .menu-toggle { display: inline-flex; }
+  .side-mask.show {
+    display: block; position: fixed; inset: 0; z-index: 290;
+    background: rgba(15, 23, 42, 0.45);
+  }
   .main { padding: 12px; }
 }
 </style>

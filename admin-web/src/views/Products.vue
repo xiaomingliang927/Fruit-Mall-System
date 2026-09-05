@@ -56,20 +56,20 @@
     <el-dialog v-model="dialog.visible" :title="dialog.isEdit ? '编辑商品' : '新增商品'" width="min(720px, 94vw)" top="6vh">
       <el-form label-width="82px">
         <el-row :gutter="12">
-          <el-col :span="12"><el-form-item label="商品分类" required>
+          <el-col :xs="24" :sm="12"><el-form-item label="商品分类" required>
             <el-select v-model="form.categoryId" style="width:100%">
               <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id" />
             </el-select>
           </el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="商品名称" required>
+          <el-col :xs="24" :sm="12"><el-form-item label="商品名称" required>
             <el-input v-model="form.name" placeholder="如：阿克苏冰糖心苹果" />
           </el-form-item></el-col>
         </el-row>
         <el-form-item label="卖点副标题"><el-input v-model="form.subtitle" /></el-form-item>
         <el-row :gutter="12">
-          <el-col :span="8"><el-form-item label="产地"><el-input v-model="form.origin" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="计量单位"><el-input v-model="form.unit" placeholder="斤 / 箱 / 盒" /></el-form-item></el-col>
-          <el-col :span="8"><el-form-item label="标签"><el-input v-model="form.tags" placeholder="逗号分隔" /></el-form-item></el-col>
+          <el-col :xs="24" :sm="8"><el-form-item label="产地"><el-input v-model="form.origin" /></el-form-item></el-col>
+          <el-col :xs="24" :sm="8"><el-form-item label="计量单位"><el-input v-model="form.unit" placeholder="斤 / 箱 / 盒" /></el-form-item></el-col>
+          <el-col :xs="24" :sm="8"><el-form-item label="标签"><el-input v-model="form.tags" placeholder="逗号分隔" /></el-form-item></el-col>
         </el-row>
         <el-form-item label="主图地址">
           <el-select v-model="form.mainImage" style="width:100%" filterable allow-create>
@@ -82,10 +82,10 @@
         <el-form-item label="规格 SKU" required>
           <div style="width:100%">
             <div v-for="(s, i) in form.skus" :key="i"
-                 style="display:flex;gap:10px;margin-bottom:10px;align-items:center">
+                 style="display:flex;gap:10px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
               <el-input v-model="s.spec" placeholder="规格名，如 5斤装" style="width:180px" :disabled="!!s.id" />
-              <el-input-number v-model="s.priceYuan" :min="0.01" :precision="2" :step="1" placeholder="元" />
-              <el-input-number v-model="s.stock" :min="0" :step="10" placeholder="库存" />
+              <el-input-number v-model="s.priceYuan" :min="0.01" :precision="2" :step="1" placeholder="元" style="width:140px" />
+              <el-input-number v-model="s.stock" :min="0" :step="10" placeholder="库存" style="width:140px" />
               <el-button v-if="!s.id" circle type="danger" plain size="small"
                          @click="form.skus.splice(i, 1)">－</el-button>
               <el-tag v-else size="small" type="info">已有 SKU（规格不可改）</el-tag>

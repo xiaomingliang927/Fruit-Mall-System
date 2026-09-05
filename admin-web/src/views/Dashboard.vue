@@ -23,7 +23,7 @@
           <div ref="trendRef" class="chart" style="height: 290px"></div>
         </el-card>
       </el-col>
-      <el-col :span="8">
+      <el-col :xs="24" :md="8">
         <el-card shadow="never" class="panel">
           <template #header><div class="ptitle">分类营业额占比<span class="psub">已支付订单</span></div></template>
           <div ref="pieRef" class="chart" style="height: 190px"></div>
@@ -48,7 +48,7 @@
           <div ref="donutRef" class="chart" style="height: 250px"></div>
         </el-card>
       </el-col>
-      <el-col :span="8">
+      <el-col :xs="24" :sm="12" :md="8">
         <el-card shadow="never" class="panel">
           <template #header><div class="ptitle">热销商品 TOP10<span class="psub">按累计销量</span></div></template>
           <div class="rank-list">

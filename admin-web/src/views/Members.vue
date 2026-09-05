@@ -69,7 +69,7 @@
     </el-card>
 
     <!-- 新增 / 续费会员 -->
-    <el-dialog v-model="dlg.visible" title="新增 / 续费会员" width="440px">
+    <el-dialog v-model="dlg.visible" title="新增 / 续费会员" width="min(440px, 94vw)">
       <el-form label-width="82px">
         <el-form-item label="手机号" required>
           <el-input v-model="dlg.phone" maxlength="11" placeholder="11 位手机号；已存在则自动续费" />
