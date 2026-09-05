@@ -89,6 +89,11 @@ bash .agents/skills/fruit-deploy/scripts/deploy.sh --backend-only   # 只发后�
 8. **宝塔 MySQL root 密码与面板记录可能不同步**：以服务器
    `/www/fruitmall/backend/.db_password` 和用户自己改的为准；应用库账号是
    `fruit`（宝塔建），后端连 `fruit` 库。
+9. **"改了没生效"先查浏览器缓存**：Nginx 若不给 index.html 发 `Cache-Control`，
+   浏览器会启发式缓存旧入口页，新构建上线的功能（如移动端抽屉遮罩）用户端
+   永远看不到，且桌面 curl 测不出来。已在 `deploy/nginx/*.conf` 加：HTML
+   `no-cache`、`/assets/`（带哈希文件名）`max-age=31536000, immutable`。
+   改 Nginx 配置后记得 `nginx -t && nginx -s reload`，并让用户下拉刷新一次。
 
 ## 部署后变更记录习惯
 
