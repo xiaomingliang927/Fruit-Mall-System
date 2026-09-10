@@ -53,6 +53,8 @@ function isOnTabBar() {
 
 export function updateCartBadge() {
 	const count = getCartCount()
+	// #ifdef MP-WEIXIN
+	// 微信端：非 TabBar 页调用 setTabBarBadge 会抛错，必须先判断
 	if (!isOnTabBar()) return
 	try {
 		if (count > 0) {
@@ -61,6 +63,18 @@ export function updateCartBadge() {
 			uni.removeTabBarBadge({ index: 2 })
 		}
 	} catch (e) { /* 非 TabBar 页场景兜底，忽略 */ }
+	// #endif
+	// #ifdef H5
+	// H5：TabBar 是全局悬浮组件，任何页面都能更新；
+	// 当前 alpha 版 uni-h5 的 removeTabBarBadge 是静默空实现，清零时直接移除角标节点
+	try {
+		if (count > 0) {
+			uni.setTabBarBadge({ index: 2, text: count > 99 ? '99+' : String(count) })
+		} else {
+			document.querySelectorAll('uni-tabbar .uni-badge, uni-tabbar [class*="badge"]').forEach((el) => el.remove())
+		}
+	} catch (e) { /* 忽略 */ }
+	// #endif
 }
 
 /** 用商品信息造一份快照；拿不到（如 id 不存在）时给兜底值，保证购物车永远能渲染 */
@@ -78,11 +92,15 @@ function snapshot(id) {
 	}
 }
 
-export function addToCart(id, qty = 1) {
+export function addToCart(id, qty = 1, overrides = {}) {
 	const cart = getCart()
 	const snap = cart[id] && typeof cart[id] === 'object' ? cart[id] : snapshot(id)
 	snap.qty = Math.min((snap.qty || 0) + qty, 99)
 	snap.id = Number(id)
+	// 详情页选中 SKU 时：覆盖规格/价格；skuId 变化则重置服务端 itemId
+	if (overrides.skuId && overrides.skuId !== snap.skuId) { snap.skuId = overrides.skuId; snap.itemId = null }
+	if (overrides.spec) snap.spec = overrides.spec
+	if (overrides.price) snap.price = overrides.price
 	cart[id] = snap
 	saveCart(cart)
 	const sel = getSelected(); sel[id] = true; saveSelected(sel)
@@ -157,6 +175,17 @@ export function getCartCount() {
 	return Object.values(cart).reduce((a, c) => a + ((c && c.qty) || 0), 0)
 }
 
+/** 各商品在购物车中的数量：{ productId: qty }。商品卡红点角标用。 */
+export function getCartCounts() {
+	const cart = getCart()
+	const out = {}
+	Object.keys(cart).forEach((k) => {
+		const s = cart[k]
+		if (s && typeof s === 'object' && s.qty > 0) out[s.id || Number(k)] = s.qty
+	})
+	return out
+}
+
 /** 直接返回本地快照，不依赖 PRODUCTS；任何购物车项都能渲染出来 */
 export function getCartList() {
 	const cart = getCart()
@@ -202,6 +231,25 @@ export async function syncFromServer() {
 		})
 		saveCart(cart); saveSelected(sel)
 	} catch (e) { /* 静默 */ }
+}
+
+/** 登录后把「未登录期间加入本地购物车」的商品推到服务端。
+ *  游客加购只存本地，而结算页读的是服务端购物车——
+ *  不推的话，登录后去结算会发现商品清单是空的。 */
+export async function pushLocalToServer() {
+	if (!uni.getStorageSync('token')) return
+	try {
+		const data = await api.get('/api/v1/cart')
+		const remoteSkus = new Set(((data && data.items) || []).map((it) => it.skuId))
+		const cart = getCart()
+		for (const id of Object.keys(cart)) {
+			const snap = cart[id]
+			if (!snap || typeof snap !== 'object' || !snap.skuId) continue
+			if (remoteSkus.has(snap.skuId)) continue
+			try { await api.post('/api/v1/cart/items', { skuId: snap.skuId, quantity: snap.qty || 1 }) } catch (e) { /* 单项失败不阻断 */ }
+		}
+	} catch (e) { /* 网络异常静默，下次登录再补 */
+	}
 }
 
 /** 退出登录：清空本地镜像与角标 */

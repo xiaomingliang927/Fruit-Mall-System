@@ -76,10 +76,16 @@ public class ProductService {
     }
 
     public PageResult<ProductListVO> pageProducts(Long categoryId, String keyword, long page, long size) {
+        // 关键词同时匹配名称/副标题/标签/产地：用户搜「智利」「进口」「车厘子」都应命中
+        String kw = StringUtils.hasText(keyword) ? keyword.trim() : null;
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<Product>()
                 .eq(Product::getStatus, 1)
                 .eq(categoryId != null, Product::getCategoryId, categoryId)
-                .like(StringUtils.hasText(keyword), Product::getName, keyword)
+                .and(kw != null, w -> w
+                        .like(Product::getName, kw)
+                        .or().like(Product::getSubtitle, kw)
+                        .or().like(Product::getTags, kw)
+                        .or().like(Product::getOrigin, kw))
                 .orderByDesc(Product::getSales);
         Page<Product> result = productMapper.selectPage(new Page<>(page, size), wrapper);
         Map<Long, Long> firstSkuByProduct = firstSkuByProduct(

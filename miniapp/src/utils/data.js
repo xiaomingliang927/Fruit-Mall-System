@@ -101,3 +101,32 @@ export function getProductsByCat(cat) {
 	if (cat === '推荐') return PRODUCTS
 	return PRODUCTS.filter((p) => p.cat === cat)
 }
+
+/**
+ * 把搜索接口返回的商品并入本地缓存。
+ * 搜索结果可能不在首页首屏那 50 条里，不并入的话加购时 snapshot() 取不到
+ * 名称/图片，购物车会出现「商品 · ¥0」这样的空壳。
+ * @param {Array} list 后端 /api/v1/products 的 records 原始项
+ * @returns {Array} 转成页面结构的商品数组
+ */
+export function mergeProducts(list) {
+	const arr = Array.isArray(list) ? list : []
+	return arr.map((p) => {
+		const item = {
+			id: p.id,
+			skuId: p.firstSkuId,
+			name: p.name,
+			spec: p.subtitle || '',
+			price: (p.minPrice || 0) / 100,
+			unit: p.unit ? '/' + p.unit : '',
+			img: imgUrl(p.mainImage),
+			tag: (p.tags || '').split(',').filter(Boolean)[0] || '',
+			cat: catNameById[p.categoryId] || '',
+			sales: p.sales || 0
+		}
+		const idx = PRODUCTS.findIndex((x) => x.id === item.id)
+		if (idx >= 0) Object.assign(PRODUCTS[idx], item)
+		else PRODUCTS.push(item)
+		return item
+	})
+}

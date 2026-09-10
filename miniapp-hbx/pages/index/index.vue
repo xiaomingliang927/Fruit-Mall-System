@@ -12,10 +12,10 @@
 					<view class="icon-btn" @click="showToast('暂无新消息')"><image src="/static/icon/png/bell-white.png" mode="aspectFit" class="bell-icon"></image></view>
 				</view>
 			</view>
-			<view class="searchbar" @click="showToast('搜索功能开发中')">
+			<view class="searchbar" @click="goSearch">
 				<text class="cat-icon">☰</text>
 				<text class="cat-text">分类</text>
-				<text class="search-txt">搜索新鲜水果</text>
+				<text class="search-txt">{{ hotKeyword ? '大家都在搜：' + hotKeyword : '搜索新鲜水果' }}</text>
 				<view class="search-btn">搜索</view>
 			</view>
 		</view>
@@ -44,7 +44,7 @@
 			<!-- 金刚区（5列圆形图） -->
 			<view class="grid-v2">
 				<view class="grid-row" v-for="(row, ri) in gridRows" :key="ri">
-					<view class="grid-cell" v-for="c in row" :key="c.lb" @click="showToast(c.lb + '（原型占位）')">
+					<view class="grid-cell" v-for="c in row" :key="c.lb" @click="goCatCell(c)">
 						<view class="grid-ic"><image :src="c.img" mode="aspectFill" class="grid-ic-img"></image></view>
 						<text class="grid-lb">{{ c.lb }}</text>
 					</view>
@@ -79,7 +79,7 @@
 							<text class="p-sp">{{ getProduct(id).spec }}{{ getProduct(id).unit }}</text>
 							<view class="p-btm">
 								<view class="p-pr"><text class="p-price">¥{{ getProduct(id).price }}</text><text class="p-unit">{{ getProduct(id).unit }}</text></view>
-								<view class="p-add" @click.stop="addCart(id)"><text class="add-icon">+</text></view>
+								<view class="p-add" @click.stop="addCart(id)"><text class="add-icon">+</text><view v-if="cartCounts[id]" class="add-badge">{{ cartCounts[id] }}</view></view>
 							</view>
 						</view>
 					</view>
@@ -91,8 +91,8 @@
 </template>
 
 <script>
-	import { IMG, PRODUCTS, FLASH_IDS, HOT_IDS, getProduct } from '@/utils/data.js'
-	import { addToCart, updateCartBadge } from '@/utils/cart.js'
+	import { IMG, PRODUCTS, FLASH_IDS, HOT_IDS, getProduct, CAT_LINK } from '@/utils/data.js'
+	import { addToCart, getCartCounts, updateCartBadge } from '@/utils/cart.js'
 	import { api, imgUrl } from '@/api'
 
 	export default {
@@ -101,22 +101,24 @@
 				IMG,
 				FLASH_IDS,
 				HOT_IDS,
+				cartCounts: {},
 				banners: [],
+				hotKeyword: '',
 				statusBarHeight: 20,
 				countdown: 2 * 3600 + 59 * 60 + 59,
 				countdownText: '02:59:59',
 				timer: null,
 				gridCats: [
-					{ lb: '时令鲜果', img: IMG.apple },
-					{ lb: '苹果专区', img: IMG.apple },
-					{ lb: '柑橘橙柚', img: IMG.orange },
-					{ lb: '热带水果', img: IMG.mango },
-					{ lb: '浆果莓类', img: IMG.strawberry },
-					{ lb: '瓜类精选', img: IMG.watermelon },
-					{ lb: '果切礼盒', img: IMG.pineapple },
-					{ lb: '果汁饮品', img: IMG.grape },
-					{ lb: '进口优选', img: IMG.blueberry },
-					{ lb: '会员专享', img: IMG.dragonfruit }
+					{ lb: '时令鲜果', img: IMG.apple, to: '时令鲜果' },
+					{ lb: '苹果专区', img: IMG.apple, to: '国产精品' },
+					{ lb: '柑橘橙柚', img: IMG.orange, to: '国产精品' },
+					{ lb: '热带水果', img: IMG.mango, to: '进口水果' },
+					{ lb: '浆果莓类', img: IMG.strawberry, to: '进口水果' },
+					{ lb: '瓜类精选', img: IMG.watermelon, to: '国产精品' },
+					{ lb: '果切礼盒', img: IMG.pineapple, to: '精品礼盒' },
+					{ lb: '果汁饮品', img: IMG.grape, to: '时令鲜果' },
+					{ lb: '进口优选', img: IMG.blueberry, to: '进口水果' },
+					{ lb: '会员专享', img: IMG.dragonfruit, to: '精品礼盒' }
 				]
 			}
 		},
@@ -136,7 +138,9 @@
 			this.loadBanners()
 		},
 		onShow() {
+			this.cartCounts = getCartCounts()
 			this.updateTabBar()
+			this.pickHotKeyword()
 		},
 		onUnload() {
 			if (this.timer) clearInterval(this.timer)
@@ -144,6 +148,16 @@
 		methods: {
 			getProduct,
 			imgUrl,
+			/** 搜索框占位词用热销第一名的商品名，比写死「搜索新鲜水果」更有引导性 */
+			pickHotKeyword() {
+				const first = HOT_IDS[0] || FLASH_IDS[0]
+				if (!first) return
+				const p = getProduct(first)
+				if (p && p.name && p.name !== '加载中…') this.hotKeyword = p.name
+			},
+			goSearch() {
+				uni.navigateTo({ url: '/pages/search/search' })
+			},
 			loadBanners() {
 				api.get('/api/v1/banners?position=home')
 					.then((list) => { this.banners = Array.isArray(list) ? list : [] })
@@ -182,9 +196,15 @@
 			},
 			addCart(id) {
 				addToCart(id)
+				this.cartCounts = getCartCounts()
 				updateCartBadge()
 				this.updateTabBar()
 				uni.showToast({ title: '已加入购物车', icon: 'none' })
+			},
+			/** 分类宫格：跳到分类页并选中对应分类 */
+			goCatCell(c) {
+				CAT_LINK.pending = c.to || '推荐'
+				uni.switchTab({ url: '/pages/category/category' })
 			},
 			showToast(msg) {
 				uni.showToast({ title: msg, icon: 'none' })
@@ -260,7 +280,8 @@
 	.p-btm { display: flex; align-items: center; justify-content: space-between; margin-top: 14rpx; }
 	.p-price { color: #f24e3e; font-size: 32rpx; font-weight: 700; }
 	.p-unit { font-size: 20rpx; color: #bbb; }
-	.p-add { width: 56rpx; height: 56rpx; border-radius: 50%; background: #2e9e6b; color: #fff; display: flex; align-items: center; justify-content: center; }
+	.p-add { position: relative; width: 56rpx; height: 56rpx; border-radius: 50%; background: #2e9e6b; color: #fff; display: flex; align-items: center; justify-content: center; }
+	.add-badge { position: absolute; top: -10rpx; right: -10rpx; min-width: 30rpx; height: 30rpx; border-radius: 15rpx; background: #e54d42; color: #fff; font-size: 19rpx; line-height: 30rpx; text-align: center; padding: 0 5rpx; font-weight: 700; box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.2); }
 	.live-fab {
 		position: fixed; right: 28rpx; bottom: 160rpx; width: 104rpx; height: 104rpx;
 		border-radius: 50%; background: linear-gradient(135deg, #43c98a, #1f8a58);

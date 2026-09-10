@@ -12,10 +12,10 @@
 					<view class="icon-btn" @click="showToast('暂无新消息')"><image src="/static/icon/png/bell-white.png" mode="aspectFit" class="bell-icon"></image></view>
 				</view>
 			</view>
-			<view class="searchbar" @click="showToast('搜索功能开发中')">
+			<view class="searchbar" @click="goSearch">
 				<text class="cat-icon">☰</text>
 				<text class="cat-text">分类</text>
-				<text class="search-txt">搜索新鲜水果</text>
+				<text class="search-txt">{{ hotKeyword ? '大家都在搜：' + hotKeyword : '搜索新鲜水果' }}</text>
 				<view class="search-btn">搜索</view>
 			</view>
 		</view>
@@ -103,6 +103,7 @@
 				HOT_IDS,
 				cartCounts: {},
 				banners: [],
+				hotKeyword: '',
 				statusBarHeight: 20,
 				countdown: 2 * 3600 + 59 * 60 + 59,
 				countdownText: '02:59:59',
@@ -139,6 +140,7 @@
 		onShow() {
 			this.cartCounts = getCartCounts()
 			this.updateTabBar()
+			this.pickHotKeyword()
 		},
 		onUnload() {
 			if (this.timer) clearInterval(this.timer)
@@ -146,6 +148,16 @@
 		methods: {
 			getProduct,
 			imgUrl,
+			/** 搜索框占位词用热销第一名的商品名，比写死「搜索新鲜水果」更有引导性 */
+			pickHotKeyword() {
+				const first = HOT_IDS[0] || FLASH_IDS[0]
+				if (!first) return
+				const p = getProduct(first)
+				if (p && p.name && p.name !== '加载中…') this.hotKeyword = p.name
+			},
+			goSearch() {
+				uni.navigateTo({ url: '/pages/search/search' })
+			},
 			loadBanners() {
 				api.get('/api/v1/banners?position=home')
 					.then((list) => { this.banners = Array.isArray(list) ? list : [] })

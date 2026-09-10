@@ -7,6 +7,13 @@
       }
     },
     {
+      "path": "pages/search/search",
+      "style": {
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
       "path": "pages/live/live",
       "style": {
         "navigationBarTitleText": "直播"

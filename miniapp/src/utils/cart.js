@@ -92,11 +92,15 @@ function snapshot(id) {
 	}
 }
 
-export function addToCart(id, qty = 1) {
+export function addToCart(id, qty = 1, overrides = {}) {
 	const cart = getCart()
 	const snap = cart[id] && typeof cart[id] === 'object' ? cart[id] : snapshot(id)
 	snap.qty = Math.min((snap.qty || 0) + qty, 99)
 	snap.id = Number(id)
+	// 详情页选中 SKU 时：覆盖规格/价格；skuId 变化则重置服务端 itemId
+	if (overrides.skuId && overrides.skuId !== snap.skuId) { snap.skuId = overrides.skuId; snap.itemId = null }
+	if (overrides.spec) snap.spec = overrides.spec
+	if (overrides.price) snap.price = overrides.price
 	cart[id] = snap
 	saveCart(cart)
 	const sel = getSelected(); sel[id] = true; saveSelected(sel)
